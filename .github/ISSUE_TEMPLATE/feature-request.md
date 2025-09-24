@@ -1,4 +1,9 @@
-## ✨ Feature Request
+---
+name: "✨ Feature Request"
+about: "Create a feature request in ANTS"
+---
+
+# ✨ Feature Request
 <!-- Provide a clear and concise description of the feature proposal -->
 
 ## Requirements

@@ -1,3 +1,8 @@
+---
+name: "# 🐜 Bug Report"
+about: "Create a bug report in ANTS"
+---
+
 # 🐜 Bug Report
 <!-- Provide a clear description of what the bug is -->
 
