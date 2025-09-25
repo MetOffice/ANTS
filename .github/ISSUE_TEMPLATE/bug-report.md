@@ -18,7 +18,7 @@ I am using the ANTS x.y.z/developer/other(specify) <!-- Please delete as appropr
 environment.
 
 ## Version
-This bug exists in ANTS x.y.z/head of trunk <!-- Please delete as appropriate-->
+This bug exists in ANTS x.y.z/head of main <!-- Please delete as appropriate-->
 
 ## Additional Context
 <!-- Please add all other details and context here -->
