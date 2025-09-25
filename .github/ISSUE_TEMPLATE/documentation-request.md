@@ -1,6 +1,6 @@
 ---
 name: "📚 Documentation Request"
-about: "Create a documentation request  in ANTS"
+about: "Create a documentation request in ANTS"
 ---
 
 # 📚 Documentation Request
