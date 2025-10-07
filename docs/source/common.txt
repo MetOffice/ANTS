@@ -1,0 +1,30 @@
+.. |ancillary files| replace:: :term:`ancillary files`
+.. |binary| replace:: :term:`binary<binary operation>`
+.. |cubesphere| replace:: :term:`cubesphere`
+.. |cylc| replace:: :term:`cylc`
+.. |Iris| replace:: :term:`Iris`
+.. |JULES| replace:: :term:`JULES`
+.. |LFRic| replace:: :term:`LFRic`
+.. |Mule| replace:: :term:`Mule`
+.. |NetCDF| replace:: :term:`NetCDF`
+.. |netCDF file| replace:: :term:`netCDF file<NetCDF>`
+.. |polygon files| replace:: :term:`polygon files`
+.. |rose stem| replace:: :term:`rose stem`
+.. |UM| replace:: :term:`UM<Unified Model>`
+.. |unary| replace:: :term:`unary<unary operation>`
+.. |Unified Model| replace:: :term:`Unified Model`
+
+.. Links
+
+.. _ANTS Documentation: https://code.metoffice.gov.uk/doc/ancil/ants/latest/index.html
+.. _miao@metoffice.gov.uk: mailto:miao@metoffice.gov.uk
+.. _Cylc Documentation: https://cylc.github.io/cylc-doc/stable/html/index.html
+.. _Iris Documentation: https://scitools-iris.readthedocs.io/en/stable/index.html
+.. _JULES trac page: https://code.metoffice.gov.uk/trac/jules
+.. _Met Office: https://www.metoffice.gov.uk/
+.. _LFRic trac page: https://code.metoffice.gov.uk/trac/lfric/
+.. _Mule Documentation: https://code.metoffice.gov.uk/doc/um/mule/latest/
+.. _NetCDF Documentation: https://www.unidata.ucar.edu/software/netcdf/
+.. _Rose Stem Documentation: https://metomi.github.io/rose/doc/html/tutorial/rose/furthertopics/rose-stem.html
+.. _Shapely Documentation: https://shapely.readthedocs.io/en/latest/index.html
+.. _UM trac page: https://code.metoffice.gov.uk/trac/um
