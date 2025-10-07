@@ -2,7 +2,7 @@
 # By default black will exlude files with "build" in the filepath, but ants is installed
 # to $ROSE_SUITE_DIR/share/fcm_make_ants/build and we want these files to be checked.
 [tool.black]
-exclude = ".svn"
+exclude = ".git"
 
 [build-system]
 # Minimum requirements for the build system to execute, defined by PEP 518.
@@ -15,12 +15,10 @@ build-backend = 'setuptools.build_meta'
 [tool.isort]
 profile = "black"  # Black compatibility for isort.
 # By default isort will exclude "build", so override default.
-skip = ".svn"
+skip = ".git"
 
 # Configure pytest.
 [tool.pytest.ini_options]
-# rose_ana directory unittests are only run inside the test suite in order to
-# stay aligned with PYTHONPATH and Rose revisions used inside rose ana tasks.
 addopts = "--durations=5"
 filterwarnings = [
     # During unittesting only, treat all warnings as errors by default:

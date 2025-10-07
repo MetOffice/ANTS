@@ -10,9 +10,12 @@ Prerequisites
 
 In order to install and get ANTS running in full you will need the following:
 
- * An installed version of `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ and some `familiarity <https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_ with it
- * A local install of `mule and shumlib <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ - talk to your local UM support team if you need support with this
- * `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows
+ * An installed version of `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
+   and some `familiarity <https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_ with it
+ * A local install of `mule and shumlib <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ -
+   talk to your local UM support team if you need support with this
+ * `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and
+   `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows
 
 Depending on your local site configuration, it may be necessary to unset the
 ``LD_LIBRARY_PATH`` environment prior to running the following conda commands.
@@ -25,8 +28,8 @@ Installing conda dependencies
 
 To start with you will need to checkout a working copy of ANTS as::
 
-   $ fcm co https://code.metoffice.gov.uk/svn/ancil/ants/<branch>
-   $ cd <branch>
+   $ git clone git@github.com:MetOffice/ANTS.git
+   $ cd ANTS
 
 To install the dependencies for a specific release of ANTS, use the
 ``environment.lock`` file to create an environment with the dependency
