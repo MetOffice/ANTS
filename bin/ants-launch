@@ -1,0 +1,123 @@
+#!/bin/bash -l
+#
+# (C) Crown Copyright, Met Office. All rights reserved.
+#
+# This file is part of ANTS and is released under the BSD 3-Clause license.
+# See LICENSE.txt in the root of the repository for full licensing details.
+#
+# Usage ants-launch CMD_WITHOPTS
+#
+# This is a convenience script intended for use at sites where ants, scitools
+# and um_tools are available via module load commands. Where such central
+# provisioning is available the expected usage for most users is to want to
+# use the ANTS_MODULE to load in an ants module. The SCITOOLS_MODULE and
+# UM_UTILS_MODULE options are provided for those wishing to deploy their own
+# ANTS builds. A PYTHONPATH_PREPEND variable is used to extend the pythonpath
+# after loading in the appropriate module(s).
+#
+#
+# ENVIRONMENT
+#   ANTS_MODULE         The version of ants you want to run. If set, this will
+#                       take precedence over loading scitools and um_tools.
+#   SCITOOLS_MODULE     The version of the software stack you want to run. Will
+#                       not be used if ANTS_MODULE is set.
+#   UM_UTILS_MODULE     The version of the UM_UTILS module you want to run (if
+#                       any). Use this to load mule on top of a scitool module.
+#                       N.B. Will only be loaded if a scitools module has been
+#                       loaded.
+#   PYTHONPATH_PREPEND  Path to a library you want to prepend to PYTHONPATH
+#   PATH_PREPEND        Path you want to prepend to PATH
+#   ULIMIT_SETTING      Specify a value you want to be passed to ulimit -s.
+#                       Typically set to unlimited for tasks using spiral
+#                       search.
+#
+#   QUIET_MODE          Use this when you don't want confirmation messages
+#                       being printed to stdout, for example when running an
+#                       eval script
+#
+# OPTIONS
+#   CMD_WITHOPTS        The command you want to invoke with options
+set -eu
+
+safe_load(){
+    PRE_LOAD_LIST=$(module -t list 2>&1)
+    module load "${1}"
+    POST_LOAD_LIST=$(module -t list 2>&1)
+
+    # Check module count to determine whether module load was successful.
+    if [[ $PRE_LOAD_LIST == $POST_LOAD_LIST ]]; then
+        echo "[ERROR] Failed to load: ${1}"
+        exit 1
+    fi
+}
+
+# Ensure numpy and dask play nicely together
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+
+export PYTHONNOUSERSITE=true
+
+# Check that either ANTS_MODULE or SCITOOLS_MODULE have been specified. If
+# neither is set then exit with an error.
+if [[ -z ${ANTS_MODULE:-} && -z ${SCITOOLS_MODULE:-} ]]; then
+    echo "[ERROR] Need to set either ANTS_MODULE or SCITOOLS_MODULE"
+    exit 1
+fi
+
+# Load Ants module if ANTS_MODULE specified
+if [[ ! -z ${ANTS_MODULE:-} ]]; then
+    safe_load $ANTS_MODULE
+    if [[ -z ${QUIET_MODE:-} ]]; then
+        # Report Mule loaded and print version info - this is useful for
+        # understanding which build of mule has been sourced.
+        echo "[INFO] Mule version loaded was:"
+        mule-version
+    fi
+else
+    safe_load $SCITOOLS_MODULE
+    # If a UM_UTILS_MODULE has been set for purposes of loading Mule then that
+    # module should be loaded in too.
+    if [[ ! -z ${UM_UTILS_MODULE:-} ]]; then
+        safe_load $UM_UTILS_MODULE
+        if [[ -z ${QUIET_MODE:-} ]]; then
+            # Report Mule loaded and print version info - this is useful for
+            # understanding which build of mule has been sourced.
+            echo "[INFO] Mule version loaded was:"
+            mule-version
+        fi
+    fi
+fi
+
+# If it has been set then prepend PYTHONPATH_PREPEND to PYTHONPATH to extend the
+# python environment.
+if [[ ! -z ${PYTHONPATH_PREPEND:-} ]]; then
+    if [[ -z ${QUIET_MODE:-} ]]; then
+        echo "[INFO] Prepending the following to PYTHONPATH:" $PYTHONPATH_PREPEND
+    fi
+    export PYTHONPATH=$PYTHONPATH_PREPEND:${PYTHONPATH:-}
+fi
+
+# If it has been set then prepend PATH_PREPEND to PATH to extend the environment.
+if [[ ! -z ${PATH_PREPEND:-} ]]; then
+    if [[ -z ${QUIET_MODE:-} ]]; then
+        echo "[INFO] Prepending the following to PATH:" $PATH_PREPEND
+    fi
+    export PATH=$PATH_PREPEND:${PATH:-}
+fi
+
+if [[ -z ${QUIET_MODE:-} ]]; then
+    # Report ANTS and Iris loaded and print version info - this is useful for
+    # debugging which builds of ANTS and Iris have been sourced. The ants-version
+    # script can be extended to debug additional dependencies.
+    ants-version
+    echo "[OK] Modules loaded."
+fi
+
+if [[ ! -z ${ULIMIT_SETTING:-} ]]; then
+    ulimit -s $ULIMIT_SETTING
+fi
+
+exec "$@"
