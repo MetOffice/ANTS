@@ -47,13 +47,11 @@ from ._merge import (
     UMSpiralSearch,
     horizontal_grid_reorder,
 )
-from .cover_mapping import SCTTransformer
 
 # Ensures documentation is promoted from _cover_mapping to this module (as a
 # consequence, also have to define remaining public methods):
 __all__ = [
     "MooreNeighbourhood",
-    "SCTTransformer",
     "UMSpiralSearch",
     "calc_grad",
     "mean",

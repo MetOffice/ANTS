@@ -23,7 +23,7 @@ clean-apidoc:
 	rm -rf source/lib
 
 apidoc:
-	cd source ; sphinx-apidoc --force --module-first --maxdepth 2 --output-dir lib ../../lib '../../lib/*tests*' '../../lib/ants/fileformats/cover_mapping.py'
+	cd source ; sphinx-apidoc --force --module-first --maxdepth 2 --output-dir lib ../../lib '../../lib/*tests*'
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

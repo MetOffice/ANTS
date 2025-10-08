@@ -114,32 +114,3 @@ def normalise_fractions(source):
     data[..., non_zero] = (
         adjustments / (1 - adjustments) * non_zero_data
     ) + non_zero_data
-
-
-class CoverMapper(object):
-    """
-    .. versionchanged:: 2.2
-       The CoverMapper class has been removed from core ANTS.
-       The code has been relocated to the LCT app in Contrib.
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise ImportError(
-            "ants.analysis.cover_mapping.CoverMapper has been removed from core ANTS "
-            "in version 2.2. The code has been relocated to the LCT app in Contrib."
-        )
-
-
-class SCTTransformer(object):
-    """
-    .. versionchanged:: 2.2
-       The SCTTransformer class has been removed from core ANTS.
-       The code has been relocated to the LCT app in Contrib.
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise ImportError(
-            "ants.analysis.cover_mapping.SCTTransformer has been removed from core "
-            "ANTS in version 2.2. "
-            "The code has been relocated to the LCT app in Contrib."
-        )
