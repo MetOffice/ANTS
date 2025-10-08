@@ -46,13 +46,6 @@ filterwarnings = [
     # Warning for behaviour internal to iris when saving a pp file in tests
     'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
 
-    # Warning for implicitly cleaning up temporary directories used in
-    # unittests for the rose ana check_cumf and check_nccmp applications.
-    # Note filter is truncated where randomly generated filename would be, so
-    # omits trailing '>'.  Example error message is:
-    # ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/tmpa2ohnjoc'>
-    'ignore:Implicitly cleaning up <TemporaryDirectory:ResourceWarning:tempfile',
-
     # Warning for tests for now deprecated functionality, see #2314:
     'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning'
 
