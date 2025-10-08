@@ -37,4 +37,4 @@ echo " || '''task''' || '''status''' || " >> $OUTPUT_STATUS_LOG
 ants-launch sqlite3 -separator " || " $DB_LOCATION "select '', name, status, '' from task_states" >> $OUTPUT_STATUS_LOG
 
 # Generate OUTPUT_DURATION_LOG
-ants-launch durations_main.py $DB_LOCATION $OUTPUT_DURATION_LOG trac
+ants-launch durations_main.py $DB_LOCATION $OUTPUT_DURATION_LOG github
