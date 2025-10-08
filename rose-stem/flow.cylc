@@ -82,7 +82,8 @@
 
 {# If no group is set then the workflow will abort running and print out the available groups #}
 {%- set grouplist = groups | sort | join("\n - ") -%}
-{{ assert(RUN_NAMES is defined, 'RUN_NAMES must be defined for this workflow: use -z RUN_NAMES=<group>. \nAvailable groups are:\n - ' + grouplist) }}
+{{ assert(group is defined, 'group must be defined for this workflow: use -z group=<group>. \nAvailable groups are:\n - ' + grouplist) }}
+{%- set RUN_NAMES = group -%}
 
 {# If an unknown group is requested abort launch #}
 {%- for name in RUN_NAMES %}

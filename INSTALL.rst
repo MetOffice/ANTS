@@ -119,13 +119,13 @@ The ``rose-stem`` directory contains a cylc workflow that runs unittests,
 integration tests, checks code style and builds documentation. To run the full
 workflow, use::
 
-    $ cylc vip ./rose-stem -z RUN_NAMES=all
+    $ cylc vip ./rose-stem -z group=all
 
 The usual ``cylc vip`` command line options can also be passed, for example to
 name the workflow, use ``-n <worflow_name>``.
 
 A subset of the workflow can be run by replacing ``all`` with a different group
-or groups, e.g. ``-z RUN_NAMES=unittests,documentation`` to run just the unit
+or groups, e.g. ``-z group=unittests,documentation`` to run just the unit
 tests and build the documentation.
 
 Installing KGOs
