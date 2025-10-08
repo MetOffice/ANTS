@@ -110,8 +110,23 @@ The unittests can then be run as::
     $ python -m pytest -c ./ants/pyproject.toml ./ants
 
 All unittests should then pass.  After running the tests, the
-``./ants/tests/resources`` directory and ``./ants/pyroject.toml`` file should
+``./ants/tests/resources`` directory and ``./ants/pyproject.toml`` file should
 be removed.
+
+Running the test workflow
+=========================
+The ``rose-stem`` directory contains a cylc workflow that runs unittests,
+integration tests, checks code style and builds documentation. To run the full
+workflow, use::
+
+    $ cylc vip ./rose-stem -z RUN_NAMES=all
+
+The usual ``cylc vip`` command line options can also be passed, for example to
+name the workflow, use ``-n <worflow_name>``.
+
+A subset of the workflow can be run by replacing ``all`` with a different group
+or groups, e.g. ``-z RUN_NAMES=unittests,documentation`` to run just the unit
+tests and build the documentation.
 
 Installing KGOs
 ===============
