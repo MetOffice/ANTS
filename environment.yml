@@ -1,0 +1,36 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - black
+  - cftime
+  - dask=2023.11.0
+  - esmf=8.4.2=mpi_mpich_h2a0de38_103
+  - esmpy=8.4.2
+  - f90nml
+  - flake8
+  - gdal=3.9.1
+  - geovista
+  - iris-esmf-regrid>=0.9
+  - iris-sample-data
+  - iris=3.7.1
+  - isort
+  - mo_pack
+  - nccmp
+  - numba
+  - numpy=1.26.0
+  - pydata-sphinx-theme
+  - pyflakes
+  - pykdtree
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - python-stratify
+  - python=3.10.13
+  - ruff
+  - setuptools
+  - sphinx=7.2.6
+  - sphinx-argparse
+  - sphinx-copybutton
+  - sphinx-sitemap
+  - vtk=*=qt_*  # required for geovista on Met Office systems
