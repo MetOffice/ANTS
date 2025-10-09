@@ -15,7 +15,8 @@ In order to install and get ANTS running in full you will need the following:
  * A local install of `mule and shumlib <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ -
    talk to your local UM support team if you need support with this
  * `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and
-   `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows
+   `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows (requires cylc
+   version >= 8.6.0)
 
 Depending on your local site configuration, it may be necessary to unset the
 ``LD_LIBRARY_PATH`` environment prior to running the following conda commands.
@@ -115,6 +116,10 @@ be removed.
 
 Running the test workflow
 =========================
+
+.. note::
+    The test workflow requires cylc at a version >= 8.6.0
+
 The ``rose-stem`` directory contains a cylc workflow that runs unittests,
 integration tests, checks code style and builds documentation. To run the full
 workflow, use::
