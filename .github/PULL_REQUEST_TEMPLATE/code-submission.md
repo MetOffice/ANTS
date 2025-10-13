@@ -52,9 +52,9 @@ Add further comments/details for your reviewers here on the impacts of the chang
 |**Approvals for this change**| |
 | --- | --- |
 | Have you got approval from the ANTS core development team for changes to codes in core ANTS (not contrib)? | YES/NO/NA |
-| Have you got approval from the relevant [https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners Ancillary Science Owner(s)] for this change? | YES/NO/NA |
-| Have you got approval from the relevant [Ancillary Workflow Owner(s) https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners] for this change? | YES/NO/NA |
-| If this is a new ancillary capability, who will become the [https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/TermsOfReference#AncilScienceowners Ancil Science Owner] for this change? | **NAME** |
+| Have you got approval from the relevant [Ancillary Science Owner(s)](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners) for this change? | YES/NO/NA |
+| Have you got approval from the relevant [Ancillary Workflow Owner(s)](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners) for this change? | YES/NO/NA |
+| If this is a new ancillary capability, who will become the [Ancil Science Owner](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/TermsOfReference#AncilScienceowners) for this change? | **NAME** |
 
 ------
 
@@ -76,13 +76,13 @@ Add details of any further testing here.
 
 |**Other**| |
 | --- | --- |
-| For non-Met Office staff, have you signed and returned the [https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html Contributor Licence Agreement]? | **YES/NO/NA** |
+| For non-Met Office staff, have you signed and returned the [Contributor Licence Agreement](https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html)? | **YES/NO/NA** |
 | Are the ticket components, keywords, etc. correct? | **YES/NO** |
 | Have links to all linked tickets been provided in the ticket description? | **YES/NO/NA** |
 | Have you <requested a code reviewer>? | **YES/NO** |
 | Has source data for rose stem been added or changed?  If so, does the licence for the source data allow us to store derived works as sources and KGOs in the repository?  Please include a link to the licence.  | **YES/NO** |
-| I confirm that all code is my own and that my contributions are not subject to copyright or license restrictions (see [https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html Contributor Licence Agreement]). | **your name** |
-| I confirm I have not knowingly violated intellectual property rights (IPR) and have taken [https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#LicencecopyrightandIPR sensible measures to prevent doing so], including appropriate [https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#AIassistanceandattribution attribution for usage of Generative AI]. I confirm that this work is my own, and I understand that it is my responsibility to ensure I am not violating others’ IPR.  This includes taking reasonable steps to ensure that all tools used while creating this contribution did not infringe IPR. | **your name** |
+| I confirm that all code is my own and that my contributions are not subject to copyright or license restrictions (see [Contributor Licence Agreement](https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html)). | **your name** |
+| I confirm I have not knowingly violated intellectual property rights (IPR) and have taken [sensible measures to prevent doing so](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#LicencecopyrightandIPR), including appropriate [attribution for usage of Generative AI](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#AIassistanceandattribution). I confirm that this work is my own, and I understand that it is my responsibility to ensure I am not violating others’ IPR.  This includes taking reasonable steps to ensure that all tools used while creating this contribution did not infringe IPR. | **your name** |
 
 <div>
 Please add any further notes here.  If Generative AI tools have been used, a brief summary (e.g. "Github copilot used to add extra unittests") should be provided.
@@ -93,7 +93,7 @@ Please add any further notes here.  If Generative AI tools have been used, a bri
 
 Please copy in the contents of your trac_status.log file(s) below (found in the cylc-run directory for your rose stem run) to your rose-stem testing here. **Note**: if your changes lead to a change in answers, you must run `rose stem --group=all` to help ensure all affected configurations has been flagged up.
 
-**Important: trac_status.log file will only be generated from revision [https://code.metoffice.gov.uk/trac/ancil/browser/ants/trunk?rev=17020 17020] and contrib rose-stem revision [https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk?rev=17024 17024, ] prior to that they will be named "trac.log".**
+**Important: trac_status.log file will only be generated from revision [17020](https://code.metoffice.gov.uk/trac/ancil/browser/ants/trunk?rev=17020) and contrib rose-stem revision [17024](https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk?rev=17024), prior to that they will be named "trac.log".**
 
 <div>
 Add trac_status.log contents for ANTS rose-stem here.
