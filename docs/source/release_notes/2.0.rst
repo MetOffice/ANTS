@@ -1,0 +1,46 @@
+ANTS 2.0 (April 2024)
+=====================
+
+.. attention::
+
+  Please note this is a major release and as such contains breaking changes.
+
+
+For a full list of changes see the release ticket :ticket:`2266`.
+
+A major part of this release is to update ANTS to use `iris 3.7.1`_ and as such many other
+dependencies used by ANTS have also been updated. As a consequence of the dependency
+updates there are known changes to memory and runtime performance, so job limits may
+need to be reviewed.
+
+Features
+--------
+
+- :ticket:`1935` ANTS is now updated to use `iris 3.7.1`_.
+- :ticket:`1838` A new search method has been introduced making use of the KDTree
+  algorithm. This provides an alternative to the spiral search for filling missing data,
+  as used in ``ants.cli.ancil_fill_n_merge.py`` and ``ants.cli.ancil_general_regrid.py``.
+- :ticket:`1409` Lakes to be added in the CCI preprocessor are now user configurable.
+
+Incompatible changes
+--------------------
+
+- :ticket:`1925` The deprecated ``ants.save`` function has been removed. Saving data
+  with ANTS must now be done via the functions in the :mod:`ants.io.save` module.
+- :ticket:`1924` There is no longer a default TwoStage horizontal regridding scheme.
+  Similarly to the vertical regridding scheme, the horizontal regridding scheme now
+  needs to be explicitly specified.
+
+Infrastructure
+--------------
+
+- :ticket:`2273` Warnings are now treated as errors in unit tests.
+
+Documentation
+-------------
+
+- :ticket:`2303` The documentation now uses the more accessible `pydata theme
+  <https://pydata-sphinx-theme.readthedocs.io/en/stable/>`_.
+
+
+.. _iris 3.7.1: https://scitools-iris.readthedocs.io/en/v3.7.1/index.html

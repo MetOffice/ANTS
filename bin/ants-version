@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+# (C) Crown Copyright, Met Office. All rights reserved.
+#
+# This file is part of ANTS and is released under the BSD 3-Clause license.
+# See LICENSE.txt in the root of the repository for full licensing details.
+"""
+This is a script to check whether ANTS and Iris can be imported. If they
+can, the file and version number is printed so that the build which has
+been loaded can be checked. This is designed to be called from inside
+ants-launch.
+
+"""
+import ants
+import iris
+
+print("[INFO] ANTS version loaded was:")
+print(f"ants: {ants.__file__} (version {ants.__version__})")
+
+print("[INFO] Iris version loaded was:")
+print(f"iris: {iris.__file__} (version {iris.__version__})")

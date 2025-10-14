@@ -1,0 +1,51 @@
+ANTS 2.1 (February 2025)
+========================
+
+For a full list of changes see the release ticket :ticket:`2325`.
+
+Features
+--------
+
+- :ticket:`2420` A latitude weighted search method is now available making use of the
+  KDTree search algorithm introduced in ANTS 2.0. With this option enabled, points of
+  similar latitudes are preferentially selected over points at different latitudes.
+
+Bugs fixed
+----------
+
+- :ticket:`2381` The cache location for cartopy data is now configurable via an
+  environment variable ``ANTS_CARTOPY_CACHE``.
+- :ticket:`2383` Fixed a bug where in some cases the merge routine for two datasets with
+  identical coordinates resulted in different coordinates for the merged cube.
+- :ticket:`2010` ANTS is now consistent with iris in identifying depths in F03 ancillary
+  files.
+
+Deprecations
+------------
+
+- :ticket:`2401` The load interface has been moved from :mod:`ants.fileformats` to
+  :mod:`ants.io.load`. As part of this ticket all support for UGRID in ANTS has been
+  removed: all UGRID functionality has been replaced by UG-ANTS.
+
+Infrastructure
+--------------
+
+- :ticket:`2501` The ``rose-stem`` test suite has now been upgraded to be cylc 8 native.
+- :ticket:`2414` ``nccmp`` is now included in the ANTS environment.
+- :ticket:`1922` A sample application has been added to contrib to provide a template to
+  follow when adding new applications.
+- :ticket:`2459` KGOs are no longer included as part of the ANTS repository. KGOs
+  are now generated on a per platform basis, for instructions see :doc:`/tutorial_KGO`.
+
+Documentation
+-------------
+
+ANTS 2.1 includes a major documentation rewrite as part of :ticket:`2362`. Improvements
+to the documentation include:
+
+- :ticket:`2478` A new :doc:`/glossary`.
+- :ticket:`2395` A re-write of the :doc:`tutorial </tutorial_application>`.
+- :ticket:`2391` A re-write of the :doc:`install instructions </install>`.
+- :ticket:`2479` A new release notes page.
+- :ticket:`2390` A re-write of the :doc:`contributing </contributing>` page.
+- :ticket:`2394` A new :doc:`/ancillary_generation_pipeline` page.

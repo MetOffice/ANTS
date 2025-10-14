@@ -1,0 +1,84 @@
+# Override default exlude pattern for black.
+# By default black will exlude files with "build" in the filepath, but ants is installed
+# to $ROSE_SUITE_DIR/share/fcm_make_ants/build and we want these files to be checked.
+[tool.black]
+exclude = ".git"
+
+[build-system]
+# Minimum requirements for the build system to execute, defined by PEP 518.
+requires = ['setuptools']
+
+# Defined by PEP 517.
+build-backend = 'setuptools.build_meta'
+
+# Configure isort.
+[tool.isort]
+profile = "black"  # Black compatibility for isort.
+# By default isort will exclude "build", so override default.
+skip = ".git"
+
+# Configure pytest.
+[tool.pytest.ini_options]
+addopts = "--durations=5"
+filterwarnings = [
+    # During unittesting only, treat all warnings as errors by default:
+    'error',
+
+    # And some specific cases where we ignore warnings.
+    # TODO: #2276 fix netCDF saving to work with future dask versions
+    'ignore:The \`numpy.can_cast\` function is not implemented by Dask array:FutureWarning:dask',
+
+    # Warning for behaviours internal to mule
+    'ignore:tostring\(\) is deprecated. Use tobytes\(\) instead.:DeprecationWarning:mule',
+    'ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning:mule',
+    'ignore:Ancillary files do not define the UM version number in the Fixed Length Header:UserWarning:mule',
+    'ignore:The binary mode of fromstring is deprecated, as it behaves surprisingly on unicode inputs. Use frombuffer instead:DeprecationWarning:mule',
+
+    # Warning for behaviour internal to stratify
+    'ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning:ants.regrid.interpolation',
+
+    # Warning for behaviour internal to iris when caculating gradients in ants.analysis
+    "ignore:Using 'divide' with a bounded coordinate is not well defined; ignoring bounds.:UserWarning:ants.analysis",
+
+    # Warning for output was conversion to zonal mean.
+    'ignore:Output converted to zonal mean.',
+
+    # Warning for behaviour internal to iris when saving a pp file in tests
+    'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
+
+    # Warning for tests for now deprecated functionality, see #2314:
+    'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning'
+
+    # Additional filters are defined in ./lib/ants/tests/conftest.py, including:
+    # 1. Warning when catopy downloads and caches Natural Earth data.
+
+]
+
+[tool.setuptools.packages.find]
+where = ["lib", "bin"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ants.__version__"}
+
+[tool.setuptools]
+script-files = ["bin/ants-launch", "bin/ants-version"]
+
+[project]
+name = "ants"
+dynamic = ["version"]
+authors = [{name = "Model Inputs And Outputs team, Met Office", email = "miao@metoffice.gov.uk"}]
+description = "Toolkit for generating ancillary files"
+readme = "README.rst"
+license = {file ="LICENSE.txt"}
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: Unix",
+]
+
+[project.scripts]
+"ancil_2anc.py" = "ants.cli.ancil_2anc:cli_interface"
+"ancil_create_shapefile.py" = "ants.cli.ancil_create_shapefile:cli_interface"
+"ancil_fill_n_merge.py" = "ants.cli.ancil_fill_n_merge:cli_interface"
+"ancil_general_regrid.py" = "ants.cli.ancil_general_regrid:cli_interface"
