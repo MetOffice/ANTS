@@ -63,7 +63,7 @@ Add further comments/details for your reviewers here on the impacts of the chang
 | Has the new functionality had unittests added? | **YES/NO/NA** |
 | Has the new functionality been added to and tested in Rose Stem? | **YES/NO/NA** |
 | If adding new functionality please confirm that the new code compares across different standard decompositions. | **YES/NO/NA** |
-| Have you encountered any failures in your rose-stem output(s)? <br> ,,These tasks **must** succeed for your ticket to pass review. | **YES/NO** |
+| Have you encountered any failures in your rose-stem output(s)? <br>These tasks **must** succeed for your ticket to pass review. | **YES/NO** |
 | Have you remembered to run the <code style check tasks/tools> | **YES/NO/NA** |
 
 
