@@ -10,16 +10,15 @@ To be completed prior to review request ''and updated'' as required during the r
 ### Branch
 
 **Code branch(es)** <br>
-[log:ants/branches/_ENTER_BRANCH_PATH_HERE_ ANTS_BRANCH_NAME] <br>
-[log:contrib/branches/_ENTER_BRANCH_PATH_HERE_ CONTRIB_BRANCH_NAME] <br>
+Related branches (e.g. contrib):
 
 
 **ANTS rose stem logs** <br>
-[http://fcm1/cylc-review/_ENTER_ROSE_STEM_PATH_HERE_ ANTS Rose stem tests] <br>
+[cylc-review ANTS Rose stem tests] <br>
 
 
 **contrib rose stem logs** <br>
-[http://fcm1/cylc-review/_ENTER_ROSE_STEM_PATH_HERE_ contrib Rose stem tests] <br>
+[cylc review contrib Rose stem tests] <br>
 
 -----
 
