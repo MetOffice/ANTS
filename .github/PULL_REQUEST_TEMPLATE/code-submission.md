@@ -92,8 +92,6 @@ Please add any further notes here.  If Generative AI tools have been used, a bri
 
 Please copy in the contents of your trac_status.log file(s) below (found in the cylc-run directory for your rose stem run) to your rose-stem testing here. **Note**: if your changes lead to a change in answers, you must run `rose stem --group=all` to help ensure all affected configurations has been flagged up.
 
-**Important: trac_status.log file will only be generated from revision [17020](https://code.metoffice.gov.uk/trac/ancil/browser/ants/trunk?rev=17020) and contrib rose-stem revision [17024](https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk?rev=17024), prior to that they will be named "trac.log".**
-
 <div>
 Add trac_status.log contents for ANTS rose-stem here.
 </div>
