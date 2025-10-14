@@ -3,7 +3,7 @@
 
 To be completed prior to review request ''and updated'' as required during the review process.
 
-**All developers are reminded to follow the [wiki:ANTS/WorkingPractices ancil working practices]**
+**All developers are reminded to follow the [ancil working practices](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices)**
 
 -----
 
@@ -14,11 +14,11 @@ Related branches (e.g. contrib):
 
 
 **ANTS rose stem logs** <br>
-[cylc-review ANTS Rose stem tests] <br>
+[please enter the workflow name here as it has been run e.g. ants-trunk/run5] <br>
 
 
 **contrib rose stem logs** <br>
-[cylc review contrib Rose stem tests] <br>
+[please enter the workflow name here as it has been run e.g. ants-contrib/run1] <br>
 
 -----
 
