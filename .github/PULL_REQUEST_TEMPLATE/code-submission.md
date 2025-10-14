@@ -24,7 +24,7 @@ Related branches (e.g. contrib):
 
 ### Testing
 
-For core ANTS only tests, the bare minimum that will be accepted is the `--group=unittests` but many, if not most, changes will need to test other groups to ensure they meet reviewer expectaitons. In general, it should be possible and is advised to run the `--group=all` group prior to review submission as this will catch any consequential issues. **Additionally** you **must** run the contrib tests, pointing at your branch, with `--group=all` to capture any behaviour changes affecting Science codes.
+For core ANTS only tests, the bare minimum that will be accepted is the `--group=unittests` but many, if not most, changes will need to test other groups to ensure they meet reviewer expectations. In general, it should be possible and is advised to run the `--group=all` group prior to review submission as this will catch any consequential issues. **Additionally** you **must** run the contrib tests, pointing at your branch, with `--group=all` to capture any behaviour changes affecting Science codes.
 
 For contrib tests, the bare minimum that will be accepted is the `--group=unittests,qa` but many, if not most, changes will need to test other groups to ensure they meet reviewer expectations.
 For example, `--group=orography`, `--group=soil`, `--group=lai` etc. when working on code in those groups. <br> To run every test use `--group=all`.

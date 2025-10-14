@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   fill="none"
+   height="100%"
+   viewBox="0 0 480.11022 650.52493"
+   width="100%"
+   version="1.1"
+   stroke-miterlimit="10"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="ancillary_system_overview.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     id="namedview25"
+     showgrid="false"
+     inkscape:zoom="1.0521954"
+     inkscape:cx="528.92754"
+     inkscape:cy="297.47923"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <metadata
+     id="metadata59">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs57">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 325.26247 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="480.11022 : 325.26247 : 1"
+       inkscape:persp3d-origin="240.05511 : 216.84164 : 1"
+       id="perspective27" />
+    <marker
+       id="TriangleOutL"
+       refY="0.0"
+       refX="0.0"
+       orient="auto">
+      <path
+         id="path3749"
+         style="marker-start:none;"
+         d="M5.77,0l-8.65,5v-10l8.65,5z"
+         fill-rule="evenodd"
+         transform="scale(0.8)"
+         stroke="#000"
+         stroke-width="1.0pt" />
+    </marker>
+    <inkscape:perspective
+       id="perspective2852"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2852-6"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <clipPath
+     id="p.0">
+    <path
+       id="path5"
+       clip-rule="nonzero"
+       d="M0,0,960,0,960,720,0,720,0,0z" />
+  </clipPath>
+  <path
+     id="path13"
+     d="m 78.804028,490.44 271.120002,0 0,159.09 -271.120002,0 z"
+     style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round" />
+  <path
+     id="path25"
+     stroke-linejoin="round"
+     d="m1,0.99999,478.11,0,0,383.94-478.11,0z"
+     stroke="#000"
+     stroke-linecap="butt"
+     stroke-width="2" />
+  <path
+     id="path35"
+     stroke-linejoin="round"
+     d="m82.745,150.35,271.12,0,0,159.09-271.12,0z"
+     stroke="#000"
+     stroke-linecap="butt"
+     stroke-width="2" />
+  <path
+     id="path5781"
+     stroke-linejoin="miter"
+     style="marker-end:url(#TriangleOutL);stroke-dasharray:none;"
+     d="m213.32,309.38,0,174.87"
+     fill-opacity="0"
+     stroke-dashoffset="0"
+     stroke="#000"
+     stroke-linecap="butt"
+     stroke-miterlimit="10"
+     stroke-width="0.98404711" />
+  <text
+     xml:space="preserve"
+     style="font-size:16px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+     x="13.305469"
+     y="28.967384"
+     id="text2833"><tspan
+       sodipodi:role="line"
+       id="tspan2835"
+       x="13.305469"
+       y="28.967384"
+       style="font-size:18px">Ancillary workflows:</tspan><tspan
+       sodipodi:role="line"
+       x="13.305469"
+       y="51.467384"
+       id="tspan2837"
+       style="font-size:18px" /><tspan
+       sodipodi:role="line"
+       x="13.305469"
+       y="73.967384"
+       id="tspan2839"
+       style="font-size:18px">produce all the ancillary files for a model configuration</tspan><tspan
+       sodipodi:role="line"
+       x="13.305469"
+       y="96.467384"
+       id="tspan2841"
+       style="font-size:18px">using a number of ancillary applications.</tspan></text>
+<text
+     xml:space="preserve"
+     style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+     x="232.84642"
+     y="417.67844"
+     id="text2887"><tspan
+       sodipodi:role="line"
+       id="tspan2889"
+       x="232.84642"
+       y="417.67844">Ancillary processing calls</tspan><tspan
+       sodipodi:role="line"
+       x="232.84642"
+       y="440.17844"
+       id="tspan2891" /><tspan
+       sodipodi:role="line"
+       x="232.84642"
+       y="462.67844"
+       id="tspan2893">code from the Ancillary tool kit</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+     x="98.712364"
+     y="187.9437"
+     id="text2851"><tspan
+       sodipodi:role="line"
+       id="tspan2853"
+       x="98.712364"
+       y="187.9437">Ancillary processing:</tspan><tspan
+       sodipodi:role="line"
+       x="98.712364"
+       y="210.4437"
+       id="tspan2855" /><tspan
+       sodipodi:role="line"
+       x="98.712364"
+       y="232.9437"
+       id="tspan2857">process data sources to</tspan><tspan
+       sodipodi:role="line"
+       x="98.712364"
+       y="255.44368"
+       id="tspan2859">produce ancillary fields.</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+     x="92.188187"
+     y="526.97375"
+     id="text2904"><tspan
+       sodipodi:role="line"
+       id="tspan2906"
+       x="92.188187"
+       y="526.97375">Ancillary tool kit:</tspan><tspan
+       sodipodi:role="line"
+       x="92.188187"
+       y="549.47375"
+       id="tspan2908"></tspan><tspan
+       sodipodi:role="line"
+       x="92.188187"
+       y="571.97375"
+       id="tspan2910">contains code common to</tspan><tspan
+       sodipodi:role="line"
+       x="92.188187"
+       y="594.47375"
+       id="tspan2914">processing such as regrid, fill,</tspan><tspan
+       sodipodi:role="line"
+       x="92.188187"
+       y="616.97375"
+       id="tspan2912">merge etc.</tspan></text>
+</svg>

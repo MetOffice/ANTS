@@ -1,0 +1,72 @@
+ANTS 2.2 (September 2025)
+=========================
+
+For a full list of changes see the release ticket :ticket:`2716`.
+
+Features
+--------
+- :ticket:`2615` The handling of the ``history`` attribute has been improved to allow
+  combining of multiple different ancillaries that have come through different
+  processing chains into a single NetCDF file.
+- :ticket:`2617` Horizontal regrid extrapolation mode is now configurable through
+  the configuration file using the ``extrapolation_mode`` setting in the
+  ``[ants_regridding_horizontal]`` section.
+- :ticket:`2658` ``pad_width`` is now configurable for decomposition. This may solve
+  issues with region overlap when decomposing polar domains.
+- :ticket:`1643` ``ants.tests.stock`` has been refactored to be more configurable. The
+  functions in ``ants.tests.stock`` have the same interface but now rely on cube
+  construction using the new :class:`ants.utils.cube.CubeBuilder`.
+
+
+Bugs fixed
+----------
+- :ticket:`2547` Fixed raster load to use :func:`numpy.linspace` to prevent differing
+  output lengths of :func:`numpy.arange`. This was done in response to a user
+  encountering issues when loading a GeoTIFF file.
+
+
+Incompatible changes
+--------------------
+- :ticket:`2719` The cache location for cartopy data is no longer configurable
+  via the environment variable ``ANTS_CARTOPY_CACHE`` (previously added in
+  :ticket:`2381`). Cartopy can be configured directly if needed, for example via the
+  ``CARTOPY_DATA_DIR`` environment variable. For guidance on configuring cartopy, see
+  the `cartopy documentation <https://cartopy.readthedocs.io/stable/reference/config.html>`_.
+- :ticket:`2221` The ``proc_ants`` package has been removed from core ANTS.
+  All application-specific code from ``proc_ants`` has been moved to Contrib.
+  Any generic code has been moved to a relevant location within the ``ants``
+  package.
+  In particular, the functions :func:`~ants.utils.cube.extract_region_by_geometry`
+  and :func:`~ants.utils.cube.fetch_seed_index` were relocated from ``proc_ants``
+  to ``ants``.
+- :ticket:`2437` Non-generic cover mapping code has been moved from core ANTS to
+  Contrib.
+  In particular, ``ants.fileformats.cover_mapping`` has been entirely moved
+  from core ANTS to the LCT application in Contrib.
+  Generic functions remain in :mod:`ants.analysis.cover_mapping`.
+- :ticket:`2656` The Raymond filter has been moved from core ANTS to the ``Orography``
+  directory in Contrib. Attempting to use :func:`ants.analysis.filters.raymond`
+  will result in an error.
+- :ticket:`2588` Source data files for rose stem testing have been removed from the
+  repository and now are pointed to from a central location using the
+  ``ANTS_SOURCES_DIRECTORY_OVERRIDE`` environment variable. See :doc:`/tutorial_sources`.
+- :ticket:`2733` :func:`ants.analysis.calc_grad` has been moved to Contrib due to the
+  implementation being specific to orography.
+
+Deprecations
+------------
+- :ticket:`2734` :func:`ants.analysis.find_small_feature_seed_points` has been
+  deprecated due to no known usage.
+
+Infrastructure
+--------------
+- :ticket:`2346` ANTS has been updated to use ``pyproject.toml`` rather than ``setup.py``
+  for installation.
+- :ticket:`2521` ANTS rose stem test suite is no longer reliant on ``rose ana``. Instead
+  it uses direct calls to ``mule-cumf`` and ``nccmp`` for KGO validation.
+
+Documentation
+-------------
+- :ticket:`2312` An accessibility statement has been added to the documentation.
+- :ticket:`2559` The ANTS installation instructions have been updated to clarify how
+  to run the full set of unit tests on the installed package.
