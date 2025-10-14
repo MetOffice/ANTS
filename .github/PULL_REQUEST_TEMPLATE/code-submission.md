@@ -1,7 +1,7 @@
 # Ticket Summary <#Enter_ticket_number_here>
 ## Author: <Enter_your_name_here>
 
-To be completed prior to review request ''and updated'' as required during the review process.
+To be completed prior to review request **and updated** as required during the review process.
 
 **All developers are reminded to follow the [ancil working practices](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices)**
 
