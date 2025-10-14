@@ -35,7 +35,7 @@ If your change will alter model evolution, affect other linked ancillary generat
 
 |**Impact of change**| |
 |--- | --- |
-| Will this maintain results for ANTS `rose stem --group=all` tests? (NA if contrib only) | **YES/NO/NA** |
+| Will this maintain results for ANTS `rose stem --group=all` tests? | **YES/NO** |
 | Will this maintain results for contrib `rose stem --group=all` tests? | **YES/NO** |
 | If this change adds a new capability, has evidence been supplied to show testing across different ANTS decomposition options (typically 0,1,2 in rose stem)? 'where applicable'' | **YES/NO/NA** |
 | If this change adds a new capability, has evidence been supplied to show testing of ancillary generation across different resolutions? e.g. For global ancillary generation capabilities for use in NWP n1280e is expected to have been tested | **YES/NO/NA** |
@@ -50,7 +50,7 @@ Add further comments/details for your reviewers here on the impacts of the chang
 
 |**Approvals for this change**| |
 | --- | --- |
-| Have you got approval from the ANTS core development team for changes to codes in core ANTS (not contrib)? | YES/NO/NA |
+| Have you got approval from the ANTS core development team for changes to codes in core ANTS? | YES/NO |
 | Have you got approval from the relevant [Ancillary Science Owner(s)](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners) for this change? | YES/NO/NA |
 | Have you got approval from the relevant [Ancillary Workflow Owner(s)](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/DraftScienceOwners) for this change? | YES/NO/NA |
 | If this is a new ancillary capability, who will become the [Ancil Science Owner](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/SteeringGroup/TermsOfReference#AncilScienceowners) for this change? | **NAME** |
