@@ -1,5 +1,5 @@
 from generate_trac_summary import generate_trac_summary
-from synthetic_data import rows_with_a_failure, rows_all_succeeded
+from synthetic_data import rows_all_succeeded, rows_with_a_failure
 
 
 def test_generate_trac_summary_with_a_failed_task():

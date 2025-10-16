@@ -1,16 +1,22 @@
+#!/usr/bin/env python
+# (C) Crown Copyright, Met Office. All rights reserved.
+#
+# This file is part of ANTS and is released under the BSD 3-Clause license.
+# See LICENSE.txt in the root of the repository for full licensing details.
 """This is the main script that should be run. It retrieves ANTS test logs from
- a database and writes them to a target directory in the user defined format 
+ a database and writes them to a target directory in the user defined format
  (Trac or Github)."""
 
 import argparse
-from generate_github_summary import generate_github_summary
-from generate_trac_summary import generate_trac_summary
+import os
+
 from generate_formatted_github_table import generate_formatted_github_table
 from generate_formatted_trac_table import generate_formatted_trac_table
-from retrieve_task_states import retrieve_task_states
+from generate_github_summary import generate_github_summary
+from generate_trac_summary import generate_trac_summary
 from output_logs_to_file import output_logs_to_file
+from retrieve_task_states import retrieve_task_states
 from verify_file_created import verify_file_created
-import os
 
 
 def parse_arguments():
@@ -24,7 +30,8 @@ def parse_arguments():
 
     Examples
     --------
-    >>> arguments = parse_arguments("path/to/db", "output/destination/path", "text_format")
+    >>> arguments = parse_arguments("path/to/db", "output/destination/path",
+        "text_format")
     >>> print(arguments.db_path)
     "path/to/db"
     >>> print(arguments.output_destination)
@@ -84,7 +91,8 @@ def generate_task_logs(text_format, db_path, output_destination):
     for character in str(output_destination):
         if character in special_characters:
             raise ValueError(
-                f'Please remove the special character ("{character}") you have in your target filepath and try again.'
+                f'Please remove the special character ("{character}") you have in your'
+                "target filepath and try again."
             )
 
     rows = retrieve_task_states(db_path)

@@ -31,7 +31,7 @@ echo "|:-|:-|" >> $OUTPUT_STATUS_LOG
 ants-launch sqlite3 -separator " | " $DB_LOCATION "select '', name, status, '' from task_states" >> $OUTPUT_STATUS_LOG
 
 # Generate TASK_STATUS log
-ants-launch generate_ants_test_logs.py $DB_LOCATION $TASK_STATUS gh
+ants-launch generate_ants_test_logs.py $DB_LOCATION $TASK_STATUS gh 1> ${CYLC_WORKFLOW_RUN_DIR}/job.out 2>${CYLC_WORKFLOW_RUN_DIR}/job.err
 
 # Generate OUTPUT_DURATION_LOG
 ants-launch durations_main.py $DB_LOCATION $OUTPUT_DURATION_LOG github

@@ -1,8 +1,9 @@
-from generate_ants_test_logs import generate_task_logs
+import unittest
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-import unittest
 from unittest.mock import patch
+
+from generate_ants_test_logs import generate_task_logs
 
 
 def test_generate_task_logs_file_is_generated_with_github_formatting():
@@ -25,7 +26,10 @@ def test_generate_task_logs_file_is_generated_with_github_formatting():
 class Test_generate_ants_test_logs_with_trac_formatting(unittest.TestCase):
 
     def test_retrieve_task_states_called_once(self, mock_retrieve_task_states):
-        with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+        with (
+            NamedTemporaryFile() as temporary_file1,
+            NamedTemporaryFile() as temporary_file2,
+        ):
 
             replica_db_path = Path(temporary_file1.name)
             replica_target_file_path = Path(temporary_file2.name)
@@ -36,7 +40,10 @@ class Test_generate_ants_test_logs_with_trac_formatting(unittest.TestCase):
     def test_generate_trac_summary_called_once(
         self, mock_generate_trac_summary, mock_retrieve_task_states
     ):
-        with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+        with (
+            NamedTemporaryFile() as temporary_file1,
+            NamedTemporaryFile() as temporary_file2,
+        ):
 
             replica_db_path = Path(temporary_file1.name)
             replica_target_file_path = Path(temporary_file2.name)
@@ -55,7 +62,10 @@ class Test_generate_ants_test_logs_with_trac_formatting(unittest.TestCase):
                 mock_generate_trac_summary.return_value = ""
                 mock_generate_formatted_trac_table.return_value = ""
 
-                with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+                with (
+                    NamedTemporaryFile() as temporary_file1,
+                    NamedTemporaryFile() as temporary_file2,
+                ):
 
                     replica_db_path = Path(temporary_file1.name)
                     replica_target_file_path = Path(temporary_file2.name)
@@ -71,7 +81,10 @@ class Test_generate_ants_test_logs_with_trac_formatting(unittest.TestCase):
 class Test_generate_ants_test_logs_with_github_formatting(unittest.TestCase):
 
     def test_retrieve_task_states_called_once(self, mock_retrieve_task_states):
-        with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+        with (
+            NamedTemporaryFile() as temporary_file1,
+            NamedTemporaryFile() as temporary_file2,
+        ):
 
             replica_db_path = Path(temporary_file1.name)
             replica_target_file_path = Path(temporary_file2.name)
@@ -82,7 +95,10 @@ class Test_generate_ants_test_logs_with_github_formatting(unittest.TestCase):
     def test_generate_github_summary_called_once(
         self, mock_generate_github_summary, mock_retrieve_task_states
     ):
-        with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+        with (
+            NamedTemporaryFile() as temporary_file1,
+            NamedTemporaryFile() as temporary_file2,
+        ):
 
             replica_db_path = Path(temporary_file1.name)
             replica_target_file_path = Path(temporary_file2.name)
@@ -102,7 +118,10 @@ class Test_generate_ants_test_logs_with_github_formatting(unittest.TestCase):
             ) as mock_generate_formatted_github_table:
                 mock_generate_github_summary.return_value = ""
                 mock_generate_formatted_github_table.return_value = ""
-                with NamedTemporaryFile() as temporary_file1, NamedTemporaryFile() as temporary_file2:
+                with (
+                    NamedTemporaryFile() as temporary_file1,
+                    NamedTemporaryFile() as temporary_file2,
+                ):
 
                     replica_db_path = Path(temporary_file1.name)
                     replica_target_file_path = Path(temporary_file2.name)

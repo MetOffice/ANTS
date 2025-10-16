@@ -1,6 +1,7 @@
 # test retrieval of values from a mock database
-from retrieve_task_states import retrieve_task_states
 from pathlib import Path
+
+from retrieve_task_states import retrieve_task_states
 
 test_directory_path = Path(__file__).parent.absolute()
 

@@ -1,6 +1,7 @@
 # test test output logs are accurate
+from tempfile import NamedTemporaryFile, TemporaryDirectory
+
 from output_logs_to_file import output_logs_to_file
-from tempfile import TemporaryDirectory, NamedTemporaryFile
 
 
 def test_output_logs_to_file():
