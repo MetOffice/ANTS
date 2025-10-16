@@ -30,7 +30,7 @@ try:
 except Exception as _SPIRAL_IMPORT_ERROR:
     spiral = None
     msg = (
-        ' {}\nUnable to import "spiral", proceeding without the '
+        '{}\nUnable to import "spiral", proceeding without the '
         "capabilities it provides.  See install.rst"
     )
     warnings.warn(msg.format(str(_SPIRAL_IMPORT_ERROR)))

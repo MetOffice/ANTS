@@ -47,7 +47,13 @@ filterwarnings = [
     'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
 
     # Warning for tests for now deprecated functionality, see #2314:
-    'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning'
+    'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning',
+
+    # Warning for the optional dependency of mule not being present:
+    "ignore:Unable to import mule:UserWarning",
+
+    # Warning for the optional dependency of um_spiral_search (from shumlib) not being present:
+    "ignore:No module named 'um_spiral_search':UserWarning"
 
     # Additional filters are defined in ./lib/ants/tests/conftest.py, including:
     # 1. Warning when catopy downloads and caches Natural Earth data.
