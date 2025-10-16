@@ -62,6 +62,7 @@ def test_pseudo_level_order_preserved_ancil():
     assert pseudo_level_points == [1, 2, 3, 302, 5, 6, 7, 8, 9]
 
 
+@ants.tests.skip_mule
 def test_grid_staggering():
     """Loads an ancil file, then tests that the grid staggering attribute has
     been added corretly"""
@@ -70,6 +71,7 @@ def test_grid_staggering():
     assert cubey.attributes["grid_staggering"] == 6
 
 
+@ants.tests.skip_mule
 def test_forecast_period_removal():
     """Loads an ancil file, adds a forecast period coordinate and saves this to a
     temporary file. The file is loaded and the coordinates are checked to ensure
@@ -85,6 +87,7 @@ def test_forecast_period_removal():
     assert "forecast_period" not in result_coords
 
 
+@ants.tests.skip_mule
 def test_forecast_reference_time():
     """Loads an ancil file, add a forecast reference time coordinate and saves this to
     a temporary file. The file is loaded and the coordinates are checked to ensure
