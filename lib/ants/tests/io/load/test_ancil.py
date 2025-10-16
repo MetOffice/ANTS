@@ -8,7 +8,7 @@ import tempfile
 import ants
 import ants.tests
 import iris.fileformats
-import mule
+from ants.fileformats.ancil import mule
 from ants.io.load import ants_format_agent
 
 
@@ -45,6 +45,7 @@ def test_correct_specification_used_pre_version_3_1_filetype():
             assert used_spec.priority == 6
 
 
+@ants.tests.skip_mule
 def test_pseudo_level_order_preserved_ancil():
     """Loads an ancil file, modifies the pseudo levels and saves this to a
     temporary file. The file is loaded and the order of the pseudo levels
