@@ -41,7 +41,7 @@ def skip_gdal(fn):
 
     Example usage:
         @skip_gdal
-        class MygdalTest(test.IrisTest):
+        class MygdalTest(ants.tests.TestCase):
             ...
 
     """
@@ -55,7 +55,7 @@ def skip_f90nml(fn):
 
     Example usage:
         @skip_f90nml
-        class Myf90nmlTest(test.IrisTest):
+        class Myf90nmlTest(ants.tests.TestCase):
             ...
 
     """
@@ -69,7 +69,7 @@ def skip_stratify(fn):
 
     Example usage:
         @skip_stratify
-        class MyStratifyTest(test.IrisTest):
+        class MyStratifyTest(ants.tests.TestCase):
             ...
 
     """
@@ -83,7 +83,7 @@ def skip_esmpy(fn):
 
     Example usage:
         @skip_esmpy
-        class MyESMPYTests(test.IrisTest):
+        class MyESMPYTests(ants.tests.TestCase):
             ...
 
     """
