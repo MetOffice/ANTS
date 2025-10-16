@@ -10,11 +10,15 @@ been loaded can be checked. This is designed to be called from inside
 ants-launch.
 
 """
+from datetime import datetime, timezone
+
 import ants
 import iris
 
-print("[INFO] ANTS version loaded was:")
+timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+print(f"[INFO] {timestamp} - ANTS version loaded was:")
 print(f"ants: {ants.__file__} (version {ants.__version__})")
 
-print("[INFO] Iris version loaded was:")
+print("[INFO] {timstamp} -Iris version loaded was:")
 print(f"iris: {iris.__file__} (version {iris.__version__})")
