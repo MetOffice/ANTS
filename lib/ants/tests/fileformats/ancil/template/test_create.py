@@ -6,7 +6,7 @@ import unittest.mock as mock
 
 import ants.tests
 import iris
-import mule
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.template import create
 
 

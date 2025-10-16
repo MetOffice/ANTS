@@ -11,7 +11,7 @@ import ants.tests
 import ants.tests.stock as stock
 import cf_units
 import iris
-import mule
+from ants.fileformats.ancil import mule
 import numpy as np
 from iris.coords import AuxCoord, DimCoord
 
