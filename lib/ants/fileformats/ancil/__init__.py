@@ -95,7 +95,17 @@ class _IrisPPFieldDataProvider(object):
         )
         return data
 
-if mule:
+
+if not mule:
+    class _Field3:
+        """This class enables mule to be an optional import.
+
+        Any attempt to instantiate this class will trigger a ValueError."""
+        def __init__(self, *args, **kwargs):
+            raise ValueError("Mule cannot be imported, but an attempt has been "
+                             "made to use mule functionality through the "
+                             "_Field3 class")
+else:
     class _Field3(mule.Field3):
         """
         Provides conveniences for ancillary generation on top of the mule Field3.
