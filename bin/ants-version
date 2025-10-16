@@ -20,5 +20,5 @@ timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 print(f"[INFO] {timestamp} - ANTS version loaded was:")
 print(f"ants: {ants.__file__} (version {ants.__version__})")
 
-print("[INFO] {timstamp} -Iris version loaded was:")
+print("[INFO] {timestamp} -Iris version loaded was:")
 print(f"iris: {iris.__file__} (version {iris.__version__})")
