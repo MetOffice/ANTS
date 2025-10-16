@@ -8,12 +8,13 @@ import ants.io.save as save
 import ants.tests
 import cf_units
 import iris
-import mule
+from ants.fileformats.ancil import mule
 import numpy as np
 from ants.fileformats.ancil.preprocessing import update_reference_year
 from iris.coords import DimCoord
 
 
+@ants.tests.skip_mule
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         self.source = tempfile.NamedTemporaryFile()
