@@ -106,11 +106,24 @@ def skip_spiral(fn):
 
     Example usage:
         @skip_spiral
-        class MySprialTests(test.IrisTest):
+        class MySpiralTests(ants.tests.TestCase):
             ...
 
     """
     return _skip_importable(ants.analysis._merge.spiral, "spiral")(fn)
+
+
+def skip_mule(fn):
+    """
+    Decorator to choose whether to run tests, based on the availability of mule.
+
+    Example usage:
+        @skip_mule
+        class MyMuleTests(ants.tests.TestCase):
+            ...
+
+    """
+    return _skip_importable(ants.fileformats.ancil.mule, "mule")(fn)
 
 
 def get_data_path(relative_path):
