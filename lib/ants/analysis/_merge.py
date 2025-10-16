@@ -25,15 +25,13 @@ from shapely.vectorized import contains
 
 try:
     from um_spiral_search.um_spiral_search import spiral_search as spiral
-
-    _SPIRAL_IMPORT_ERROR = False
 except Exception as _SPIRAL_IMPORT_ERROR:
     spiral = None
-    msg = (
-        '{}\nUnable to import "spiral", proceeding without the '
-        "capabilities it provides.  See install.rst"
+    _SPIRAL_IMPORT_ERROR_MESSAGE = (
+        f'{str(_SPIRAL_IMPORT_ERROR)}\nUnable to import "spiral", proceeding without '
+        "the capabilities it provides.  See install.rst"
     )
-    warnings.warn(msg.format(str(_SPIRAL_IMPORT_ERROR)))
+    warnings.warn(_SPIRAL_IMPORT_ERROR_MESSAGE)
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -1162,7 +1160,7 @@ class UMSpiralSearch(FillABC):
         :meta public:
         """
         if spiral is None:
-            raise _SPIRAL_IMPORT_ERROR
+            raise ValueError(_SPIRAL_IMPORT_ERROR_MESSAGE)
 
         cyclic = self._source_x.circular
 
