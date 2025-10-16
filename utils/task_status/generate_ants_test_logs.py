@@ -87,7 +87,7 @@ def generate_task_logs(text_format, db_path, output_destination):
         )
 
     # Validate filename doesn't contain special characters other than "."
-    special_characters = "!@#$%^&*()-+?£=,<>"
+    special_characters = "!@#$%^&*()+?£=,<>"
     for character in str(output_destination):
         if character in special_characters:
             raise ValueError(
