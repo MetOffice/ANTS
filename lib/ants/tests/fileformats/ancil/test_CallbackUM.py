@@ -10,6 +10,7 @@ import iris
 from ants.fileformats.ancil import _CallbackUM as CallbackUM
 
 
+@ants.tests.skip_mule
 class Test___call__(ants.tests.TestCase):
     def setUp(self):
         self.cube = iris.cube.Cube([0])

@@ -27,6 +27,7 @@ class TestAll(ants.tests.TestCase):
         with self.assertRaises(ValueError):
             _cubes_to_ancilfile(self.cube)
 
+    @ants.tests.skip_mule
     def test_accept_supported_depth_coordinate(self):
         # Only checking that this does not raise exception so no need to
         # check for return value
@@ -36,6 +37,7 @@ class TestAll(ants.tests.TestCase):
         self.cube.add_aux_coord(coord, 0)
         _cubes_to_ancilfile(self.cube)
 
+    @ants.tests.skip_mule
     def test__sorted_ppfields_call(self):
         # Check that pp field sorting is called.
         cubes = iris.cube.CubeList([self.cube])
@@ -47,6 +49,7 @@ class TestAll(ants.tests.TestCase):
             _cubes_to_ancilfile(cubes)
         patch.assert_called_once_with(cubes)
 
+    @ants.tests.skip_mule
     def test_rotated_pole_treatment(self):
         # Check what happens for various scenarios for rotated pole treatment.
         for lat_pole, lon_pole in zip([89, 89, 90], [0, 180, 200]):

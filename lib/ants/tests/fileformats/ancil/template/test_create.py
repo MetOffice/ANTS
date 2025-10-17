@@ -10,6 +10,7 @@ from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.template import create
 
 
+@ants.tests.skip_mule
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         cube = iris.cube.Cube([0])
