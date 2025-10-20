@@ -86,7 +86,7 @@ else
             # Report Mule loaded and print version info - this is useful for
             # understanding which build of mule has been sourced.
             echo "[INFO] Mule version loaded was:"
-            mule-version
+            mule-version || echo "No mule version loaded"
         fi
     fi
 fi
