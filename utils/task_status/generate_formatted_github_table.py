@@ -30,7 +30,7 @@ def generate_formatted_github_table(rows):
     final_table = (
         "## Test Results - Detail ##\n"
         + "| Task Name | Status |\n"
-        + "|:-|:-|\n"
+        + "|:-|:-|"
         + "\n".join(failed_tasks)
         + "\n"
         + "\n".join(succeeded_tasks)

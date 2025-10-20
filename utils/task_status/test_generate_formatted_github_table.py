@@ -4,7 +4,7 @@ from synthetic_data import rows_with_a_failure
 
 def test_generate_formatted_github_table():
     expected_output = (
-        "## Test Results - Detail ##\n" + "| Task Name | Status |\n" + "|:-|:-|\n"
+        "## Test Results - Detail ##\n" + "| Task Name | Status |\n" + "|:-|:-|"
         "| **process_1** | "
         "**failed** |\n| process_2 | succeeded |\n| "
         "process_3 | succeeded |"
