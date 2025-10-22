@@ -9,7 +9,6 @@ set -eu
 
 export DB_LOCATION=${CYLC_WORKFLOW_RUN_DIR}/log/db
 export OUTPUT_STATUS_LOG=${CYLC_WORKFLOW_RUN_DIR}/trac_status.log
-export TASK_STATUS=${CYLC_WORKFLOW_RUN_DIR}/task_status.log
 export OUTPUT_DURATION_LOG=${CYLC_WORKFLOW_RUN_DIR}/trac_durations.log
 
 # Suppress ants-launch debug logs
@@ -24,14 +23,19 @@ export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/utils/task_status/:$P
 date > $OUTPUT_STATUS_LOG
 echo "-----" >> $OUTPUT_STATUS_LOG
 
-# Generate test status table for OUTPUT_STATUS_LOG
-echo "## Test Results ##" >> $OUTPUT_STATUS_LOG
+# Generate test status summary table for OUTPUT_STATUS_LOG
+echo "## Test Results - Summary ##" >>$OUTPUT_STATUS_LOG
+echo " | **tasks** | **total** | " >> $OUTPUT_STATUS_LOG
+echo " |:-|:-| " >> $OUTPUT_STATUS_LOG
+sqlite3 -separator " | " /home/users/theo.geddes/cylc-run/ants-task-status/run1/log/db "select '', status, count(status), '' from task_states" >> $OUTPUT_STATUS_LOG
+echo " " >> $OUTPUT_STATUS_LOG
+
+# Generate test status summary table for OUTPUT_STATUS_LOG
+echo "## Test Results - Detail ##" >> $OUTPUT_STATUS_LOG
 echo " | **task** | **status** | " >> $OUTPUT_STATUS_LOG
-echo "|:-|:-|" >> $OUTPUT_STATUS_LOG
+echo " |:-|:-| " >> $OUTPUT_STATUS_LOG
 ants-launch sqlite3 -separator " | " $DB_LOCATION "select '', name, status, '' from task_states" >> $OUTPUT_STATUS_LOG
 
-# Generate TASK_STATUS log
-ants-launch generate_ants_test_logs.py $DB_LOCATION $TASK_STATUS gh 1> ${CYLC_WORKFLOW_RUN_DIR}/job.out 2>${CYLC_WORKFLOW_RUN_DIR}/job.err
 
 # Generate OUTPUT_DURATION_LOG
 ants-launch durations_main.py $DB_LOCATION $OUTPUT_DURATION_LOG github
