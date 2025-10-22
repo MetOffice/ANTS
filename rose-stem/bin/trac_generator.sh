@@ -27,7 +27,7 @@ echo "-----" >> $OUTPUT_STATUS_LOG
 echo "## Test Results - Summary ##" >>$OUTPUT_STATUS_LOG
 echo " | **tasks** | **total** | " >> $OUTPUT_STATUS_LOG
 echo " |:-|:-| " >> $OUTPUT_STATUS_LOG
-sqlite3 -separator " | " /home/users/theo.geddes/cylc-run/ants-task-status/run1/log/db "select '', status, count(status), '' from task_states" >> $OUTPUT_STATUS_LOG
+sqlite3 -separator " | " $DB_LOCATION "select '', status, count(status), '' from task_states" >> $OUTPUT_STATUS_LOG
 echo " " >> $OUTPUT_STATUS_LOG
 
 # Generate test status summary table for OUTPUT_STATUS_LOG
