@@ -11,11 +11,7 @@ export DB_LOCATION=${CYLC_WORKFLOW_RUN_DIR}/log/db
 export OUTPUT_STATUS_LOG=${CYLC_WORKFLOW_RUN_DIR}/workflow_status.log
 export OUTPUT_DURATION_LOG=${CYLC_WORKFLOW_RUN_DIR}/task_durations.log
 
-# Suppress ants-launch debug logs
-export QUIET_MODE=true
-
-# Put ants-launch and durations_main.py on the path
-export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/bin/:$PATH
+# Put durations_main.py on the path
 export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/utils/generate_logs/:$PATH
 
 # User info for OUTPUT_STATUS_LOG
