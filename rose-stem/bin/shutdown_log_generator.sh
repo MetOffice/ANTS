@@ -14,7 +14,7 @@ export OUTPUT_DURATION_LOG=${CYLC_WORKFLOW_RUN_DIR}/task_durations.log
 # Suppress ants-launch debug logs
 export QUIET_MODE=true
 
-# Put ants-launch, durations_main.py and generate_ants_test_logs.py on the path
+# Put ants-launch and durations_main.py on the path
 export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/bin/:$PATH
 export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/utils/generate_logs/:$PATH
 
