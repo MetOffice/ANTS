@@ -25,7 +25,13 @@ _RESOURCE_PATH = os.path.join(os.path.split(__file__)[0], "resources")
 # Enables skipping tests if there's certain missing dependencies
 SKIP_OPTIONAL_TESTS = True
 
-
+# Define test decorators to skip tests if an optional dependency is missing.
+# This needs a new decorator to be defined for each optional dependency.
+# There's two parts to using the decorator:  firstly, in the test we import
+# the thing to be skipped from the location where the import is allowed to
+# fail (e.g. from `ants.fileformats.ancil import mule` for mule, rather than a
+# direct `import mule`); and secondly, using the @skip_X decorator in any
+# tests that rely on the optional dependency.
 def _skip_importable(module, name):
     skip = unittest.skipIf(
         condition=not module and SKIP_OPTIONAL_TESTS,

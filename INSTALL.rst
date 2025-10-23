@@ -12,8 +12,9 @@ In order to install and get ANTS running in full you will need the following:
 
  * An installed version of `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
    and some `familiarity <https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_ with it
- * A local install of `mule and shumlib <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ -
-   talk to your local UM support team if you need support with this
+ * A local install of `mule and shumlib
+   <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ - talk to your local
+   UM support team if you need support with this.
  * `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and
    `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows (requires cylc
    version >= 8.6.0)
@@ -70,8 +71,10 @@ you can use the ``--no-build-isolation`` option to pip as follows::
 Configuring Mule
 ----------------
 
-ANTS requires a local installation of |Mule|. Mule's bin directory must be added to
-the PATH and the lib directory added to the PYTHONPATH.
+ANTS requires a local installation of |Mule|.  Mule's bin directory must be
+added to the PATH and the lib directory added to the PYTHONPATH.  This is
+required for using the spiral search or saving F03 format ancillaries, but can
+be omitted for the rare use cases where those features are not needed.
 
 .. _quick-verification:
 
