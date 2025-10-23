@@ -5,7 +5,7 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 set -eu
 
-# CYLC8 compatible suite log dumping script for trac template completion.
+# CYLC8 compatible suite log dumping script.
 
 export DB_LOCATION=${CYLC_WORKFLOW_RUN_DIR}/log/db
 export OUTPUT_STATUS_LOG=${CYLC_WORKFLOW_RUN_DIR}/workflow_status.log
