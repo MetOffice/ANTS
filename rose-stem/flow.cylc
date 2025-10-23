@@ -63,7 +63,7 @@
 [scheduler]
     [[events]]
         mail events =
-        shutdown handlers = ANTS_MODULE={{ ANTS_MODULE }} shutdown_log_generator.sh
+        shutdown handlers = shutdown_log_generator.sh
 [task parameters]
         split = 0, 1, 2
         fill = spiral, kdtree
