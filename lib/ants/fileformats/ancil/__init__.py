@@ -24,12 +24,15 @@ independent of which load function is used:
 import ants
 import iris
 import warnings
+
 try:
     import mule
 except ImportError as _mule_import_error:
     mule = None
-    message = (f"Unable to import mule: {_mule_import_error}\nProceeding "
-               "without capabilities provided by mule.")
+    message = (
+        f"Unable to import mule: {_mule_import_error}\nProceeding "
+        "without capabilities provided by mule."
+    )
     warnings.warn(message)
 import numpy as np
 from ants.fileformats import pp
@@ -42,12 +45,8 @@ from . import template
 # (i.e. lookup headers) are indexed from 1.  Where possible, access the header
 # elements by name rather than index.
 
-IMDI = -32768
-RMDI = -1073741824.0
-
-if mule:
-    _NUM_LOOKUP_INTS = mule.Field.NUM_LOOKUP_INTS
-    _NUM_LOOKUP_REALS = mule.Field.NUM_LOOKUP_REALS
+IMDI = -32768  # As defined by UMDP F03 at UM version 13.9.
+RMDI = -1073741824.0  # As defined by UMDP F03 at UM version 13.9.
 
 
 class _CallbackUM(pp._CallbackPP):
@@ -100,12 +99,23 @@ if not mule:
     class _Field3:
         """This class enables mule to be an optional import.
 
-        Any attempt to instantiate this class will trigger a ValueError."""
+        Any attempt to instantiate this class will trigger a ValueError.  This
+        means that we can import this package safely, but any attempt to use
+        mule functionality will trigger an error.
+
+        """
+
         def __init__(self, *args, **kwargs):
-            raise ValueError("Mule cannot be imported, but an attempt has been "
-                             "made to use mule functionality through the "
-                             "_Field3 class")
+            raise ValueError(
+                "Mule cannot be imported, but an attempt has been "
+                "made to use mule functionality through the "
+                "_Field3 class"
+            )
+
 else:
+    _NUM_LOOKUP_INTS = mule.Field.NUM_LOOKUP_INTS
+    _NUM_LOOKUP_REALS = mule.Field.NUM_LOOKUP_REALS
+
     class _Field3(mule.Field3):
         """
         Provides conveniences for ancillary generation on top of the mule Field3.
@@ -139,7 +149,8 @@ else:
             )
             int_headers.fill(IMDI)
             real_headers = np.empty(
-                shape=_NUM_LOOKUP_REALS, dtype=np.dtype(">f%d" % mule._DEFAULT_WORD_SIZE)
+                shape=_NUM_LOOKUP_REALS,
+                dtype=np.dtype(">f%d" % mule._DEFAULT_WORD_SIZE),
             )
             real_headers.fill(RMDI)
 
@@ -167,7 +178,7 @@ else:
         @classmethod
         def from_pp(cls, ppfield):
             """
-            Generates a mule Field3 from a pp field.
+            Generates a mule Field3 from an iris PPField3.
 
             Data type conversion is done to ensure that the data is in the correct
             format for writing as an ancillary.  This also corrects the missing
@@ -201,7 +212,9 @@ else:
             # Ensure consistent RMDI across all fields
             if ppfield.bmdi != RMDI:
                 bmdi_offset = [
-                    offset[0] for (name, offset) in ppfield.HEADER_DEFN if name == "bmdi"
+                    offset[0]
+                    for (name, offset) in ppfield.HEADER_DEFN
+                    if name == "bmdi"
                 ][0]
                 bmdi_ind = bmdi_offset - _NUM_LOOKUP_INTS
                 real_headers[bmdi_ind] = RMDI
