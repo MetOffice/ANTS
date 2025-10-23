@@ -15,6 +15,7 @@ def mock_field():
         int_headers=int_headers, real_headers=real_headers, data_provider=None
     )
 
+
 @ants.tests.skip_mule
 class Test_is_rotated(ants.tests.TestCase):
     def setUp(self):

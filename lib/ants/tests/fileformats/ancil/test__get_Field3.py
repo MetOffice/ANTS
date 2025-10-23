@@ -19,9 +19,11 @@ class TestOptionalMule(ants.tests.TestCase):
         actual = _get_Field3(None)
 
         with self.assertRaisesRegex(ValueError, expected_error):
-            actual('foo', 'bar', 'baz')
+            actual("foo", "bar", "baz")
 
     @ants.tests.skip_mule
     def test_instantiating_Field3_with_mule(self):
         """Mule implies using the _Field3 that inherits from mule."""
-        assert issubclass(ants.fileformats.ancil._Field3, ants.fileformats.ancil.mule.Field3)
+        assert issubclass(
+            ants.fileformats.ancil._Field3, ants.fileformats.ancil.mule.Field3
+        )

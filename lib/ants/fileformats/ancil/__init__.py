@@ -21,9 +21,10 @@ independent of which load function is used:
    cube.attributes['grid_staggering'].
 
 """
+import warnings
+
 import ants
 import iris
-import warnings
 
 try:
     import mule
@@ -117,6 +118,7 @@ class _ActualField3(mule.Field3):
     Provides conveniences for ancillary generation on top of the mule Field3.
 
     """
+
     _NUM_LOOKUP_INTS = mule.Field.NUM_LOOKUP_INTS
     _NUM_LOOKUP_REALS = mule.Field.NUM_LOOKUP_REALS
 
@@ -143,7 +145,8 @@ class _ActualField3(mule.Field3):
         """
         # Following pp.PPField.save we make sure the data is big-endian
         int_headers = np.empty(
-            shape=_ActualField3._NUM_LOOKUP_INTS, dtype=np.dtype(">i%d" % mule._DEFAULT_WORD_SIZE)
+            shape=_ActualField3._NUM_LOOKUP_INTS,
+            dtype=np.dtype(">i%d" % mule._DEFAULT_WORD_SIZE),
         )
         int_headers.fill(IMDI)
         real_headers = np.empty(
@@ -210,9 +213,7 @@ class _ActualField3(mule.Field3):
         # Ensure consistent RMDI across all fields
         if ppfield.bmdi != RMDI:
             bmdi_offset = [
-                offset[0]
-                for (name, offset) in ppfield.HEADER_DEFN
-                if name == "bmdi"
+                offset[0] for (name, offset) in ppfield.HEADER_DEFN if name == "bmdi"
             ][0]
             bmdi_ind = bmdi_offset - _ActualField3._NUM_LOOKUP_INTS
             real_headers[bmdi_ind] = RMDI

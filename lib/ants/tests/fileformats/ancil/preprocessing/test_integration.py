@@ -11,8 +11,8 @@ import ants
 import ants.tests
 import cf_units
 import iris
-from ants.fileformats.ancil import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.preprocessing import (
     _create_climatology_config,
     correct_lbproc,

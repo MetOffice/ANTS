@@ -8,8 +8,8 @@ import ants.io.save as save
 import ants.tests
 import cf_units
 import iris
-from ants.fileformats.ancil import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.preprocessing import make_time_bounds_contiguous
 from iris.coords import DimCoord
 
