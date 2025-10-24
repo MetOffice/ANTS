@@ -46,7 +46,7 @@ filterwarnings = [
     # Warning for behaviour internal to iris when saving a pp file in tests
     'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
 
-    # Warning for tests for now deprecated functionality, see #2314:
+    # Warning for tests for now deprecated functionality, see #34:
     'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning',
 
     # Warning for the optional dependency of mule not being present:
