@@ -74,7 +74,12 @@ if [[ ! -z ${ANTS_MODULE:-} ]]; then
         # Report Mule loaded and print version info - this is useful for
         # understanding which build of mule has been sourced.
         echo "[INFO] Mule version loaded was:"
-        mule-version
+        if which mule-version
+	then
+            mule-version
+        else
+            echo "No mule version loaded"
+        fi
     fi
 else
     safe_load $SCITOOLS_MODULE
@@ -86,7 +91,12 @@ else
             # Report Mule loaded and print version info - this is useful for
             # understanding which build of mule has been sourced.
             echo "[INFO] Mule version loaded was:"
-            mule-version || echo "No mule version loaded"
+            if which mule-version
+	    then
+                mule-version
+            else
+                echo "No mule version loaded"
+            fi
         fi
     fi
 fi
