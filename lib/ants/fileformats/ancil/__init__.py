@@ -103,14 +103,30 @@ class _GuardField3:
     means that we can import this package safely, but any attempt to use
     mule functionality will trigger an error.
 
+    Using the `from_pp` class method or the `_get_headers_from_pp` static
+    method will also trigger an error.
+
     """
 
     def __init__(self, *args, **kwargs):
+        self._error()
+
+    @staticmethod
+    def _get_headers_from_pp(*args, **kwargs):
+        _GuardField3._error()
+
+    @classmethod
+    def from_pp(cls, *args, **kwargs):
+        cls._error()
+
+    @staticmethod
+    def _error():
         raise ValueError(
             "Mule cannot be imported, but an attempt has been "
             "made to use mule functionality through the "
             "_Field3 class"
         )
+
 
 def _get_Field3(mule):
     if mule:
