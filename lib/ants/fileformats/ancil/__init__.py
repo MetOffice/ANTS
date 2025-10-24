@@ -130,6 +130,7 @@ class _GuardField3:
 
 def _get_Field3(mule):
     if mule:
+
         class _ActualField3(mule.Field3):
             """
             Provides conveniences for ancillary generation on top of the mule Field3.
@@ -222,7 +223,8 @@ def _get_Field3(mule):
                 # pp field with 64 word length header to ancillary field conversion.
                 if not isinstance(ppfield, iris.fileformats.pp.PPField3):
                     raise TypeError(
-                        "pp header version not supported for ancillary " "field generation."
+                        "pp header version not supported for ancillary "
+                        "field generation."
                     )
 
                 int_headers, real_headers = cls._get_headers_from_pp(ppfield)
@@ -230,7 +232,9 @@ def _get_Field3(mule):
                 # Ensure consistent RMDI across all fields
                 if ppfield.bmdi != RMDI:
                     bmdi_offset = [
-                        offset[0] for (name, offset) in ppfield.HEADER_DEFN if name == "bmdi"
+                        offset[0]
+                        for (name, offset) in ppfield.HEADER_DEFN
+                        if name == "bmdi"
                     ][0]
                     bmdi_ind = bmdi_offset - _ActualField3._NUM_LOOKUP_INTS
                     real_headers[bmdi_ind] = RMDI

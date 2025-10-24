@@ -25,6 +25,7 @@ _RESOURCE_PATH = os.path.join(os.path.split(__file__)[0], "resources")
 # Enables skipping tests if there's certain missing dependencies
 SKIP_OPTIONAL_TESTS = True
 
+
 # Define test decorators to skip tests if an optional dependency is missing.
 # This needs a new decorator to be defined for each optional dependency.
 # There's two parts to using the decorator:  firstly, in the test we import
