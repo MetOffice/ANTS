@@ -96,7 +96,7 @@ class _IrisPPFieldDataProvider(object):
         return data
 
 
-class _TripwireField3:
+class _GuardField3:
     """This class enables mule to be an optional import.
 
     Any attempt to instantiate this class will trigger a ValueError.  This
@@ -274,7 +274,7 @@ def _get_Field3(mule):
 
         _Field3 = _ActualField3
     else:
-        _Field3 = _TripwireField3
+        _Field3 = _GuardField3
     return _Field3
 
 
