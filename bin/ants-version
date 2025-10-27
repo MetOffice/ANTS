@@ -12,13 +12,14 @@ ants-launch.
 """
 from datetime import datetime, timezone
 
-import ants
-import iris
+import ants  # noqa: E402
 
 timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
 print(f"[INFO] {timestamp} - ANTS version loaded was:")
 print(f"ants: {ants.__file__} (version {ants.__version__})")
 
+import iris  # noqa: E402
+
+timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 print(f"[INFO] {timestamp} - Iris version loaded was:")
 print(f"iris: {iris.__file__} (version {iris.__version__})")
