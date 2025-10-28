@@ -17,8 +17,12 @@ export PATH=${CYLC_WORKFLOW_SHARE_DIR}/fcm_make_ants/build/utils/generate_logs/:
 # User info for OUTPUT_STATUS_LOG
 date > $OUTPUT_STATUS_LOG
 # Git status of the workflow
-echo "Status: " >> $OUTPUT_STATUS_LOG
+echo "Git status: " >> $OUTPUT_STATUS_LOG
 jq '.status' ${CYLC_WORKFLOW_RUN_DIR}/log/version/vcs.json >> $OUTPUT_STATUS_LOG
+echo "Commit: " >> $OUTPUT_STATUS_LOG
+# Git commit of the workflow
+jq '.commit' ${CYLC_WORKFLOW_RUN_DIR}/log/version/vcs.json >> $OUTPUT_STATUS_LOG
+echo " " >> $OUTPUT_STATUS_LOG
 echo "-----" >> $OUTPUT_STATUS_LOG
 
 # Generate test status summary table for OUTPUT_STATUS_LOG
