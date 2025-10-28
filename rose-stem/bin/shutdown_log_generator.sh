@@ -21,7 +21,9 @@ echo "Git status: " >> $OUTPUT_STATUS_LOG
 jq '.status' ${CYLC_WORKFLOW_RUN_DIR}/log/version/vcs.json >> $OUTPUT_STATUS_LOG
 echo "Commit: " >> $OUTPUT_STATUS_LOG
 # Git commit of the workflow
-jq '.commit' ${CYLC_WORKFLOW_RUN_DIR}/log/version/vcs.json >> $OUTPUT_STATUS_LOG
+export COMMIT=$(jq '.commit' ${CYLC_WORKFLOW_RUN_DIR}/log/version/vcs.json)
+# Remove the speechmarks from the commit
+echo ${COMMIT:1:-1} >> $OUTPUT_STATUS_LOG
 echo " " >> $OUTPUT_STATUS_LOG
 echo "-----" >> $OUTPUT_STATUS_LOG
 
