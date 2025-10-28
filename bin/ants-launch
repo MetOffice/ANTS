@@ -95,7 +95,7 @@ fi
 # python environment.
 if [[ ! -z ${PYTHONPATH_PREPEND:-} ]]; then
     if [[ -z ${QUIET_MODE:-} ]]; then
-        date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ Prepending the following to PYTHONPATH: ${PYTHONPATH_PREPEND}"
+        date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ - Prepending the following to PYTHONPATH: ${PYTHONPATH_PREPEND}"
     fi
     export PYTHONPATH=$PYTHONPATH_PREPEND:${PYTHONPATH:-}
 fi
