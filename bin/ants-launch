@@ -78,6 +78,7 @@ if [[ ! -z ${ANTS_MODULE:-} ]]; then
             mule-version
         else
             echo "[WARNING] No mule version loaded"
+            echo "[WARNING] No mule version loaded" 1>&2
         fi
     fi
 else
@@ -94,6 +95,7 @@ else
                 mule-version
             else
                 echo "[WARNING] No mule version loaded"
+                echo "[WARNING] No mule version loaded" 1>&2
             fi
         fi
     fi

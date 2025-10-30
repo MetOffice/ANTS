@@ -1,5 +1,5 @@
 #!jinja2
-{% set ANTS_MODULE = "ants/developer" %}
+{% set ANTS_MODULE = "ants/optional_mule" %}
 {% set PYTHONPATH_PREPEND = "$CYLC_WORKFLOW_RUN_DIR/share/fcm_make_ants/build/lib" %}
 
 {% set fill_n_merge_source = ['land_cover', 'invert_mask'] %}
