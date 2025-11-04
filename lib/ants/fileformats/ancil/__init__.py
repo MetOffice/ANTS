@@ -128,8 +128,8 @@ class _GuardField3:
         )
 
 
-def _get_Field3(mule):
-    if mule:
+def _get_Field3(mule_present):
+    if mule_present:
 
         class _ActualField3(mule.Field3):
             """
@@ -370,9 +370,8 @@ def _cubes_to_ancilfile(cubes):
     return ancilfile
 
 
-def _fetch_grid_staggering_from_file(filenames):
-    """
-    Fetch grid filename: staggering mapping.
+def _fetch_grid_staggering_from_file(filenames, mule_present):
+    """Fetch grid filename: staggering mapping.
 
     Parameters
     ----------
@@ -380,12 +379,22 @@ def _fetch_grid_staggering_from_file(filenames):
         The name of the ancillary file from which to fetch the grid staggering
         attribute.
 
+    mule_present: obj
+        If this evaluates to True, use mule to get the grid staggering from
+        the file.  Otherwise, raise a meaningful error.
+
     Returns
     -------
     : dict
         Mapping between filename and grid staggering.
 
     """
+    if mule_present is False:
+        raise ValueError(
+            "Mule cannot be imported, but an attempt has been "
+            "made to use mule functionality through loading"
+            "an F03 ancillary file."
+        )
     mapping = {}
     for filename in filenames:
         ffv = mule.AncilFile.from_file(filename)
@@ -405,7 +414,7 @@ def load_cubes(*args, **kwargs):
     :func:`iris.fileformats.um.load_cubes`
 
     """
-    grid_staggering = _fetch_grid_staggering_from_file(args[0])
+    grid_staggering = _fetch_grid_staggering_from_file(args[0], mule)
     args, kwargs = pp._add_callback(_CallbackUM(grid_staggering), *args, **kwargs)
     return iris.fileformats.um.load_cubes(*args, **kwargs)
 
@@ -420,7 +429,7 @@ def load_cubes_32bit_ieee(*args, **kwargs):
     :func:`load_cubes` for keyword details
 
     """
-    grid_staggering = _fetch_grid_staggering_from_file(args[0])
+    grid_staggering = _fetch_grid_staggering_from_file(args[0], mule)
     args, kwargs = pp._add_callback(_CallbackUM(grid_staggering), *args, **kwargs)
     return iris.fileformats.um.load_cubes_32bit_ieee(*args, **kwargs)
 
