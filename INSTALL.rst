@@ -73,9 +73,9 @@ Configuring Mule
 
 ANTS requires a local installation of |Mule|.  Mule's bin directory must be
 added to the PATH and the lib directory added to the PYTHONPATH.  This is
-required for using the spiral search, loading UM format ancillaries (i.e. as
-defined in F03), or saving UM format ancillaries; but can be omitted for the
-rare use cases where those features are not needed.
+required for using the UM spiral search, loading UM format ancillaries
+(i.e. as defined in F03), or saving UM format ancillaries; but can be omitted
+for the rare use cases where those features are not needed.
 
 .. _quick-verification:
 
