@@ -31,7 +31,11 @@ jobs:
 
             - name: Sphinx build
               shell: micromamba-shell {0}
-              run: ./build_docs.sh
+              run: make --directory=docs clean clean-apidoc apidoc html
+
+            - name: Linkcheck
+              shell: micromamba-shell {0}
+              run: make --directory=docs linkcheck
 
             - name: Upload pages artifact
               uses: actions/upload-pages-artifact@v4
