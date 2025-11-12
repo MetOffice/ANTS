@@ -50,7 +50,15 @@ jobs:
                 steps.black.outcome == 'failure' ||
                 steps.isort.outcome == 'failure' ||
                 steps.flake8.outcome == 'failure'
+              env:
+                BLACK_OUTCOME: ${{ steps.black.outcome }}
+                ISORT_OUTCOME: ${{ steps.isort.outcome }}
+                FLAKE8_OUTCOME: ${{ steps.flake8.outcome }}
               run: |
-                echo "One or more code style checks failed"
+                echo "One or more code style checks failed:"
+                echo "black: $BLACK_OUTCOME"
+                echo "isort: $ISORT_OUTCOME"
+                echo "flake8: $FLAKE8_OUTCOME"
+                echo "See the logs for the failed checks for more details"
                 exit 1
 
