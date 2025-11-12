@@ -2,8 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
-from ._constraints import ExtractConstraint
 from . import analysis, config, coord_systems, exceptions, utils
+from ._constraints import ExtractConstraint
 from .command_parse import AntsArgParser
 from .fileformats import load, load_cube, load_cubes, load_grid, load_raw
 
