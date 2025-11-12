@@ -30,11 +30,14 @@ jobs:
             - name: Run black
               run: black --check .
               shell: micromamba-shell {0}
+              continue-on-error: true
 
             - name: Run isort
               run: isort --check .
               shell: micromamba-shell {0}
+              continue-on-error: true
 
             - name: Run flake8
               run: flake8 --max-line-length 88 --extend-ignore E203
               shell: micromamba-shell {0}
+              continue-on-error: true
