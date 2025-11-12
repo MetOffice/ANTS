@@ -20,6 +20,7 @@ skip = ".git"
 # Configure pytest.
 [tool.pytest.ini_options]
 addopts = "--durations=5"
+tmp_path_retention_policy = "none"
 filterwarnings = [
     # During unittesting only, treat all warnings as errors by default:
     'error',
