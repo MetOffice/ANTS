@@ -28,16 +28,29 @@ jobs:
                 cache-environment: true
 
             - name: Run black
+              id: black
               run: black --check .
               shell: micromamba-shell {0}
               continue-on-error: true
 
             - name: Run isort
+              id: isort
               run: isort --check .
               shell: micromamba-shell {0}
               continue-on-error: true
 
             - name: Run flake8
+              id: flake8
               run: flake8 --max-line-length 88 --extend-ignore E203
               shell: micromamba-shell {0}
               continue-on-error: true
+
+            - name: Collect failures
+              if: |
+                steps.black.outcome == 'failure' ||
+                steps.isort.outcome == 'failure' ||
+                steps.flake8.outcome == 'failure'
+              run: |
+                echo "One or more code style checks failed"
+                exit 1
+
