@@ -355,22 +355,19 @@ def _customised_load(func):
                 "iris.FUTURE.datum_support flag.",
                 FutureWarning,
             )
-            user_callback = None
-            if len(args)>1:
-                user_callback = args[1]
-            else:
-                if 'callback' in kwargs:
-                    user_callback = kwargs.pop('callback')
+            ignore_metadata_files = False
             if 'ignore_metadata_files' in kwargs:
                     ignore_metadata_files = kwargs.pop('ignore_metadata_files')
-                    #Do the handling for each way a user callback can be passed in through iris
-                    if ignore_metadata_files == False:
-                        args, kwargs = _add_metadata_file_callback(user_callback, args, kwargs)
-                        #_create_callabck_metadata
-                        #do the create callback function and append to callbacks
-                        # (copy pp callbak if user callback exists then use the existing
-                        # pp callback code to append that to the ants callback)
-            else:
+            if ignore_metadata_files == False:
+                #Do the handling for each way a user callback can be passed in through iris
+                user_callback = None
+                if len(args)>1:
+                    user_callback = args[1]
+                else:
+                    if 'callback' in kwargs:
+                        user_callback = kwargs.pop('callback')
+                print("first args: ", args)
+                print("first kwargs: ", kwargs)
                 args, kwargs = _add_callback(_CallbackMetadata(user_callback), *args, **kwargs)
             # Use context manager to avoid permanently modifying iris behaviour.
             with ants_format_agent():
@@ -386,17 +383,6 @@ def _customised_load(func):
 
     return load_function
 
-def _add_metadata_file_callback(user_callback, *args, **kwargs):
-    """
-    have a seperate function for loading metadata
-    if user callback is not none
-    do an update the same way as in the pp file
-    copy pp callback to be the same and add user one to run after this
-
-    """
-    args, kwargs = _add_callback(_CallbackMetadata(), *args, **kwargs)
-    return args, kwargs
-
 def _add_callback(callback, *args, **kwargs):
     """
     Adds both the ants callback and the user provided callback (if any) to the
@@ -404,11 +390,17 @@ def _add_callback(callback, *args, **kwargs):
 
     """
     args = list(args)
+    print(args)
+    print("len args: ", len(args))
     if len(args) == 1:
         kwargs['callback'] = callback
+    elif len(args) == 2:
+        args[1] = callback
     else:
         args[2] = callback
     args = tuple(args)
+    print("with first callback args: ", args)
+    print("with first callback kwargs: ", kwargs)
     return args, kwargs
 
 class _CallbackMetadata(object):
@@ -425,6 +417,7 @@ class _CallbackMetadata(object):
         """
         
         """
+        print("callback has been added")
         metadata_filenames = ''.join([filename, ".*"])
         metadata_files = glob.glob(metadata_filenames)
         if metadata_files != []:
