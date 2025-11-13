@@ -57,6 +57,7 @@ See Also
 """
 import copy
 import warnings
+import glob
 from contextlib import contextmanager
 from functools import wraps
 
@@ -354,6 +355,23 @@ def _customised_load(func):
                 "iris.FUTURE.datum_support flag.",
                 FutureWarning,
             )
+            user_callback = None
+            if len(args)>1:
+                user_callback = args[1]
+            else:
+                if 'callback' in kwargs:
+                    user_callback = kwargs.pop('callback')
+            if 'ignore_metadata_files' in kwargs:
+                    ignore_metadata_files = kwargs.pop('ignore_metadata_files')
+                    #Do the handling for each way a user callback can be passed in through iris
+                    if ignore_metadata_files == False:
+                        args, kwargs = _add_metadata_file_callback(user_callback, args, kwargs)
+                        #_create_callabck_metadata
+                        #do the create callback function and append to callbacks
+                        # (copy pp callbak if user callback exists then use the existing
+                        # pp callback code to append that to the ants callback)
+            else:
+                args, kwargs = _add_callback(_CallbackMetadata(user_callback), *args, **kwargs)
             # Use context manager to avoid permanently modifying iris behaviour.
             with ants_format_agent():
                 cubes = func(*args, **kwargs)
@@ -367,6 +385,75 @@ def _customised_load(func):
         return cubes
 
     return load_function
+
+def _add_metadata_file_callback(user_callback, *args, **kwargs):
+    """
+    have a seperate function for loading metadata
+    if user callback is not none
+    do an update the same way as in the pp file
+    copy pp callback to be the same and add user one to run after this
+
+    """
+    args, kwargs = _add_callback(_CallbackMetadata(), *args, **kwargs)
+    return args, kwargs
+
+def _add_callback(callback, *args, **kwargs):
+    """
+    Adds both the ants callback and the user provided callback (if any) to the
+    load.
+
+    """
+    args = list(args)
+    if len(args) == 1:
+        kwargs['callback'] = callback
+    else:
+        args[2] = callback
+    args = tuple(args)
+    return args, kwargs
+
+class _CallbackMetadata(object):
+    """Callback for collecting metadata from sidecar files.
+    
+    This callback will load additional metadata files with the naming convention:
+    filename.<metadata> and append the contents of those files to the cube
+    attributes.
+    """
+    def __init__(self, user_callback):
+        self._user_callback = user_callback
+
+    def __call__(self, cube, field, filename):
+        """
+        
+        """
+        metadata_filenames = ''.join([filename, ".*"])
+        metadata_files = glob.glob(metadata_filenames)
+        if metadata_files != []:
+            self._retrieve_metadata(metadata_files, cube)
+        if self._user_callback is not None:
+            self._user_callback(cube, field, filename)
+
+    def _retrieve_metadata(self, metadata_files, cube):
+        """
+        Reads in the contents of each file and adds an attribute to the cube with the
+        name of the file.
+
+        Parameters
+        ----------
+        metadata_files: list
+            The list of filenames that contain metadata for the cube.
+        cube : :class:`iris.cube.Cube`
+            The cube being loaded.
+
+        """
+        for metadata_file in metadata_files:
+            open_file = open(metadata_file, "r")
+            metadata = open_file.readlines()
+            open_file.close()
+            file_name_splits = str(metadata_file).split(".")
+            attribute_name = file_name_splits[-1]
+            cube.attributes[attribute_name] = metadata
+            with open('written_license.txt', 'a')as file:
+                file.write(''.join(metadata))
 
 
 def load_cube(*args, **kwargs):
