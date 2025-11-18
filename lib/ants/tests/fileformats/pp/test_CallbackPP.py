@@ -21,7 +21,7 @@ class Test___call__(ants.tests.TestCase):
     def call(self):
         callback = CallbackPP()
         callback.append_user_callback(self.user_callback)
-        callback(self.cube, mock.sentinel.field, "filename")
+        callback(self.cube, mock.sentinel.field, mock.sentinel.filename)
 
     def test__freeze_pseudo_level_is_called_if_pseudo_level_present(self):
         pseudo_level = iris.coords.DimCoord([0], long_name="pseudo_level")
