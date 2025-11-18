@@ -71,6 +71,7 @@ class _CallbackUM(pp._CallbackPP):
         cube.attributes["grid_staggering"] = self.grid_staggering[filename]
         super(_CallbackUM, self).__call__(cube, field, filename)
 
+
 class _IrisPPFieldDataProvider(object):
     def __init__(self, ppfield):
         self.ppfield = ppfield
