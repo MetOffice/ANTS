@@ -57,10 +57,6 @@ class _CallbackUM(pp._CallbackPP):
         operations (e.g. :func:`~ants.io.load.load`, :func:`~ants.io.load.load_cube`
         etc).
 
-        This callback will load additional metadata files with the naming convention:
-        filename.<metadata> and append the contents of those files to the cube
-        attributes.
-
         Parameters
         ----------
         cube : :class:`iris.cube.Cube`
@@ -73,32 +69,7 @@ class _CallbackUM(pp._CallbackPP):
 
         """
         cube.attributes["grid_staggering"] = self.grid_staggering[filename]
-        metadata_files = glob.glob(filename+".*")
-        if metadata_files:
-            self._retrieve_metadata(metadata_files, cube)
         super(_CallbackUM, self).__call__(cube, field, filename)
-
-    def _retrieve_metadata(self, metadata_files, cube):
-        """
-        Reads in the contents of each file and adds an attribute to the cube with the
-        name of the file.
-
-        Parameters
-        ----------
-        metadata_files: list
-            The list of filenames that contain metadata for the cube.
-        cube : :class:`iris.cube.Cube`
-            The cube being loaded.
-
-        """
-        for metadata_file in metadata_files:
-            open_file = open(metadata_file, "r")
-            metadata = open_file.readlines()
-            open_file.close()
-            file_name_splits = str(metadata_file).split(".")
-            attribute_name = file_name_splits[-1]
-            cube.attributes[attribute_name] = metadata
-
 
 class _IrisPPFieldDataProvider(object):
     def __init__(self, ppfield):
@@ -374,13 +345,8 @@ def load_cubes(*args, **kwargs):
     :func:`iris.fileformats.um.load_cubes`
 
     """
-    #change this function
     grid_staggering = _fetch_grid_staggering_from_file(args[0])
     args, kwargs = pp._add_callback(_CallbackUM(grid_staggering), *args, **kwargs)
-    # here
-    #get the filepath - args[0]? search for files of the same name +.
-    #load in contents as attribute dictionary - in callback?
-    # add to cube
     return iris.fileformats.um.load_cubes(*args, **kwargs)
 
 
