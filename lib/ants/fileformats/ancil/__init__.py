@@ -21,7 +21,6 @@ independent of which load function is used:
    cube.attributes['grid_staggering'].
 
 """
-import glob
 import ants
 import iris
 import mule
@@ -51,7 +50,7 @@ class _CallbackUM(pp._CallbackPP):
 
     def __call__(self, cube, field, filename):
         """
-        ANTS callback to add grid staggering, maintain pseudo level order.
+        ANTS callback to add grid staggering and maintain pseudo level order.
 
         Used as a callback when loading fields files for all ants.io.load
         operations (e.g. :func:`~ants.io.load.load`, :func:`~ants.io.load.load_cube`
