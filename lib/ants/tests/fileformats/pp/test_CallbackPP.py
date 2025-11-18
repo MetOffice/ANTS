@@ -4,9 +4,6 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 
 import unittest.mock as mock
-import tempfile
-import os
-import pytest
 
 import ants.tests
 import iris
