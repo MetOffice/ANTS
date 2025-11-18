@@ -361,8 +361,8 @@ def _customised_load(func):
             if ignore_metadata_files == False:
                 #Do the handling for each way a user callback can be passed in through iris
                 user_callback = None
-                if len(args)>1:
-                    user_callback = args[1]
+                if len(args)==3:
+                    user_callback = args[2]
                 else:
                     if 'callback' in kwargs:
                         user_callback = kwargs.pop('callback')
@@ -394,9 +394,7 @@ def _add_callback(callback, *args, **kwargs):
     print("len args: ", len(args))
     if len(args) == 1:
         kwargs['callback'] = callback
-    elif len(args) == 2:
-        args[1] = callback
-    else:
+    elif len(args) == 3:
         args[2] = callback
     args = tuple(args)
     print("with first callback args: ", args)
@@ -423,6 +421,7 @@ class _CallbackMetadata(object):
         if metadata_files != []:
             self._retrieve_metadata(metadata_files, cube)
         if self._user_callback is not None:
+            print("should have added user callback")
             self._user_callback(cube, field, filename)
 
     def _retrieve_metadata(self, metadata_files, cube):
