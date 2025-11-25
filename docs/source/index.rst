@@ -46,7 +46,7 @@ Contents:
    :maxdepth: 2
 
    introduction.rst
-   contributing.rst
+   Contribute <contributing.rst>
    install.rst
    ancillary_generation_pipeline.rst
    tutorials.rst

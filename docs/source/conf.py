@@ -148,14 +148,7 @@ sitemap_url_scheme = "{link}"
 # Link to ANTS Trac page
 # Include accessibility in footer
 html_theme_options = {
-    "icon_links": [
-        {
-            "name": "Trac",
-            "url": "https://code.metoffice.gov.uk/trac/ancil",
-            "icon": "fa-solid fa-bugs",
-            "type": "fontawesome",
-        }
-    ],
+    "github_url": "https://github.com/MetOffice/ANTS",
     "footer_end": [
         "accessibility",
         "theme-version",
