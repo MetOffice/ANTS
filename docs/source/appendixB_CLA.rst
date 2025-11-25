@@ -32,7 +32,7 @@ with the Met Office Privacy Policy and UK and European Data Protection Laws
 (the Data Protection Act 2018 and the General Data Protection Regulation EU
 2016/680). The legal basis for processing is contractual necessity, as set out
 in the Privacy Policy. Personal Data processed by the Met Office will not be
-disclosed to third parties for marketing purposes. Your MOSRS username will be
+disclosed to third parties for marketing purposes. Your GitHub username will be
 stored in order to permit Developers of ANTS Projects to ascertain that your
 contribution is covered by a signed CLA. Your Personal Data will be stored on a
 Sharepoint site belonging to the ANTS administrators. For further information,
@@ -40,7 +40,7 @@ please see the `Privacy Policy
 <https://www.metoffice.gov.uk/about-us/legal/privacy>`_.
 
 To end this agreement please contact miao@metoffice.gov.uk. This will result in
-your MOSRS username being removed from the list of CLA signees and will prevent
+your GitHub username being removed from the list of CLA signees and will prevent
 further contributions being accepted to ANTS projects. Please be aware that for
 purposes of recording previous agreements of Your existing Contributions, it is
 not possible to withdraw the signed CLA from the historical archive. This does
@@ -84,12 +84,9 @@ Great Britain and Northern Ireland ("DSIT"), whose principal place of business
 is situated at FitzRoy Road, Exeter, Devon EX1 3PB, United Kingdom, for and on
 behalf of DSIT.
 
-“MOSRS” shall mean the Met Office Science Repository Service.
-
 “ANTS Projects” shall mean tools made available under the ANTS name and/or
 logo, and published through public channels such as
-https://code.metoffice.gov.uk/doc/ancil/ants/latest/index.html and the ants and
-contrib MOSRS repositories.
+https://github.com/MetOffice/ANTS.
 
 “Parties” shall mean the Met Office and You.
 
@@ -234,7 +231,7 @@ Full Name:         ___________________________________________
 
 Organisation:    ___________________________________________
 
-MOSRS username: ___________________________________________
+GitHub username: ___________________________________________
 
 Date:                  ___________________________________________
 
