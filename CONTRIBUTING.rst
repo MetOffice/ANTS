@@ -41,8 +41,8 @@ Contribute Code
 All contributions to ANTS are made via merges with the ``main``
 branch of https://github.com/MetOffice/ANTS.
 
-New contributors to ANTS should complete the following Contributor Licence
-Agreement (CLA).
+New contributors to ANTS must agree to the following Contributor Licence
+Agreement (CLA), and add their name and institution to the list of contributors.
 
 Contributor Licence Agreement (v1)
 ----------------------------------
@@ -265,14 +265,10 @@ enforceable by any person not a party to it.
 This Agreement shall be governed by and construed in accordance with the
 laws of the England and Wales.
 
+Code contributors
+-----------------
 
-Full Name:         ___________________________________________
+The following people have contributed to this code under the terms of the
+Contributor Licence Agreement:
 
-Organisation:    ___________________________________________
-
-GitHub username: ___________________________________________
-
-Date:                  ___________________________________________
-
-Signature:         ___________________________________________
-
+* Josh Rackham (Met Office)
