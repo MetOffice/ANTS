@@ -61,8 +61,7 @@ Contents:
    about.rst
    Accessibility Statement <accessibility.rst>
    Appendix A: F03 Ancillary file time metadata <appendixA_time_handling.rst>
-   Appendix B: Contributor Licence Agreement <appendixB_CLA.rst>
-   Appendix C: ants-launch wrapper <appendixC_antslaunch.rst>
+   antslaunch.rst
    glossary.rst
 
 ====================

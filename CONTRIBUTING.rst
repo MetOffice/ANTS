@@ -39,7 +39,7 @@ Contribute Code
 ---------------
 
 All contributions to ANTS are made via merges with the ``main``
-branch of `MetOffice/ANTS <https://github.com/MetOffice/ANTS>`_.
+branch of https://github.com/MetOffice/ANTS.
 
 New contributors to ANTS should complete the following Contributor Licence
 Agreement (CLA).
