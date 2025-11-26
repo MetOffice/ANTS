@@ -123,16 +123,16 @@ Great Britain and Northern Ireland ("DSIT"), whose principal place of business
 is situated at FitzRoy Road, Exeter, Devon EX1 3PB, United Kingdom, for and on
 behalf of DSIT.
 
-“ANTS Projects” shall mean tools made available under the ANTS name and/or
+"ANTS Projects" shall mean tools made available under the ANTS name and/or
 logo, and published through public channels such as
 https://github.com/MetOffice/ANTS.
 
-“Parties” shall mean the Met Office and You.
+"Parties" shall mean the Met Office and You.
 
-“Working Day” shall mean a day other than a Saturday, Sunday or public
+"Working Day" shall mean a day other than a Saturday, Sunday or public
 holiday in England when banks in London are open for business.
 
-“Personal Data” shall have the meaning given in s.3 of the Data Protection
+"Personal Data" shall have the meaning given in s.3 of the Data Protection
 Act 2018.
 
 2. Grant of copyright license
@@ -200,10 +200,10 @@ dispute arising between them out of or in connection with this Agreement within
 
 If the dispute cannot be resolved, then the Parties shall attempt to settle
 it by mediation in accordance with the Centre for Effective Dispute Resolution
-(“CEDR”) Model Mediation Procedure from time-to-time in force.
+("CEDR") Model Mediation Procedure from time-to-time in force.
 
 To initiate the mediation a party to the Agreement must give notice in
-writing (the “ADR Notice”) to the other party requesting mediation in
+writing (the "ADR Notice") to the other party requesting mediation in
 accordance with this clause.
 
 8. Mediation
