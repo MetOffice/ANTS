@@ -167,5 +167,7 @@ linkcheck_ignore = [
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule.html#mule.Field3
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule/ancil.html#mule.ancil.AncilFile
     r"https://code.metoffice.gov.uk/doc/um/mule/latest/mule.*\.html\#",
+    # Ignore ANTS GitHub while it is private.
+    # TODO: Remove from ignore list when repository goes public.
     r"https://github.com/MetOffice/ANTS.*",
 ]
