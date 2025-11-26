@@ -47,50 +47,51 @@ Agreement (CLA), and add their name and institution to the list of contributors.
 Contributor Licence Agreement (v1)
 ----------------------------------
 
-Thank you for your interest in contributing to the ANTS Projects, which are
+Thank you for your interest in contributing to ANTS, which is
 managed by the Met Office.
 
 In order to clarify the intellectual property license granted with
-Contributions from any person or entity, all ANTS Projects must have a
+Contributions from any person or entity, ANTS must have a
 Contributor License Agreement ("CLA") on file that has been signed by each
 Contributor, indicating agreement to the license terms below. Each contributing
 individual within a contributing organisation must personally sign the CLA form.
 
 This license is for your protection as a Contributor as well as the protection
-of ANTS Projects and its users; it does not change your rights to use your own
+of ANTS and its users; it does not change your rights to use your own
 Contributions for any other purpose.
 
-To sign the CLA please complete the form at the end of this page. Completion of
-this form constitutes a legally binding agreement between You and the Met
+To sign the CLA please add your name and institute in the Code contributors
+section at the bottom of this page. Signing of
+this document constitutes a legally binding agreement between You and the Met
 Office.
 
 The Met Office will collect, use and process your Personal Data for the
-purposes of supporting the development of the ANTS Projects and recording
+purposes of supporting the development of ANTS and recording
 ownership of contributions. Your Personal Data will be processed in accordance
 with the Met Office Privacy Policy and UK and European Data Protection Laws
 (the Data Protection Act 2018 and the General Data Protection Regulation EU
 2016/680). The legal basis for processing is contractual necessity, as set out
 in the Privacy Policy. Personal Data processed by the Met Office will not be
 disclosed to third parties for marketing purposes. Your GitHub username will be
-stored in order to permit Developers of ANTS Projects to ascertain that your
-contribution is covered by a signed CLA. Your Personal Data will be stored on a
-Sharepoint site belonging to the ANTS administrators. For further information,
+stored in order to permit Developers ANTS to ascertain that your
+contribution is covered by a signed CLA. Your Personal Data will be stored in a
+GitHub repository belonging to the ANTS administrators. For further information,
 please see the `Privacy Policy
 <https://www.metoffice.gov.uk/about-us/legal/privacy>`_.
 
 To end this agreement please contact miao@metoffice.gov.uk. This will result in
 your GitHub username being removed from the list of CLA signees and will prevent
-further contributions being accepted to ANTS projects. Please be aware that for
+further contributions being accepted to ANTS. Please be aware that for
 purposes of recording previous agreements of Your existing Contributions, it is
 not possible to withdraw the signed CLA from the historical archive. This does
 not affect your rights as a data subject, as set out in the `Privacy Policy
 <https://www.metoffice.gov.uk/about-us/legal/privacy>`_.
 
 You accept and agree to the following terms and conditions for Your past,
-present and future Contributions submitted to ANTS Projects. In return, the Met
+present and future Contributions submitted to ANTS. In return, the Met
 Office shall not use Your Contributions in a way that is contrary to the
-interests of users of the ANTS Projects. Except for the license granted herein
-to the Met Office and recipients of software distributed by ANTS Projects, You
+interests of users of ANTS. Except for the license granted herein
+to the Met Office and recipients of software distributed by ANTS, You
 reserve all right, title, and interest in and to Your Contributions.
 
 1. Definitions
@@ -108,12 +109,12 @@ outstanding shares, or (iii) beneficial ownership of such entity.
 
 "Contribution" shall mean any original work of authorship, including any
 modifications or additions to an existing work, that is intentionally submitted
-by You to the ANTS Projects. For the purposes of this definition, "submitted"
+by You to ANTS. For the purposes of this definition, "submitted"
 means any form of electronic, verbal, or written communication sent to ANTS
-Projects or the Met Office or their representatives or members, including but
+or the Met Office or their representatives or members, including but
 not limited to communication on electronic mailing lists, source code control
 systems, and issue tracking systems that are managed by, or on behalf of, ANTS
-Projects for the purpose of discussing and improving the Work, but excluding
+for the purpose of discussing and improving the Work, but excluding
 communication that is conspicuously marked or otherwise designated in writing
 by You as "Not a Contribution".
 
@@ -123,7 +124,7 @@ Great Britain and Northern Ireland ("DSIT"), whose principal place of business
 is situated at FitzRoy Road, Exeter, Devon EX1 3PB, United Kingdom, for and on
 behalf of DSIT.
 
-"ANTS Projects" shall mean tools made available under the ANTS name and/or
+"ANTS" shall mean tools made available under the ANTS name and/or
 logo, and published through public channels such as
 https://github.com/MetOffice/ANTS.
 
@@ -138,24 +139,24 @@ Act 2018.
 2. Grant of copyright license
 
 Subject to the terms and conditions of this Agreement, You hereby grant to
-the Met Office and to recipients of ANTS Projects a perpetual, worldwide,
+the Met Office and to recipients of ANTS a perpetual, worldwide,
 non-exclusive, royalty-free, irrevocable copyright license to reproduce,
 prepare derivative works of, publicly display, publicly perform, sublicense,
 and distribute Your Contributions and such derivative works under the terms of
-the license specified for the ANTS Project to which a Contribution is
-submitted. Details of the license specified for each ANTS Project shall be
-located in the LICENSE file of the project's source code repository. The
-license chosen for an ANTS project shall be one of the open source licenses
+the license specified for ANTS to which a Contribution is
+submitted. Details of the license specified for ANTS shall be
+located in the LICENSE file of the source code repository. The
+license chosen for ANTS shall be one of the open source licenses
 from the list maintained by the Open Source Initiative (OSI)
 (https://opensource.org/licenses).
 
 You agree and acknowledge that the Met Office may sublicense and distribute
 your Contributions under any subsequent version of the licence specified for
-the ANTS Project to which your Contribution was made. Furthermore, You agree
-that, by agreement through the standard ANTS governance process, an ANTS
-Project may change the license from time to time to an alternative open source
+ANTS to which your Contribution was made. Furthermore, You agree
+that, by agreement through the standard ANTS governance process, ANTS
+may change the license from time to time to an alternative open source
 license from the list maintained by the OSI in order to suit the evolution of
-the Project.
+ANTS.
 
 3. Intellectual property infringement
 
@@ -172,7 +173,7 @@ You represent that you are legally entitled to grant the above license. If
 your employer(s) has rights to intellectual property that you create that
 includes your Contributions, you represent that you have received permission to
 make Contributions on behalf of that employer, or that your employer has waived
-such rights for your Contributions to the ANTS Projects.
+such rights for your Contributions to ANTS.
 
 5. Contribution of Your creation(s)
 
