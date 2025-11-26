@@ -167,4 +167,5 @@ linkcheck_ignore = [
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule.html#mule.Field3
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule/ancil.html#mule.ancil.AncilFile
     r"https://code.metoffice.gov.uk/doc/um/mule/latest/mule.*\.html\#",
+    r"https://github.com/MetOffice/ANTS.*",
 ]
