@@ -60,7 +60,7 @@ This license is for your protection as a Contributor as well as the protection
 of ANTS and its users; it does not change your rights to use your own
 Contributions for any other purpose.
 
-To sign the CLA please add your name and institute in the Code contributors
+To sign the CLA please add your name and institute in the `Code contributors`_
 section at the bottom of this page. Signing of
 this document constitutes a legally binding agreement between You and the Met
 Office.
