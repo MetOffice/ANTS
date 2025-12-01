@@ -44,8 +44,13 @@ branch of https://github.com/MetOffice/ANTS.
 New contributors to ANTS must agree to the following Contributor Licence
 Agreement (CLA), and add their name and institution to the list of contributors.
 
-Contributor Licence Agreement (v1)
-----------------------------------
+The CLA below supercedes the CLA that was previously used on the Met Office
+Science Repository Service (MOSRS). Contributors who have previously contributed
+code to ANTS via MOSRS must agree to the new CLA by adding their name and
+institution to the list of contributors.
+
+Contributor Licence Agreement (v1.1)
+------------------------------------
 
 Thank you for your interest in contributing to ANTS, which is
 managed by the Met Office.
