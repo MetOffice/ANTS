@@ -1,13 +1,13 @@
 .. meta::
    :description lang=en: Information about the ants-launch script
    :keywords: appendix, run, application, module
-   :property=og:locale: en_GB    
+   :property=og:locale: en_GB
 
 .. _ants_launch:
 
-========================================
-Appendix C: ants launch
-========================================
+===============================
+Appendix B: ants-launch wrapper
+===============================
 
 ants-launch is a  convenience script intended for use at sites where ants, scitools
 and um_tools are available via module load commands. Where such central
