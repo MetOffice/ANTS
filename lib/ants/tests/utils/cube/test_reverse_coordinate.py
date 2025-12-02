@@ -43,7 +43,3 @@ class TestAll(ants.tests.TestCase):
         cube = reverse_coordinate(self.cube, "latitude")
         cube = reverse_coordinate(cube, "latitude")
         self.assertEqual(cube, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

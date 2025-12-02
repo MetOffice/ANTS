@@ -60,7 +60,3 @@ class TestAll(ants.tests.TestCase):
         )
         with self.assertRaisesRegex(ValueError, msg):
             find_time_coordinates(cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

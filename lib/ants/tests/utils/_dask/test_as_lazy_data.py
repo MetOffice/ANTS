@@ -20,7 +20,3 @@ class TestAll(ants.tests.TestCase):
                 asarray=mock.sentinel.asarray,
             )
         self.assertTrue(patched.called)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

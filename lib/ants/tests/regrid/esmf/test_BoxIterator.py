@@ -45,7 +45,3 @@ class Test_4d(ants.tests.TestCase):
             it.get_indices()
             count += 1
         self.assertEqual(count, 5 * 4 * 3 * 2)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

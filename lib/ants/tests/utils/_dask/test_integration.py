@@ -72,7 +72,3 @@ class TestConcatenation(ants.tests.TestCase):
         realised_slice = dask_array.compute()
         self.assertEqual(type(realised_slice), np.ndarray)
         self.assertEqual(type(og_dask_array), da.Array)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

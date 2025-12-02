@@ -62,7 +62,3 @@ class TestAll(ants.tests.TestCase):
     def test_tl_start_cw(self):
         tl_bounds = np.roll(self.bl_bounds_cw, -3, axis=2)
         self.assert_corners(tl_bounds, True)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

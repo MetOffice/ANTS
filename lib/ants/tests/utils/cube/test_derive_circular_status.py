@@ -73,7 +73,3 @@ class TestAll(ants.tests.TestCase):
         derive_circular_status(self.cube)
 
         self.assertFalse(hasattr(self.cube.coord("longitude"), "circular"))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

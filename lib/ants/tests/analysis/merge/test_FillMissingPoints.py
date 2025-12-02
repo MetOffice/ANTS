@@ -48,7 +48,3 @@ class TestAll(Common, ants.tests.TestCase):
             "moved to 'ants.analysis.UMSpiralSearch'.",
             FutureWarning,
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

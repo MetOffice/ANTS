@@ -41,7 +41,3 @@ class Testall(ants.tests.TestCase):
         result = standard_deviation(self.src_cube, self.mean)
         target = np.array([3.0, 2.0, 4.0])
         self.assertArrayAlmostEqual(result.data, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -67,7 +67,3 @@ class TestDiffCS(TestCommon, ants.tests.TestCase):
         msg = msg.replace(")", r"\)")
         with self.assertRaisesRegex(ValueError, msg):
             transform_bbox(bbox, UM_SPHERE.crs, OSGB.crs)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -101,7 +101,3 @@ class TestAll(ants.tests.TestCase):
         msg = "No time based coordinates"
         with self.assertRaisesRegex(RuntimeError, msg):
             set_month_mean_for_year(cube, 2000)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

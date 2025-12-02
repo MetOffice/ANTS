@@ -48,7 +48,3 @@ class TestAll(ants.tests.TestCase):
         msg = "primary_cubes' and 'alternate_cubes' don't share common"
         with self.assertRaisesRegex(ValueError, msg):
             sort_cubes(self.primary, self.alternate)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

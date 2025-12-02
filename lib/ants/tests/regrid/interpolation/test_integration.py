@@ -509,7 +509,3 @@ class TestHybridPressure(ants.tests.TestCase):
         msg = r"Currently pressure coordinates \(air_pressure\) are not " "supported"
         with self.assertRaisesRegex(RuntimeError, msg):
             self.source.regrid(self.target, interpolation.Linear())
-
-
-if __name__ == "__main__":
-    ants.tests.main()

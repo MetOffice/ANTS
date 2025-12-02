@@ -70,7 +70,3 @@ class Test___repr__(ants.tests.TestCase):
         scheme = Linear()
         tar = "Linear(extrapolation_mode=nan)"
         self.assertEqual(repr(scheme), tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

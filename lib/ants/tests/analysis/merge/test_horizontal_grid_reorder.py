@@ -90,7 +90,3 @@ class Test4D(ants.tests.TestCase):
         )
         with self.assertRaisesRegex(RuntimeError, msg):
             horizontal_grid_reorder(cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

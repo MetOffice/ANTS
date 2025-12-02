@@ -178,7 +178,3 @@ class Test___getitem__(tests.TestCase):
         target = self.data.copy()
         np.ma.masked_values(target, 5, copy=False)
         self.assertArrayEqual(data, target)
-
-
-if __name__ == "__main__":
-    tests.main()

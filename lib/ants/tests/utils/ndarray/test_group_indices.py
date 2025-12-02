@@ -31,7 +31,3 @@ class TestAll(ants.tests.TestCase):
         res = group_indices(arr)
         tar = [slice(1, 2)]
         self.assertEqual(res, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

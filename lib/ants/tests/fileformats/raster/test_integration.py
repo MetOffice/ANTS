@@ -71,7 +71,3 @@ class TestDeferredLoading(tests.TestCase):
         self.assertArrayEqual(res, tar)
         self.assertFalse(res_cube.has_lazy_data())
         self.assertTrue(self.res_cube.has_lazy_data())
-
-
-if __name__ == "__main__":
-    tests.main()

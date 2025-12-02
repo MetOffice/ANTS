@@ -69,7 +69,3 @@ class TestAll(ants.tests.TestCase):
             ]
         )
         self.assertArrayEqual(mask, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

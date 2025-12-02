@@ -49,7 +49,3 @@ class TestAll(ants.tests.TestCase):
         )
         with self.assertRaisesRegex(RuntimeError, error_msg):
             update_history(self.cube, msg, date=date, add_date=False)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

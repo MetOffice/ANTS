@@ -16,7 +16,3 @@ class TestAll(ants.tests.TestCase):
         with patch as patched:
             is_lazy_data(mock.sentinel.data)
         self.assertTrue(patched.called)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

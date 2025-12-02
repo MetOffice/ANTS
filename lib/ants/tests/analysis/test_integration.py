@@ -17,7 +17,3 @@ class TestStandardDeviation(ants.tests.TestCase):
         mean = stock.geodetic((5, 5))
         result = standard_deviation(source, mean)
         self.assertFalse((result.data < 0).any())
-
-
-if __name__ == "__main__":
-    ants.tests.main()

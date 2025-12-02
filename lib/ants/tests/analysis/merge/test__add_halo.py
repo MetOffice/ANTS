@@ -66,7 +66,3 @@ class TestAll(ants.tests.TestCase):
             ]
         )
         self.assertArrayEqual(res, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()
