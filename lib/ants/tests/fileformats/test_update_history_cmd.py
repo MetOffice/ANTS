@@ -56,7 +56,3 @@ class TestAll(ants.tests.TestCase):
         for acube in cubes:
             self.assertIn(history_string, acube.attributes["history"])
             self.assertIn(another_history_string, acube.attributes["history"])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

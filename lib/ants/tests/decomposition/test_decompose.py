@@ -255,7 +255,3 @@ class TestAll(ants.tests.TestCase):
 
         # DomainDecompose should have been initialised with a pad_width of 2
         self.decomposer.assert_called_once_with(pad_width=2)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

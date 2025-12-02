@@ -220,7 +220,3 @@ class Test__create_climatology_config(Common, ants.tests.TestCase):
         expected = end_date.strftime("%Y-%m-%d")
         config = _create_climatology_config(ancil)
         self.assertEqual(config["climatology"]["end"], expected)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

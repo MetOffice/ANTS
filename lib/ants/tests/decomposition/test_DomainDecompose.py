@@ -68,7 +68,3 @@ class Test_source_piece_generator(ants.tests.TestCase):
         expected_source_pieces = [global_cube[:6], global_cube[:9], global_cube[3:]]
 
         self.assertListEqual(source_pieces, expected_source_pieces)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

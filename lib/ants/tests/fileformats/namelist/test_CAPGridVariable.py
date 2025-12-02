@@ -280,7 +280,3 @@ class Test_y(ants.tests.TestCase):
         grid = CAPGrid(sample)
         self.assertArrayEqual(grid.y.points, [3, 2, 1])
         self.assertArrayEqual(grid.y.bounds, [[3.5, 2.5], [2.5, 1.5], [1.5, 0.5]])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

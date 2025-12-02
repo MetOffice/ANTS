@@ -52,7 +52,3 @@ class Test_is_regular(ants.tests.TestCase):
         self.field.x = None
         self.field.y = None
         self.assertEqual(self.field.is_regular, (True, True))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

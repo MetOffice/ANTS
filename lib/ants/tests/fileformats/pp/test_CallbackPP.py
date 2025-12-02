@@ -45,7 +45,3 @@ class Test___call__(ants.tests.TestCase):
         self.user_callback.assert_called_once_with(
             self.cube, mock.sentinel.field, mock.sentinel.filename
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

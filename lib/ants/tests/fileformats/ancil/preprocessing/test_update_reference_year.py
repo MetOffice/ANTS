@@ -111,7 +111,3 @@ class TestAll(ants.tests.TestCase):
         msg = "The provided year must be a positive integer."
         with self.assertRaisesRegex(ValueError, msg):
             update_reference_year(self.ffv, -500)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

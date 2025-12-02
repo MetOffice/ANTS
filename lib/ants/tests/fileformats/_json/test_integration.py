@@ -23,7 +23,3 @@ class Test_load(ants.tests.TestCase):
     def test_value(self):
         res = load(mock.sentinel.path)
         self.assertEqual(res, self.tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

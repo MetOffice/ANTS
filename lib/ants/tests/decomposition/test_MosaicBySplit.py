@@ -27,7 +27,3 @@ class TestAll(ants.tests.TestCase):
         msg = "'list' object has no attribute 'shape'"
         with self.assertRaisesRegex(AttributeError, msg):
             list(slices)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

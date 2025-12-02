@@ -117,7 +117,3 @@ class TestPP2Cube(ants.tests.TestCase):
         with patch as util_gbound:
             cube = pp2cubes(ppfield)
         util_gbound.assert_called_once_with(cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

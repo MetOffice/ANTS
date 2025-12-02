@@ -116,7 +116,3 @@ class Test_load(ants.tests.TestCase):
         tar = {"key1": np.array([1, 2], "int32")}
         self.assertArrayEqual(res["key1"], tar["key1"])
         self.assertEqual(res["key1"].dtype, tar["key1"].dtype)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

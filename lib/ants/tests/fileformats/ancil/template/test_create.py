@@ -89,7 +89,3 @@ class TestAll(ants.tests.TestCase):
                 self.cubes[0],
                 mock.sentinel.headers,
             )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

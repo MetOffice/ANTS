@@ -118,7 +118,3 @@ class TestExceptions(ants.tests.TestCase):
         with mock.patch("ants.fileformats.warnings.filterwarnings"):
             with warnings.catch_warnings(action="error", category=FutureWarning):
                 cube = ants.utils.cube.defer_cube(cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()
