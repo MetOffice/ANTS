@@ -41,7 +41,3 @@ class TestAll(ants.tests.TestCase):
         self.patch_eo.assert_called_once_with(
             source, target, fix_period=False, pad_width=1
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()
