@@ -49,6 +49,14 @@ Science Repository Service (MOSRS). Contributors who have previously contributed
 code to ANTS via MOSRS must agree to the new CLA by adding their name and
 institution to the list of contributors.
 
+ANTS uses `pre-commit <https://pre-commit.com>`_ hooks.
+If you are a first-time contributor, you may need to run the following command
+once to install ``pre-commit`` into your local git repository::
+
+    pre-commit install
+
+You may need to activate an environment containing ``pre-commit`` before running.
+
 Contributor Licence Agreement (v1.1)
 ------------------------------------
 
