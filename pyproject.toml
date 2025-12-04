@@ -25,7 +25,7 @@ filterwarnings = [
     'error',
 
     # And some specific cases where we ignore warnings.
-    # TODO: #2276 fix netCDF saving to work with future dask versions
+    # TODO: https://github.com/MetOffice/ANTS/issues/67 fix netCDF saving to work with future dask versions
     'ignore:The \`numpy.can_cast\` function is not implemented by Dask array:FutureWarning:dask',
 
     # Warning for behaviours internal to mule
