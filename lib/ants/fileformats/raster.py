@@ -158,7 +158,7 @@ class _GdalDataProxy(object):
 
 def _patch_projection_string(projection):
     """
-    Patch introduced in #2043:
+    Patch introduced in iris 3 upgrade:
 
     Swap positions of latitude and longitude in a projection string.
 
