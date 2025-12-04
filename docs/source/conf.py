@@ -115,8 +115,8 @@ copybutton_exclude = ".linenos, .gp"
 highlight_language = "python-console"
 
 # Ignore the following warnings in nitpicky mode
-# TODO #2323: Remove the entries relating to private classes
-# when we have fixed the documentation tfor these.
+# TODO https://github.com/MetOffice/ANTS/issues/89: Remove the entries relating to
+# private classes when we have fixed the documentation tfor these.
 nitpick_ignore = [
     ("py:exc", "argparse.ArgumentTypeError"),
     ("py:class", "ants.fileformats.namelist.umgrid._CAPGrid"),
