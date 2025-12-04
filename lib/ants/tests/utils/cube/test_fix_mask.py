@@ -205,7 +205,3 @@ class TestAll(ants.tests.TestCase):
         self.assertTrue(hasattr(acube.data, "mask"))
         self.assertEqual(acube.data.mask.shape, acube.data.shape)
         self.assertTrue(dask.array.all(dask.array.ma.getmaskarray(acube.core_data())))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

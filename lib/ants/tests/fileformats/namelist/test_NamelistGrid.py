@@ -54,7 +54,3 @@ class Test___init__(ants.tests.TestCase):
         for group in grid._raw:
             for subkey in grid._raw[group]:
                 self.assertEqual(grid._raw[group][subkey], grid.defaults[group][subkey])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

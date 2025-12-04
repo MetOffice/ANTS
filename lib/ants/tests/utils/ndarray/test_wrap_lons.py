@@ -28,7 +28,3 @@ class TestAll(ants.tests.TestCase):
         tar = np.array([0, 180, 0])
         res = wrap_lons(points, 0, 360, endpoint=False)
         self.assertArrayEqual(res, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

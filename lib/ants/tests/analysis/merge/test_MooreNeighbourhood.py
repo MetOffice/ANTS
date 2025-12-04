@@ -321,7 +321,3 @@ class Test_neighbourhood_mean(ants.tests.TestCase):
         )
         res = nn.neighbourhood_mean()
         self.assertArrayAlmostEqual(res, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -21,7 +21,3 @@ class TestAll(ants.tests.TestCase):
     def test_model_level_number(self):
         source = stock.simple_4d_with_hybrid_height()
         self.check_axis(source, 1)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

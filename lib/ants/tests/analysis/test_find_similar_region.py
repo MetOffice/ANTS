@@ -32,7 +32,3 @@ class TestValues(ants.tests.TestCase):
         tar = [[100, 0, 100, 0], [100, 0, 100, 100], [0, 1, 0, 0]]
         arr[visited] = 100
         self.assertArrayEqual(arr, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

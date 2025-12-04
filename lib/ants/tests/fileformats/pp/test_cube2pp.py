@@ -536,7 +536,3 @@ class TestSetLblevDepthField(ants.tests.TestCase):
         # https://github.com/SciTools/iris/issues/4082.
         with mock.patch("ants.fileformats.pp._set_lblev_depths"):
             self.assert_lblevs()
-
-
-if __name__ == "__main__":
-    ants.tests.main()

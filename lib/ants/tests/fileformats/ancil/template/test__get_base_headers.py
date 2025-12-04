@@ -33,7 +33,3 @@ class TestAll(ants.tests.TestCase):
         self.assertEqual(
             len(cubes_subset), actual["integer_constants"]["num_field_types"]
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -134,7 +134,3 @@ class TestExceptions(ants.tests.TestCase):
             msg = "Unable to resolve discontiguous extraction along y-axis"
             with self.assertRaisesRegex(RuntimeError, msg):
                 get_slices(cube, (-90, 90), (-100, -80))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

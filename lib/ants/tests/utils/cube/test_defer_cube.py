@@ -101,7 +101,3 @@ class MockTempFile:
 
     def close(self):
         pass
-
-
-if __name__ == "__main__":
-    ants.tests.main()

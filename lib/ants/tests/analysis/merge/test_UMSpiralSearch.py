@@ -299,7 +299,3 @@ class TestExceptions(Common, ants.tests.TestCase):
         msg = ".*any valid data."
         with self.assertRaisesRegex(ValueError, msg):
             UMSpiralSearch(self.source, target_mask=self.target_mask)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

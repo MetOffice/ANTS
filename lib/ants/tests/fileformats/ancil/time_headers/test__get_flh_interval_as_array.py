@@ -271,7 +271,3 @@ class TestGetFlhIntervalAsArray(ants.tests.TestCase):
         )
         with self.assertRaises(ValueError):
             _get_flh_interval_as_array(tc)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

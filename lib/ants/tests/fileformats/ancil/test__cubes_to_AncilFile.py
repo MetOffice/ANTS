@@ -62,7 +62,3 @@ class TestAll(ants.tests.TestCase):
             ancil = _cubes_to_ancilfile(self.cube)
             targ_grid_type = 100
             self.assertEqual(ancil.fixed_length_header.horiz_grid_type, targ_grid_type)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -32,7 +32,3 @@ class Test__run_num_processes(ants.tests.TestCase):
         self.patched_dset.assert_called_once_with(
             {"multiprocessing.context": "fork"}, num_workers=9
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

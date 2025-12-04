@@ -265,7 +265,3 @@ class TestAntsArgParser(ants.tests.TestCase):
             parser = AntsArgParser(target_lsm=True, time_constraints=True)
             with self.assertRaises(exceptions.TimeConstraintMissingException):
                 parser.parse_args()
-
-
-if __name__ == "__main__":
-    ants.tests.main()

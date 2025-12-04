@@ -92,7 +92,3 @@ class Test___repr__(Common, ants.tests.TestCase):
         res = res_crs.__repr__()
         tar = "GeogCS(6000000.0)"
         self.assertEqual(res, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

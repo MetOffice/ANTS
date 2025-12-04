@@ -23,7 +23,3 @@ class TestAll(ants.tests.TestCase):
         self.mock_load.assert_called_once_with(
             mock.sentinel.dummy, self.mock_callback()
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

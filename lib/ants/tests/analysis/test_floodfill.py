@@ -96,7 +96,3 @@ class TestValues(ants.tests.TestCase):
 
         floodfill(array, (0, 0), 5, extended_neighbourhood=True, wraparound=True)
         self.assertArrayEqual(array, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

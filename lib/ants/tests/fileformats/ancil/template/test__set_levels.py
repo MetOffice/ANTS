@@ -97,7 +97,3 @@ class TestFailures(ants.tests.TestCase):
         cubes = iris.cube.CubeList(self._make_cube(vc) for vc in (vc1, vc2))
 
         self.assertRaises(RuntimeError, _set_levels, cubes, None)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

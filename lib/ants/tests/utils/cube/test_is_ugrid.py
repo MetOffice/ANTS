@@ -19,7 +19,3 @@ class TestAll(ants.tests.TestCase):
         ugrid_cube = ants.tests.stock.geodetic((1, 1))
         ugrid_cube.attributes["Conventions"] = "UGRID"
         self.assertTrue(is_ugrid(ugrid_cube))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

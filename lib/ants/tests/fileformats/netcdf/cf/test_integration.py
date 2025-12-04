@@ -56,7 +56,3 @@ class TestAll(ants.tests.TestCase):
             complevel=4,
             fill_value=-1,
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

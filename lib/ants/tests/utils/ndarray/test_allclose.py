@@ -21,7 +21,3 @@ class TestAll(ants.tests.TestCase):
         with mock.patch("numpy.allclose") as pclose:
             allclose(mock.sentinel.x1, mock.sentinel.x2, tolerance=0.1)
         pclose.assert_called_once_with(mock.sentinel.x1, mock.sentinel.x2, 0.1)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

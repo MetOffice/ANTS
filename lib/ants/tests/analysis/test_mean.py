@@ -30,7 +30,3 @@ class Testall(ants.tests.TestCase):
         self.src_cube.long_name = None
         res = mean(self.src_cube, self.tgt_cube)
         self.assertEqual(res.long_name, None)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

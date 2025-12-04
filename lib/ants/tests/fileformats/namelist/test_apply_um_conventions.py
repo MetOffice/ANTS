@@ -27,7 +27,3 @@ class TestRegionalRotation(ants.tests.TestCase):
         y.bounds = y_bounds
         apply_um_conventions(self.cube)
         self.assert_coord(tar_x, tar_y)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

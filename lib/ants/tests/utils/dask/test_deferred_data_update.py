@@ -97,7 +97,3 @@ class TestExceptions(ants.tests.TestCase):
         msg = "Expected 2D target data, got 1 instead"
         with self.assertRaisesRegex(ValueError, msg):
             deferred_data_update(source, target, mock.sentinel.slices)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

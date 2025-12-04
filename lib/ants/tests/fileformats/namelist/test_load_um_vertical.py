@@ -60,7 +60,3 @@ class TestExceptions(ants.tests.TestCase):
         msg = "No supported groups found"
         with self.assertRaisesRegex(ValueError, msg):
             next(load_um_vertical("dummy_filename"))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

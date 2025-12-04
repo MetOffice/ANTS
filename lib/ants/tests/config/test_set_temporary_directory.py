@@ -29,7 +29,3 @@ class TestNoTempDirEnvironmentVariableSet(ants.tests.TestCase):
     def test_no_temp_dir_env_var_set(self):
         set_temporary_directory()
         self.assertEqual(tempfile.tempdir, None)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

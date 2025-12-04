@@ -44,7 +44,3 @@ class Testall(ants.tests.TestCase):
 
         mock_method.assert_called_once_with(primary_cube, alternate_cube, None)
         self.assertFalse(self.mock_fill.called)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

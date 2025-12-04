@@ -127,7 +127,3 @@ class TestAll(ants.tests.TestCase):
 
     def assertContiguousFields(self, start, end):
         self.assertArrayEqual(start.raw[1:7], end.raw[7:13])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

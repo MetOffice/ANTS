@@ -828,7 +828,3 @@ class TestMuleWorkaround(_BaseCommon, ants.tests.TestCase):
             raise RuntimeError(
                 "Mule is populating lbuser2 for us.  Remove " "our workaround."
             )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

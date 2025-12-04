@@ -136,7 +136,3 @@ y_split=2
         with patch as mock_expandvars:
             self.config._get_option("ants_decomposition", "x_split")
         mock_expandvars.assert_called_once_with("3 # some in-line comment")
-
-
-if __name__ == "__main__":
-    ants.tests.main()

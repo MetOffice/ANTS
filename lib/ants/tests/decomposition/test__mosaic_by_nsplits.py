@@ -76,7 +76,3 @@ class TestAll(ants.tests.TestCase):
             (slice(0, None, 1), slice(4, None, 1), slice(0, None, 1)),
         ]
         self._test_iterable_compare(iter_result, iter_target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()
