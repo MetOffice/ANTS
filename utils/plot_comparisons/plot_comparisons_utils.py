@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # (C) Crown Copyright, Met Office. All rights reserved.
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
