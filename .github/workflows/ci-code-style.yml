@@ -61,4 +61,3 @@ jobs:
                 echo "flake8: $FLAKE8_OUTCOME"
                 echo "See the logs for the failed checks for more details"
                 exit 1
-

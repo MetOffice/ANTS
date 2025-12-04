@@ -64,4 +64,3 @@ Using the ANTS 2.1 module again::
   >>> ff.to_file("load_files/middle_um_version_ancil")
   >>> ff.fixed_length_header.data_set_format_version = 15
   >>> ff.to_file("load_files/pre_um_3_1_ancil")
-
