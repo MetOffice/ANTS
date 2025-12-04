@@ -6,7 +6,7 @@ exclude = ".git"
 
 [build-system]
 # Minimum requirements for the build system to execute, defined by PEP 518.
-requires = ['setuptools']
+requires = ["setuptools>=80", "setuptools-scm[simple]>=8"]
 
 # Defined by PEP 517.
 build-backend = 'setuptools.build_meta'
@@ -62,9 +62,6 @@ filterwarnings = [
 
 [tool.setuptools.packages.find]
 where = ["lib", "bin"]
-
-[tool.setuptools.dynamic]
-version = {attr = "ants.__version__"}
 
 [tool.setuptools]
 script-files = ["bin/ants-launch", "bin/ants-version"]

@@ -316,7 +316,8 @@ ruff=0.6.7=py310h624018c_0
 s2n=1.5.3=h7b32b05_0
 scipy=1.14.1=py310ha3fb0e1_0
 scooby=0.10.0=pyhd8ed1ab_0
-setuptools=75.1.0=pyhd8ed1ab_0
+setuptools=80.9.0=pyhff2d567_0
+setuptools-scm=9.2.2=pyhd8ed1ab_0
 shapely=2.0.6=py310h64a4ca9_1
 six=1.16.0=pyh6c4a22f_0
 snappy=1.2.1=ha2e4443_0
