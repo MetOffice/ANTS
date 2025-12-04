@@ -343,8 +343,9 @@ def _customised_load(func):
         # Ensure that we leave appropriate calling to the underlying iris load
         # function.
 
-        # TODO #2294, remove warning filter workaround when iris issue
-        # https://github.com/SciTools/iris/issues/5749 has been fixed.
+        # TODO https://github.com/MetOffice/ANTS/issues/68, remove warning filter
+        # workaround when iris issue https://github.com/SciTools/iris/issues/5749 has
+        # been fixed.
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
