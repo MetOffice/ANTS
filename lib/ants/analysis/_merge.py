@@ -589,8 +589,7 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
         if validity_polygon.contains(domain_polygon):
             raise RuntimeError("Target domain is wholly within the provided polygon")
     else:
-        # Workaround for supporting different shaped sources (redundant after
-        # #136)
+        # Workaround for supporting different shaped sources
         validity_polygon = domain_polygon
 
     if not np.isreal(primary_cube.dtype):
