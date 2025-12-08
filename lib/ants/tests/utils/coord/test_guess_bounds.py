@@ -125,7 +125,3 @@ class Test_time_coordinate(ants.tests.TestCase):
         coord = iris.coords.AuxCoord(points, standard_name="time", units=unit)
         with self.assertRaisesRegex(ValueError, "Unsupported time"):
             ants.utils.coord.guess_bounds(coord)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -567,7 +567,3 @@ class Test_is_endgame(ants.tests.TestCase):
         }
         grid = CAPGrid(sample)
         self.assertTrue(grid.is_endgame)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

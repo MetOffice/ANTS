@@ -78,7 +78,3 @@ class TestAll(ants.tests.TestCase):
 
         set_crs(self.cube)
         self.assertEqual(self.cube, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

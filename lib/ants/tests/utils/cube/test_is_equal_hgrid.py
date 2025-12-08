@@ -40,7 +40,3 @@ class TestErrorsRaised(ants.tests.TestCase):
             ValueError, "ANTS doesn't support ugrid data. Please use UG-ANTS instead."
         ):
             is_equal_hgrid([cube1, cube2])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

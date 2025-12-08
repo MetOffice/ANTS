@@ -37,7 +37,3 @@ class TestAll(ants.tests.TestCase):
         result = is_global(cube)
         target = True
         self.assertEqual(result, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

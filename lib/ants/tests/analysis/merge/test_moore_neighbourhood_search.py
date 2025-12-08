@@ -279,7 +279,3 @@ class Test_mask_prioritisation(_MaskApplication, ants.tests.TestCase):
         target = data.copy()
         target[2, 2] = 6.5
         self._assert_expected(cube, target, land_binary_mask)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

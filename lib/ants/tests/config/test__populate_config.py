@@ -21,7 +21,3 @@ class TestAll(ants.tests.TestCase):
             mock_config.parse_configuration.call_args_list,
             [mock.call(mock.sentinel.path1), mock.call(mock.sentinel.path2)],
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

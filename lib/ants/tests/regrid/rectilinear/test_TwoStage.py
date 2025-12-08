@@ -168,7 +168,3 @@ class Test___repr__(ants.tests.TestCase):
         scheme = TwoStage(mdtol=mdtol)
         tar = "TwoStage(mdtol={})".format(mdtol)
         self.assertEqual(repr(scheme), tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

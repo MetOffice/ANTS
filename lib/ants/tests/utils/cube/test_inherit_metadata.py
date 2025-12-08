@@ -22,7 +22,3 @@ class TestAll(ants.tests.TestCase):
         self.assertIs(
             source.attributes["grid_staggering"], target.attributes["grid_staggering"]
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

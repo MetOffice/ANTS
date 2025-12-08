@@ -47,7 +47,3 @@ class TestAll(ants.tests.TestCase):
         coord = cube.coord("bing")
         self.assertEqual(coord.bounds.shape, (4, 5, 2))
         self.assertEqual(cube.coord_dims(coord), (0, 1))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -34,7 +34,3 @@ class Test___call__(ants.tests.TestCase):
         pp_call_mock.assert_called_once_with(
             self.cube, mock.sentinel.field, mock.sentinel.filename
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

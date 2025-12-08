@@ -50,7 +50,3 @@ Development changes
 If a contributor has a change that adds, removes or changes rose stem source files, then
 they should modify the rose-app.conf file of the rose stem app to point to the new or
 modified file and include the changes on the ticket template.
-
-
-
-

@@ -121,7 +121,3 @@ class Test_sigma(Common, ants.tests.TestCase):
         expected = 1.0
         actual = self.actual.sigma.bounds[0][0]
         self.assertEqual(expected, actual)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

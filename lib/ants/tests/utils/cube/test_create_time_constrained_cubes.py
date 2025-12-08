@@ -135,7 +135,3 @@ class TestLimits(ants.tests.TestCase):
         expected = 1989
         actual = _get_cube_end_year(self.cube)
         self.assertEqual(actual, expected)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

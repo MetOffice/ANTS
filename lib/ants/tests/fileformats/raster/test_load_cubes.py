@@ -200,7 +200,3 @@ class TestAll(tests.TestCase):
         )
         crs = _get_crs(gdal_projection)
         self.assertIsInstance(crs, ants.coord_systems.CFCRS)
-
-
-if __name__ == "__main__":
-    tests.main()

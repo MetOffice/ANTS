@@ -75,7 +75,3 @@ class TestIsPeriodic(ants.tests.TestCase):
             "Can only test time coordinates for periodicity.  foo",
         ):
             is_periodic(not_time)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -24,7 +24,3 @@ class TestAll(ants.tests.TestCase):
         yc = cube.coord("latitude")
         # Testing as much for no exception, as for returned result
         self.assertEqual((xc, yc), horizontal_grid(cube))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

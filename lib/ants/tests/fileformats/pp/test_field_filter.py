@@ -35,7 +35,3 @@ class TestPPField(ants.tests.TestCase):
 
         result = field_filter([ppfield1, ppfield2, ppfield3], stash)
         self.assertEqual(result, [ppfield1, ppfield3])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

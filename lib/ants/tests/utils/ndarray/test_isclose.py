@@ -24,7 +24,3 @@ class TestAll(ants.tests.TestCase):
         x2[0] += 1e-13
         x2[1] += 1e-3
         self.assertArrayAlmostEqual(isclose(x1, x2), [True, False])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -128,7 +128,3 @@ class TestErrorsRaised(ants.tests.TestCase):
             ValueError, "ANTS doesn't support ugrid data. Please use UG-ANTS instead."
         ):
             make_consistent_with_lsm(self.ugrid_source, self.lsm, False)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

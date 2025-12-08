@@ -195,7 +195,3 @@ class TestLinear_interpolator(_TestCommon, ants.tests.TestCase):
         result = self.interpolate()
         target = {"grid_staggering": 3}
         self.check_attributes(result, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

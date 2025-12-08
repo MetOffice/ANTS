@@ -99,7 +99,3 @@ class TestAll(ants.tests.TestCase):
         _coerce_netcdf_classic_dtypes(cube)
         self.assertEqual(cube.data.dtype, np.int16)
         self.assertEqual(cube.attributes["valid_range"], [0, 255])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

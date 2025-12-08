@@ -220,7 +220,3 @@ class TestAll(ants.tests.TestCase):
             self.headers["fixed_length_header"], actual["fixed_length_header"]
         )
         self.assertEqual(self.headers["integer_constants"], actual["integer_constants"])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

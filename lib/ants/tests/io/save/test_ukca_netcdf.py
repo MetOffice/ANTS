@@ -99,7 +99,3 @@ class TestSave(ants.tests.TestCase):
         with cfpatch, ukcapatch as nc_patch:
             save.ukca_netcdf(self.cube, "dummy_fnme")
         nc_patch.assert_called_once()
-
-
-if __name__ == "__main__":
-    ants.tests.main()

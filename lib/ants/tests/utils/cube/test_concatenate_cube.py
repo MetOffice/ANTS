@@ -33,7 +33,3 @@ class TestAll(ants.tests.TestCase):
     def test_workaround(self):
         res = concatenate_cube(self.source)
         self.assertIsInstance(res, iris.cube.Cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

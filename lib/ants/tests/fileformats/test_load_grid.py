@@ -190,7 +190,3 @@ PHI_POLE=37.5,LAMBDA_POLE=177.5,ROTATED=T
         actual = self.result.coord(axis="x")
 
         self.assertEqual(actual, expected)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

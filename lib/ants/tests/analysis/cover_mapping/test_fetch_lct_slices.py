@@ -29,7 +29,3 @@ class TestAll(ants.tests.TestCase):
         target_slices = tuple([(1, 0), slice(None), slice(None)])
         slices = fetch_lct_slices(self.cube, [2, 3])
         self.assertEqual(slices, target_slices)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

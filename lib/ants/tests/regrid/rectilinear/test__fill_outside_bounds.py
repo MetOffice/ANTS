@@ -136,7 +136,3 @@ class TestFillRange(Common, ants.tests.TestCase):
         expected = source_cube.data
         result = fill_range(source_cube, x_outside_bounds, value, coord)
         self.assertEqual(expected.all(), result.data.all())
-
-
-if __name__ == "__main__":
-    ants.tests.main()
