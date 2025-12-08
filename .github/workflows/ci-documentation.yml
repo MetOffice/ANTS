@@ -29,6 +29,10 @@ jobs:
                 environment-name: ci-env
                 cache-environment: true
 
+            - name: Install ANTS
+              run: pip install .
+              shell: micromamba-shell {0}
+
             - name: Sphinx build
               shell: micromamba-shell {0}
               run: make --directory=docs clean clean-apidoc apidoc html
