@@ -27,6 +27,10 @@ jobs:
                 environment-name: ci-env
                 cache-environment: true
 
+            - name: Install ANTS
+              run: pip install .
+              shell: micromamba-shell {0}
+
             - name: Run pytest
               run: pytest --verbose
               shell: micromamba-shell {0}

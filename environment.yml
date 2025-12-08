@@ -30,6 +30,7 @@ dependencies:
   - python=3.10.13
   - ruff
   - setuptools
+  - setuptools-scm
   - sphinx=7.2.6
   - sphinx-argparse
   - sphinx-copybutton
