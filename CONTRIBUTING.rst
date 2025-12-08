@@ -287,3 +287,4 @@ Contributor Licence Agreement:
 
 * Josh Rackham (Met Office)
 * Harold Dyson (Met Office)
+* Theo Geddes (Met Office)
