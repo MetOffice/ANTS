@@ -38,7 +38,8 @@ import iris
 import iris.analysis.calculus
 import numpy as np
 
-from . import _merge, cover_mapping
+from . import cover_mapping
+from . import _merge
 from ._merge import (
     FillABC,
     FillMissingPoints,
