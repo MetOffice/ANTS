@@ -38,9 +38,12 @@ project = "ANTS"
 copyright = f"2015 - {datetime.now().year}, Met Office"
 author = "Model Inputs and Outputs team, Met Office"
 
-# The full version, including alpha/beta/rc tags
-version = ants.__version__
-release = ants.__version__
+# Avoid using the full version string if it is a developer version
+if "dev" in ants.__version__:
+    version = "developer"
+else:
+    version = ants.__version__
+release = version
 
 iris_version = iris.__version__
 numpy_version = np.__version__.rsplit(".", 1)[0]
@@ -136,9 +139,10 @@ html_context = {
 }
 
 # Settings for site map
-html_baseurl = "https://code.metoffice.gov.uk/doc/ancil/ants/latest/"
+html_baseurl = "https://metoffice.github.io/ANTS/"
 sitemap_locales = [None]
 sitemap_url_scheme = "{link}"
+html_last_updated_fmt = ""
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -149,6 +153,9 @@ sitemap_url_scheme = "{link}"
 # Include accessibility in footer
 html_theme_options = {
     "github_url": "https://github.com/MetOffice/ANTS",
+    "footer_center": [
+        "last-updated",
+    ],
     "footer_end": [
         "accessibility",
         "theme-version",
