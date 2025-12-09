@@ -11,8 +11,8 @@ import ants.tests
 import ants.tests.stock as stock
 import cf_units
 import iris
-import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from iris.coords import AuxCoord, DimCoord
 
 
@@ -80,6 +80,7 @@ class _BaseCommon(object):
         return mule.AncilFile.from_file(fh.name)
 
 
+@ants.tests.skip_mule
 class TestAncillaryVersion(_BaseCommon, ants.tests.TestCase):
     def testall(self):
         with mock.patch(
@@ -90,6 +91,7 @@ class TestAncillaryVersion(_BaseCommon, ants.tests.TestCase):
             self.assertEqual(ffv.fixed_length_header.model_version, 3)
 
 
+@ants.tests.skip_mule
 class TestMissingDataUMDefault(_BaseCommon, ants.tests.TestCase):
     def test_mdi_not_um_standard(self):
         expected = mule._REAL_MDI
@@ -103,6 +105,7 @@ class TestMissingDataUMDefault(_BaseCommon, ants.tests.TestCase):
         self.assertEqual(actual, expected)
 
 
+@ants.tests.skip_mule
 class TestVegPseudoLevels(_BaseCommon, ants.tests.TestCase):
     def _cube_with_pseudo_levels(self):
         nlat, nlon, npseudo = 2, 2, 3
@@ -137,6 +140,7 @@ class TestVegPseudoLevels(_BaseCommon, ants.tests.TestCase):
         self.assertArrayEqual(ffv.integer_constants.raw[8:15], expected)
 
 
+@ants.tests.skip_mule
 class TestHeightModelLevels(_BaseCommon, ants.tests.TestCase):
     def setUp(self):
         # Ensure the number of levels is as expected.
@@ -187,6 +191,7 @@ class TestDepthModelLevels(_BaseCommon, ants.tests.TestCase):
         self.cube.add_dim_coord(mcoord, 0)
         self.cube.add_aux_coord(depth, data_dims=0)
 
+    @ants.tests.skip_mule
     def test_level_header(self):
         ffv = self.load_mule_ancil_from_disk(self.cube)
         expected = np.ones(7, dtype="int") * -32768
@@ -197,12 +202,14 @@ class TestDepthModelLevels(_BaseCommon, ants.tests.TestCase):
         # array access on the .raw property.
         self.assertArrayEqual(ffv.integer_constants.raw[8:15], expected)
 
+    @ants.tests.skip_mule
     def test_grid_staggering_2_accepted(self):
         # Compare with TestHeightModelLevels.test_grid_staggering_2_rejected
         self.cube.attributes["grid_staggering"] = 2
         ffv = self.load_mule_ancil_from_disk(self.cube)
         self.assertEqual(ffv.fixed_length_header.grid_staggering, 2)
 
+    @ants.tests.skip_mule
     def test_depth_vertical_coordinate(self):
         ffv = self.load_mule_ancil_from_disk(self.cube)
         self.assertEqual(ffv.fixed_length_header.vert_coord_type, 4)
@@ -212,6 +219,7 @@ class TestDepthModelLevels(_BaseCommon, ants.tests.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported depth"):
             self.load_mule_ancil_from_disk(self.cube)
 
+    @ants.tests.skip_mule
     def test_invalid_depth_name_skipped(self):
         # Rename the depth coordinate to an invalid name and
         # check that the header is not modified
@@ -220,6 +228,7 @@ class TestDepthModelLevels(_BaseCommon, ants.tests.TestCase):
         self.assertEqual(ffv.fixed_length_header.vert_coord_type, 1)
 
 
+@ants.tests.skip_mule
 class TestSingleAndMultiLevel(_BaseCommon, ants.tests.TestCase):
     _NLEV = 3
 
@@ -263,6 +272,7 @@ class TestSingleAndMultiLevel(_BaseCommon, ants.tests.TestCase):
         self.assertEqual(len(cubes), ffv.integer_constants.num_field_types)
 
 
+@ants.tests.skip_mule
 class TestTimeCoordinates(_BaseCommon, ants.tests.TestCase):
     def assert_time(self, ffv, t1, t2, t3):
         # ffv.fixed_length_header.tX_year through to
@@ -349,6 +359,7 @@ class TestTimeCoordinates(_BaseCommon, ants.tests.TestCase):
         self.assertEqual(ffv.fixed_length_header.time_type, expected)
 
 
+@ants.tests.skip_mule
 class TestRotatedPoleGrid(_BaseCommon, ants.tests.TestCase):
     @property
     def get_crs(self):
@@ -544,6 +555,7 @@ class TestRotatedPoleGrid(_BaseCommon, ants.tests.TestCase):
         self.assertArrayEqual(actual, expected)
 
 
+@ants.tests.skip_mule
 class TestPseudoLevelOrder(_BaseCommon, ants.tests.TestCase):
     # Ensure preservation of pseudo-levels
 
@@ -585,6 +597,7 @@ class TestPseudoLevelOrder(_BaseCommon, ants.tests.TestCase):
         self.assertArrayEqual(pseudo_levels, expected)
 
 
+@ants.tests.skip_mule
 class TestMultipleFields(_BaseCommon, ants.tests.TestCase):
     def _build_cube(self):
         time_unit = cf_units.Unit(
@@ -616,6 +629,7 @@ class TestExceptions(_BaseCommon, ants.tests.TestCase):
     def setUp(self):
         self.cube = self._make_global_cube(0.5, 2, 2)
 
+    @ants.tests.skip_mule
     def test_not_identical_coordinates_present(self):
         # Where coordinates are not ~identically defined to all cubes being
         # saved.
@@ -631,6 +645,7 @@ class TestExceptions(_BaseCommon, ants.tests.TestCase):
         with self.assertRaisesRegex(RuntimeError, msg):
             self.load_mule_ancil_from_disk(iris.cube.CubeList([self.cube, cube]))
 
+    @ants.tests.skip_mule
     def test_missing_coordinates(self):
         # Where coordinates are not common to all cubes being saved.
         cube = self.cube.copy()
@@ -702,15 +717,19 @@ class TestFieldDtype(_BaseCommon, ants.tests.TestCase):
             and res_kind == self.KIND[target_type]
         )
 
+    @ants.tests.skip_mule
     def test_logical_valid_min_max_int8(self):
         self.assertFieldType("int8", "logical", valid_min=0, valid_max=1)
 
+    @ants.tests.skip_mule
     def test_integer_valid_max_int8(self):
         self.assertFieldType("int8", "integer", valid_max=1)
 
+    @ants.tests.skip_mule
     def test_logical_valid_range_int8(self):
         self.assertFieldType("int8", "logical", valid_range=[0, 1])
 
+    @ants.tests.skip_mule
     def test_logical_valid_range_valid_x_int8_agrees(self):
         # Ensure that valid_range, valid_min and valid_max being specified
         # is accepted when they agree.
@@ -731,6 +750,7 @@ class TestFieldDtype(_BaseCommon, ants.tests.TestCase):
                 "int8", "logical", valid_range=[0, 1], valid_min=10, valid_max=100
             )
 
+    @ants.tests.skip_mule
     def test_non_logical_valid_range_valid_x_ignore(self):
         # Ensure that the valid_range, valid_min and valid_max are ignored
         # even if they don't agree with oneanother when we don't interpret
@@ -739,26 +759,31 @@ class TestFieldDtype(_BaseCommon, ants.tests.TestCase):
             "int8", "integer", valid_range=[1, 2], valid_min=10, valid_max=100
         )
 
+    @ants.tests.skip_mule
     def test_non_logical_valid_range_int8(self):
         # When valid_x indicates that field doesn't represent a logical, ensure
         # that it doesn't end up as a logical.
         self.assertFieldType("int8", "integer", valid_range=[1, 10])
 
+    @ants.tests.skip_mule
     def test_no_valid_range_int8(self):
         # If this fails in future, it will be because valid_range has been
         # derived i.e. valid_range will no longer need to be specified
         # manually for logical fields.
         self.assertFieldType("int8", "integer")
 
+    @ants.tests.skip_mule
     def test_logical_valid_x_int64(self):
         # Ensure that don't ignore valid_x when the source field is not with
         # itemsize 1 i.e. it only has to be of integer type.
         self.assertFieldType("int64", "logical", valid_min=0, valid_max=1)
 
+    @ants.tests.skip_mule
     def test_float64(self):
         self.assertFieldType("float32", "float")
 
 
+@ants.tests.skip_mule
 class TestVariableResGrid(_BaseCommon, ants.tests.TestCase):
     def assert_load_save_cycle(self, grid_staggerring):
         cube = stock.geodetic((3, 3))
@@ -789,6 +814,7 @@ class TestVariableResGrid(_BaseCommon, ants.tests.TestCase):
         self.assert_load_save_cycle(6)
 
 
+@ants.tests.skip_mule
 class TestMuleWorkaround(_BaseCommon, ants.tests.TestCase):
     def test_lbuser2_set(self):
         cube1 = stock.geodetic((3, 3))
@@ -802,7 +828,3 @@ class TestMuleWorkaround(_BaseCommon, ants.tests.TestCase):
             raise RuntimeError(
                 "Mule is populating lbuser2 for us.  Remove " "our workaround."
             )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -371,7 +371,7 @@ applicable) as:
             args.netcdf_only,
         )
 
-We will now update our ``main()`` section to take these arguments and to run 
+We will now update our ``main()`` section to take these arguments and to run
 the savers. While we are in there we will also remove the debug print
 statements, add some comments, and put in a docstring.
 Update your ``main()`` section to look like this:

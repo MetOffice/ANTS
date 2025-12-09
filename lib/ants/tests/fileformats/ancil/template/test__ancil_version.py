@@ -19,7 +19,3 @@ class TestAll(ants.tests.TestCase):
         with mock.patch("ants.__version__", new="10.2dev"):
             version = _ancil_version()
         self.assertEqual(version, 1002)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

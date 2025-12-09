@@ -256,7 +256,3 @@ class TestHorizontalExtrapolationConfig(ants.tests.TestCase):
         self.assertEqual(
             scheme._horizontal_scheme.extrapolation_mode, default_extrapolation_mode
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

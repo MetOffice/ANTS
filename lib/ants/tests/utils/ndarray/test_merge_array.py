@@ -111,7 +111,3 @@ class TestExceptions(ants.tests.TestCase):
         msg = "Arrays are not compatible for merging"
         with self.assertRaisesRegex(ValueError, msg):
             merge_array(a, b)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

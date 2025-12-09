@@ -46,7 +46,7 @@ safe_load(){
 
     # Check module count to determine whether module load was successful.
     if [[ $PRE_LOAD_LIST == $POST_LOAD_LIST ]]; then
-        echo "[ERROR] Failed to load: ${1}"
+        date -u +"[ERROR] %Y-%m-%dT%H:%M:%SZ - Failed to load: ${1}"
         exit 1
     fi
 }
@@ -63,7 +63,7 @@ export PYTHONNOUSERSITE=true
 # Check that either ANTS_MODULE or SCITOOLS_MODULE have been specified. If
 # neither is set then exit with an error.
 if [[ -z ${ANTS_MODULE:-} && -z ${SCITOOLS_MODULE:-} ]]; then
-    echo "[ERROR] Need to set either ANTS_MODULE or SCITOOLS_MODULE"
+    date -u +"[ERROR] %Y-%m-%dT%H:%M:%SZ - Need to set either ANTS_MODULE or SCITOOLS_MODULE"
     exit 1
 fi
 
@@ -73,8 +73,13 @@ if [[ ! -z ${ANTS_MODULE:-} ]]; then
     if [[ -z ${QUIET_MODE:-} ]]; then
         # Report Mule loaded and print version info - this is useful for
         # understanding which build of mule has been sourced.
-        echo "[INFO] Mule version loaded was:"
-        mule-version
+        date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ - Mule version loaded was:"
+        if which mule-version ; then
+            mule-version
+        else
+            date -u +"[WARNING] %Y-%m-%dT%H:%M:%SZ - No mule version loaded"
+            date -u +"[WARNING] %Y-%m-%dT%H:%M:%SZ - No mule version loaded" 1>&2
+        fi
     fi
 else
     safe_load $SCITOOLS_MODULE
@@ -85,8 +90,13 @@ else
         if [[ -z ${QUIET_MODE:-} ]]; then
             # Report Mule loaded and print version info - this is useful for
             # understanding which build of mule has been sourced.
-            echo "[INFO] Mule version loaded was:"
-            mule-version
+            date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ - Mule version loaded was:"
+            if which mule-version ; then
+                mule-version
+            else
+                date -u +"[WARNING] %Y-%m-%dT%H:%M:%SZ - No mule version loaded"
+                date -u +"[WARNING] %Y-%m-%dT%H:%M:%SZ - No mule version loaded" 1>&2
+            fi
         fi
     fi
 fi
@@ -95,7 +105,7 @@ fi
 # python environment.
 if [[ ! -z ${PYTHONPATH_PREPEND:-} ]]; then
     if [[ -z ${QUIET_MODE:-} ]]; then
-        echo "[INFO] Prepending the following to PYTHONPATH:" $PYTHONPATH_PREPEND
+        date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ - Prepending the following to PYTHONPATH: ${PYTHONPATH_PREPEND}"
     fi
     export PYTHONPATH=$PYTHONPATH_PREPEND:${PYTHONPATH:-}
 fi
@@ -103,7 +113,7 @@ fi
 # If it has been set then prepend PATH_PREPEND to PATH to extend the environment.
 if [[ ! -z ${PATH_PREPEND:-} ]]; then
     if [[ -z ${QUIET_MODE:-} ]]; then
-        echo "[INFO] Prepending the following to PATH:" $PATH_PREPEND
+        date -u +"[INFO] %Y-%m-%dT%H:%M:%SZ - Prepending the following to PATH: ${PATH_PREPEND}"
     fi
     export PATH=$PATH_PREPEND:${PATH:-}
 fi
@@ -113,7 +123,7 @@ if [[ -z ${QUIET_MODE:-} ]]; then
     # debugging which builds of ANTS and Iris have been sourced. The ants-version
     # script can be extended to debug additional dependencies.
     ants-version
-    echo "[OK] Modules loaded."
+    date -u +"[OK] %Y-%m-%dT%H:%M:%SZ - Modules loaded."
 fi
 
 if [[ ! -z ${ULIMIT_SETTING:-} ]]; then

@@ -21,9 +21,20 @@ independent of which load function is used:
    cube.attributes['grid_staggering'].
 
 """
+import warnings
+
 import ants
 import iris
-import mule
+
+try:
+    import mule
+except ImportError as _mule_import_error:
+    mule = None
+    message = (
+        f"Unable to import mule: {_mule_import_error}\nProceeding "
+        "without capabilities provided by mule."
+    )
+    warnings.warn(message)
 import numpy as np
 from ants.fileformats import pp
 
@@ -35,10 +46,8 @@ from . import template
 # (i.e. lookup headers) are indexed from 1.  Where possible, access the header
 # elements by name rather than index.
 
-IMDI = mule._INTEGER_MDI
-RMDI = mule._REAL_MDI
-_NUM_LOOKUP_INTS = mule.Field.NUM_LOOKUP_INTS
-_NUM_LOOKUP_REALS = mule.Field.NUM_LOOKUP_REALS
+IMDI = -32768  # As defined by UMDP F03 at UM version 13.9.
+RMDI = -1073741824.0  # As defined by UMDP F03 at UM version 13.9.
 
 
 class _CallbackUM(pp._CallbackPP):
@@ -87,158 +96,209 @@ class _IrisPPFieldDataProvider(object):
         return data
 
 
-class _Field3(mule.Field3):
-    """
-    Provides conveniences for ancillary generation on top of the mule Field3.
+class _GuardField3:
+    """This class enables mule to be an optional import.
+
+    Any attempt to instantiate this class will trigger a ValueError.  This
+    means that we can import this package safely, but any attempt to use
+    mule functionality will trigger an error.
+
+    Using the `from_pp` class method or the `_get_headers_from_pp` static
+    method will also trigger an error.
 
     """
+
+    def __init__(self, *args, **kwargs):
+        self._error()
 
     @staticmethod
-    def _get_headers_from_pp(ppfield):
-        """
-        Gets headers in a format suitable for use for generating a mule Field
-        from the ppfield.
-
-
-        Parameters
-        ----------
-
-        ppfield : :class:`iris.fileformats.pp.PPField`
-            The field from which to extract the headers.
-
-        Returns
-        -------
-
-        : tuple(:class:`numpy.ndarray`, :class:`numpy.ndarray`)
-            First array is the int_headers and the second array is the real
-            headers
-
-        """
-        # Following pp.PPField.save we make sure the data is big-endian
-        int_headers = np.empty(
-            shape=_NUM_LOOKUP_INTS, dtype=np.dtype(">i%d" % mule._DEFAULT_WORD_SIZE)
-        )
-        int_headers.fill(IMDI)
-        real_headers = np.empty(
-            shape=_NUM_LOOKUP_REALS, dtype=np.dtype(">f%d" % mule._DEFAULT_WORD_SIZE)
-        )
-        real_headers.fill(RMDI)
-
-        word_count = 0
-        for name, word_no in ppfield.HEADER_DEFN:
-            ppfield_value = getattr(ppfield, name)
-            for sub_index, num in enumerate(word_no):
-                if len(word_no) > 1:
-                    value = ppfield_value[sub_index]
-                else:
-                    value = ppfield_value
-
-                # First sort out the integer headers
-                if word_count >= _NUM_LOOKUP_INTS:
-                    word_count = 0
-
-                # Cast as special types include pp.SplittableInt and pp._LBProc
-                if num < _NUM_LOOKUP_INTS:
-                    int_headers[word_count] = int(value)
-                else:
-                    real_headers[word_count] = float(value)
-                word_count += 1
-        return (int_headers, real_headers)
+    def _get_headers_from_pp(*args, **kwargs):
+        _GuardField3._error()
 
     @classmethod
-    def from_pp(cls, ppfield):
-        """
-        Generates a mule Field3 from a pp field.
+    def from_pp(cls, *args, **kwargs):
+        cls._error()
 
-        Data type conversion is done to ensure that the data is in the correct
-        format for writing as an ancillary.  This also corrects the missing
-        data indicator if needed.
-
-        Parameters
-        ----------
-        ppfield: :class:`iris.fileformats.pp.PPField3`
-            The PP field from which to create a mule Field.
-
-        Returns
-        -------
-        : :class:`mule.Field3`
-            The ppfield translated to a mule Field3.
-
-        .. warning::
-
-            This is not lazy - i.e. if the data attached to the ppfield is
-            lazy, the conversion to a mule field will realise it.
-
-        """
-
-        # pp field with 64 word length header to ancillary field conversion.
-        if not isinstance(ppfield, iris.fileformats.pp.PPField3):
-            raise TypeError(
-                "pp header version not supported for ancillary " "field generation."
-            )
-
-        int_headers, real_headers = cls._get_headers_from_pp(ppfield)
-
-        # Ensure consistent RMDI across all fields
-        if ppfield.bmdi != RMDI:
-            bmdi_offset = [
-                offset[0] for (name, offset) in ppfield.HEADER_DEFN if name == "bmdi"
-            ][0]
-            bmdi_ind = bmdi_offset - _NUM_LOOKUP_INTS
-            real_headers[bmdi_ind] = RMDI
-
-        # LBVC - should always be set (surface/model level).
-        if ppfield.lbvc == 0:
-            int_headers[25] = 129
-
-        field = cls(
-            int_headers=int_headers,
-            real_headers=real_headers,
-            data_provider=_IrisPPFieldDataProvider(ppfield),
+    @staticmethod
+    def _error():
+        raise ValueError(
+            "Mule cannot be imported, but an attempt has been "
+            "made to use mule functionality through the "
+            "_Field3 class"
         )
 
-        field.x = field.y = None
-        if getattr(ppfield, "x", None) is not None:
-            field.bdx = field.bzx = RMDI
-            field.x = ppfield.x
-        if getattr(ppfield, "y", None) is not None:
-            field.bdy = field.bzy = RMDI
-            field.y = ppfield.y
 
-        return field
+def _get_Field3(mule_present):
+    if mule_present:
 
-    @property
-    def is_regular(self):
-        """
-        Determine whether the field has regular x or y.
+        class _ActualField3(mule.Field3):
+            """
+            Provides conveniences for ancillary generation on top of the mule Field3.
 
-        Returns
-        -------
-        : tuple of bool
-            Regularity of the dimensions in the order (x, y).
+            """
 
-        """
-        if not hasattr(self, "x"):
-            self.x = None
-        if not hasattr(self, "y"):
-            self.y = None
-        return (self.x is None, self.y is None)
+            _NUM_LOOKUP_INTS = mule.Field.NUM_LOOKUP_INTS
+            _NUM_LOOKUP_REALS = mule.Field.NUM_LOOKUP_REALS
 
-    @property
-    def is_rotated(self):
-        """
-        Returns
-        -------
-        : bool
-            True if the pp header lbcode.ix is 1
+            @staticmethod
+            def _get_headers_from_pp(ppfield):
+                """
+                Gets headers in a format suitable for use for generating a mule Field
+                from the ppfield.
 
-        """
-        try:
-            ix = int(str(self.lbcode)[-3])
-            res = ix == 1
-        except IndexError:
-            res = False
-        return res
+
+                Parameters
+                ----------
+
+                ppfield : :class:`iris.fileformats.pp.PPField`
+                    The field from which to extract the headers.
+
+                Returns
+                -------
+
+                : tuple(:class:`numpy.ndarray`, :class:`numpy.ndarray`)
+                    First array is the int_headers and the second array is the real
+                    headers
+
+                """
+                # Following pp.PPField.save we make sure the data is big-endian
+                int_headers = np.empty(
+                    shape=_ActualField3._NUM_LOOKUP_INTS,
+                    dtype=np.dtype(">i%d" % mule._DEFAULT_WORD_SIZE),
+                )
+                int_headers.fill(IMDI)
+                real_headers = np.empty(
+                    shape=_ActualField3._NUM_LOOKUP_REALS,
+                    dtype=np.dtype(">f%d" % mule._DEFAULT_WORD_SIZE),
+                )
+                real_headers.fill(RMDI)
+
+                word_count = 0
+                for name, word_no in ppfield.HEADER_DEFN:
+                    ppfield_value = getattr(ppfield, name)
+                    for sub_index, num in enumerate(word_no):
+                        if len(word_no) > 1:
+                            value = ppfield_value[sub_index]
+                        else:
+                            value = ppfield_value
+
+                        # First sort out the integer headers
+                        if word_count >= _ActualField3._NUM_LOOKUP_INTS:
+                            word_count = 0
+
+                        # Cast as special types include pp.SplittableInt and pp._LBProc
+                        if num < _ActualField3._NUM_LOOKUP_INTS:
+                            int_headers[word_count] = int(value)
+                        else:
+                            real_headers[word_count] = float(value)
+                        word_count += 1
+                return (int_headers, real_headers)
+
+            @classmethod
+            def from_pp(cls, ppfield):
+                """
+                Generates a mule Field3 from an iris PPField3.
+
+                Data type conversion is done to ensure that the data is in the correct
+                format for writing as an ancillary.  This also corrects the missing
+                data indicator if needed.
+
+                Parameters
+                ----------
+                ppfield: :class:`iris.fileformats.pp.PPField3`
+                    The PP field from which to create a mule Field.
+
+                Returns
+                -------
+                : :class:`mule.Field3`
+                    The ppfield translated to a mule Field3.
+
+                .. warning::
+
+                    This is not lazy - i.e. if the data attached to the ppfield is
+                    lazy, the conversion to a mule field will realise it.
+
+                """
+
+                # pp field with 64 word length header to ancillary field conversion.
+                if not isinstance(ppfield, iris.fileformats.pp.PPField3):
+                    raise TypeError(
+                        "pp header version not supported for ancillary "
+                        "field generation."
+                    )
+
+                int_headers, real_headers = cls._get_headers_from_pp(ppfield)
+
+                # Ensure consistent RMDI across all fields
+                if ppfield.bmdi != RMDI:
+                    bmdi_offset = [
+                        offset[0]
+                        for (name, offset) in ppfield.HEADER_DEFN
+                        if name == "bmdi"
+                    ][0]
+                    bmdi_ind = bmdi_offset - _ActualField3._NUM_LOOKUP_INTS
+                    real_headers[bmdi_ind] = RMDI
+
+                # LBVC - should always be set (surface/model level).
+                if ppfield.lbvc == 0:
+                    int_headers[25] = 129
+
+                field = cls(
+                    int_headers=int_headers,
+                    real_headers=real_headers,
+                    data_provider=_IrisPPFieldDataProvider(ppfield),
+                )
+
+                field.x = field.y = None
+                if getattr(ppfield, "x", None) is not None:
+                    field.bdx = field.bzx = RMDI
+                    field.x = ppfield.x
+                if getattr(ppfield, "y", None) is not None:
+                    field.bdy = field.bzy = RMDI
+                    field.y = ppfield.y
+
+                return field
+
+            @property
+            def is_regular(self):
+                """
+                Determine whether the field has regular x or y.
+
+                Returns
+                -------
+                : tuple of bool
+                    Regularity of the dimensions in the order (x, y).
+
+                """
+                if not hasattr(self, "x"):
+                    self.x = None
+                if not hasattr(self, "y"):
+                    self.y = None
+                return (self.x is None, self.y is None)
+
+            @property
+            def is_rotated(self):
+                """
+                Returns
+                -------
+                : bool
+                    True if the pp header lbcode.ix is 1
+
+                """
+                try:
+                    ix = int(str(self.lbcode)[-3])
+                    res = ix == 1
+                except IndexError:
+                    res = False
+                return res
+
+        _Field3 = _ActualField3
+    else:
+        _Field3 = _GuardField3
+    return _Field3
+
+
+_Field3 = _get_Field3(mule)
 
 
 def _cubes_to_ancilfile(cubes):
@@ -310,9 +370,8 @@ def _cubes_to_ancilfile(cubes):
     return ancilfile
 
 
-def _fetch_grid_staggering_from_file(filenames):
-    """
-    Fetch grid filename: staggering mapping.
+def _fetch_grid_staggering_from_file(filenames, mule_present):
+    """Fetch grid filename: staggering mapping.
 
     Parameters
     ----------
@@ -320,12 +379,22 @@ def _fetch_grid_staggering_from_file(filenames):
         The name of the ancillary file from which to fetch the grid staggering
         attribute.
 
+    mule_present: obj
+        If this evaluates to True, use mule to get the grid staggering from
+        the file.  Otherwise, raise a meaningful error.
+
     Returns
     -------
     : dict
         Mapping between filename and grid staggering.
 
     """
+    if mule_present is False:
+        raise ValueError(
+            "Mule cannot be imported, but an attempt has been "
+            "made to use mule functionality through loading"
+            "an F03 ancillary file."
+        )
     mapping = {}
     for filename in filenames:
         ffv = mule.AncilFile.from_file(filename)
@@ -345,7 +414,7 @@ def load_cubes(*args, **kwargs):
     :func:`iris.fileformats.um.load_cubes`
 
     """
-    grid_staggering = _fetch_grid_staggering_from_file(args[0])
+    grid_staggering = _fetch_grid_staggering_from_file(args[0], mule)
     args, kwargs = pp._add_callback(_CallbackUM(grid_staggering), *args, **kwargs)
     return iris.fileformats.um.load_cubes(*args, **kwargs)
 
@@ -360,7 +429,7 @@ def load_cubes_32bit_ieee(*args, **kwargs):
     :func:`load_cubes` for keyword details
 
     """
-    grid_staggering = _fetch_grid_staggering_from_file(args[0])
+    grid_staggering = _fetch_grid_staggering_from_file(args[0], mule)
     args, kwargs = pp._add_callback(_CallbackUM(grid_staggering), *args, **kwargs)
     return iris.fileformats.um.load_cubes_32bit_ieee(*args, **kwargs)
 

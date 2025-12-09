@@ -241,7 +241,3 @@ class TestExceptions(ants.tests.TestCase):
                     """
         with self.assertRaisesRegex(RuntimeError, msg):
             extract_overlap(source, grid, fix_period=False, pad_width=0)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

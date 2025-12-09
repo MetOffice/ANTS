@@ -115,8 +115,8 @@ copybutton_exclude = ".linenos, .gp"
 highlight_language = "python-console"
 
 # Ignore the following warnings in nitpicky mode
-# TODO #2323: Remove the entries relating to private classes
-# when we have fixed the documentation tfor these.
+# TODO https://github.com/MetOffice/ANTS/issues/89: Remove the entries relating to
+# private classes when we have fixed the documentation tfor these.
 nitpick_ignore = [
     ("py:exc", "argparse.ArgumentTypeError"),
     ("py:class", "ants.fileformats.namelist.umgrid._CAPGrid"),
@@ -148,14 +148,7 @@ sitemap_url_scheme = "{link}"
 # Link to ANTS Trac page
 # Include accessibility in footer
 html_theme_options = {
-    "icon_links": [
-        {
-            "name": "Trac",
-            "url": "https://code.metoffice.gov.uk/trac/ancil",
-            "icon": "fa-solid fa-bugs",
-            "type": "fontawesome",
-        }
-    ],
+    "github_url": "https://github.com/MetOffice/ANTS",
     "footer_end": [
         "accessibility",
         "theme-version",
@@ -174,4 +167,7 @@ linkcheck_ignore = [
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule.html#mule.Field3
     # https://code.metoffice.gov.uk/doc/um/mule/latest/mule/ancil.html#mule.ancil.AncilFile
     r"https://code.metoffice.gov.uk/doc/um/mule/latest/mule.*\.html\#",
+    # Ignore ANTS GitHub while it is private.
+    # TODO: Remove from ignore list when repository goes public.
+    r"https://github.com/MetOffice/ANTS.*",
 ]

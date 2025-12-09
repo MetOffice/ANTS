@@ -6,7 +6,6 @@ import tempfile
 
 import ants.tests
 import iris.fileformats
-import mule.pp
 import pytest
 from ants.io.load import ants_format_agent
 
@@ -21,9 +20,12 @@ def test_correct_pp_specification_used():
             assert used_spec.priority == 6
 
 
+@ants.tests.skip_mule
 def test_pseudo_level_order_preserved():
     """Loads a pp file, modifies the pseudo levels and saves this to a temporary file.
     The file is loaded and the order of the pseudo levels are checked."""
+    import mule.pp
+
     file_path = ants.tests.get_data_path("load_files/contains_pseudo_levels.pp")
     pp_fields = mule.pp.fields_from_pp_file(file_path)
     # Change pseudolevels to non numerical order
@@ -36,11 +38,14 @@ def test_pseudo_level_order_preserved():
     assert pseudo_level_points == [1, 2, 3, 302, 5, 6, 7, 8, 9]
 
 
+@ants.tests.skip_mule
 @pytest.mark.xfail
 def test_pseudo_level_orders_with_iris():
     """Loads a pp file, modifies the pseudo levels and saves this to a temporary file.
     The file is loaded with iris and the order of the pseudo levels are checked."""
     file_path = ants.tests.get_data_path("load_files/contains_pseudo_levels.pp")
+    import mule.pp
+
     pp_fields = mule.pp.fields_from_pp_file(file_path)
     # Change pseudolevels to non numerical order
     pp_fields[3].lbuser5 = 302

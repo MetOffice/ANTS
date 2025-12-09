@@ -10,13 +10,14 @@ Prerequisites
 
 In order to install and get ANTS running in full you will need the following:
 
- * An installed version of `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
-   and some `familiarity <https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_ with it
- * A local install of `mule and shumlib <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ -
-   talk to your local UM support team if you need support with this
- * `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and
-   `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows (requires cylc
-   version >= 8.6.0)
+* An installed version of `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
+  and some `familiarity <https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_ with it
+* A local install of `mule and shumlib
+  <https://code.metoffice.gov.uk/doc/um/mule/latest>`_ - talk to your local
+  UM support team if you need support with this
+* `Rose <http://metomi.github.io/rose/doc/html/index.html>`_ and
+  `cylc <https://cylc.github.io/>`_ for running rose-stem test workflows (requires cylc
+  version >= 8.6.0)
 
 Depending on your local site configuration, it may be necessary to unset the
 ``LD_LIBRARY_PATH`` environment prior to running the following conda commands.
@@ -67,11 +68,18 @@ you can use the ``--no-build-isolation`` option to pip as follows::
 
     $ python -m pip install --no-build-isolation .
 
+For development work, you may want to install ANTS in editable mode::
+
+    $ python -m pip install --editable .
+
 Configuring Mule
 ----------------
 
-ANTS requires a local installation of |Mule|. Mule's bin directory must be added to
-the PATH and the lib directory added to the PYTHONPATH.
+ANTS requires a local installation of |Mule|.  Mule's bin directory must be
+added to the PATH and the lib directory added to the PYTHONPATH.  This is
+required for using the UM spiral search, loading UM format ancillaries
+(i.e. as defined in F03), or saving UM format ancillaries; but can be omitted
+for the rare use cases where those features are not needed.
 
 .. _quick-verification:
 
@@ -81,10 +89,11 @@ Quick verification
 A quick verification that the installation has completed can be done by
 activating the environment (if it's not already active) and running::
 
-    $ python -c 'import ants; print(ants.__file__)'
+    $ ants-version
 
-If eveything has worked correctly, the returned path should point inside the
-newly created conda environment.
+If everything has worked correctly, the returned path should point inside the
+newly created conda environment for a stable installation, or to the working
+copy of ANTS for a developer (editable) installation.
 
 Confirming ANTS Installation
 ============================

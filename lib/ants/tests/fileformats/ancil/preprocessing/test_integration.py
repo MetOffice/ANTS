@@ -11,8 +11,8 @@ import ants
 import ants.tests
 import cf_units
 import iris
-import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.preprocessing import (
     _create_climatology_config,
     correct_lbproc,
@@ -104,6 +104,7 @@ class Common(object):
         return cube
 
 
+@ants.tests.skip_mule
 class Test_set_climatology_year(Common, ants.tests.TestCase):
     def assert_climatology(self, ancil, tar):
         set_climatology_year(ancil, 2012)
@@ -185,6 +186,7 @@ class Test_set_climatology_year(Common, ants.tests.TestCase):
         self.assert_climatology(ancil, tar)
 
 
+@ants.tests.skip_mule
 class Test_correct_lbproc(Common, ants.tests.TestCase):
     def testall(self):
         ancil = gen_single_field_ffv()
@@ -192,6 +194,7 @@ class Test_correct_lbproc(Common, ants.tests.TestCase):
         self.assertEqual(ancil.fields[0].lbproc, 0)
 
 
+@ants.tests.skip_mule
 class Test__create_climatology_config(Common, ants.tests.TestCase):
     def test_exception_for_not_monthly_mean(self):
         ancil = gen_climatological_ffv()
@@ -217,7 +220,3 @@ class Test__create_climatology_config(Common, ants.tests.TestCase):
         expected = end_date.strftime("%Y-%m-%d")
         config = _create_climatology_config(ancil)
         self.assertEqual(config["climatology"]["end"], expected)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

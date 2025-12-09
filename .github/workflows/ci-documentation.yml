@@ -1,0 +1,61 @@
+name: CI documentation build and deploy
+
+on:
+    pull_request:
+        branches: main
+    push:
+        branches: main
+    workflow_dispatch:
+
+# Limit concurrently running workflow for a specific pull request.
+# Cancel and resubmit if a new push is made. See GitHub docs:
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build-docs:
+        name: Build documentation with Sphinx
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+
+            - name: Setup python environment
+              uses: mamba-org/setup-micromamba@v2
+              with:
+                environment-file: environment.lock
+                environment-name: ci-env
+                cache-environment: true
+
+            - name: Sphinx build
+              shell: micromamba-shell {0}
+              run: make --directory=docs clean clean-apidoc apidoc html
+
+            - name: Linkcheck
+              shell: micromamba-shell {0}
+              run: make --directory=docs linkcheck
+
+            - name: Upload pages artifact
+              uses: actions/upload-pages-artifact@v4
+              with:
+                path: docs/build/html
+
+    deploy-docs:
+        name: Deploy built documentation to GitHub pages
+        # Only run deploy-docs job on push to main, see GitHub docs:
+        # https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions
+        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        permissions:
+            contents: read
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-24.04
+        needs: build-docs
+        steps:
+            - name: Deploy documentation to pages
+              uses: actions/deploy-pages@v4

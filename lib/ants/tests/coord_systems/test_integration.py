@@ -46,7 +46,3 @@ class TestANTSCoordinateSystems(ants.tests.TestCase):
         )
         res_crs = crs.as_ants_crs()
         self.assertIs(res_crs, crs)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -72,7 +72,3 @@ class TestIsMaskedArray(ants.tests.TestCase):
         test_cube.attributes["emission_type"] = "2"
         lazy_test_cube = ants.utils.cube.defer_cube(test_cube)
         self.assertTrue(_is_masked_array(lazy_test_cube.core_data()))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

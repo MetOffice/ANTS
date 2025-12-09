@@ -49,7 +49,3 @@ class TestAll(ants.tests.TestCase):
         coord.points = points
         res = concatenate(self.source)
         self.assertTrue(len(res) == 2)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

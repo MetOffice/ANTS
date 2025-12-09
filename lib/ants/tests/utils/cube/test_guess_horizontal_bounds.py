@@ -32,7 +32,3 @@ class TestAll(ants.tests.TestCase):
         guess_horizontal_bounds([cube, cube2])
         self.mock_hgrid.called_with(cube)
         self.mock_hgrid.called_with(cube2)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

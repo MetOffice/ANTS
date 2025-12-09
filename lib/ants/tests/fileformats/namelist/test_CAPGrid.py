@@ -55,7 +55,3 @@ class Test_coord_system(ants.tests.TestCase):
 
         protgeog.assert_called_once_with(targ_y, targ_x, ellipsoid=UM_SPHERE.crs)
         self.assertEqual(res, protgeog())
-
-
-if __name__ == "__main__":
-    ants.tests.main()

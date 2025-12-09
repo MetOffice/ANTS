@@ -8,12 +8,13 @@ import ants.io.save as save
 import ants.tests
 import cf_units
 import iris
-import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.preprocessing import make_time_bounds_contiguous
 from iris.coords import DimCoord
 
 
+@ants.tests.skip_mule
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         self.source = tempfile.NamedTemporaryFile()
@@ -126,7 +127,3 @@ class TestAll(ants.tests.TestCase):
 
     def assertContiguousFields(self, start, end):
         self.assertArrayEqual(start.raw[1:7], end.raw[7:13])
-
-
-if __name__ == "__main__":
-    ants.tests.main()

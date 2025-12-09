@@ -81,7 +81,3 @@ class TestGetGrid(ants.tests.TestCase):
         msg = "Invalid values found in month_number coordinate."
         with self.assertRaisesRegex(RuntimeError, msg):
             _get_grid(my_cubes)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

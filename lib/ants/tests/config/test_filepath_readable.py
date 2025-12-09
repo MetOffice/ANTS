@@ -50,7 +50,3 @@ class TestAll(ants.tests.TestCase):
         self.mock_expanduser.assert_called_once_with(self.filepath)
         self.mock_expandvars.assert_called_once_with(self.filepath)
         mock_realpath.assert_called_once_with(self.filepath)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

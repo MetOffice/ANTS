@@ -8,12 +8,13 @@ import ants.io.save as save
 import ants.tests
 import cf_units
 import iris
-import mule
 import numpy as np
+from ants.fileformats.ancil import mule
 from ants.fileformats.ancil.preprocessing import update_reference_year
 from iris.coords import DimCoord
 
 
+@ants.tests.skip_mule
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         self.source = tempfile.NamedTemporaryFile()
@@ -110,7 +111,3 @@ class TestAll(ants.tests.TestCase):
         msg = "The provided year must be a positive integer."
         with self.assertRaisesRegex(ValueError, msg):
             update_reference_year(self.ffv, -500)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -558,7 +558,3 @@ class Test___del__(Common1D, ants.tests.TestCase):
         del regridder
         for obj in [grid1, grid2, field1, field2, rpatched()]:
             self.assertTrue(obj.destroy.called)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

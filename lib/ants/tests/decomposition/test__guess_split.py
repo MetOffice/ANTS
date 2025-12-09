@@ -111,7 +111,3 @@ class TestException(ants.tests.TestCase):
         msg = "Currently, unable to guess a suitable decomposition split"
         with self.assertRaisesRegex(RuntimeError, msg):
             guess_split(source, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

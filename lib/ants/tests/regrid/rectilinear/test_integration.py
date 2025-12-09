@@ -65,7 +65,8 @@ class TestIrisRegrid(ants.tests.TestCase):
 class TestTwoStage(_TestCommon, ants.tests.TestCase):
     def test_warning(self):
         # Note that area weighted regridding within iris masks grid cells which
-        # even slightly extend beyond the source extent, see iris github #1752.
+        # even slightly extend beyond the source extent, see iris github
+        # https://github.com/SciTools/iris/issues/1752.
         expected_warning = "NaN values introduced by extrapolation"
         source = stock.osgb((50, 50), xlim=(0, 6e5), ylim=(0, 12e5))
         target = stock.geodetic((50, 50), xlim=(-10, 10), ylim=(45, 65))
@@ -195,7 +196,3 @@ class TestLinear_interpolator(_TestCommon, ants.tests.TestCase):
         result = self.interpolate()
         target = {"grid_staggering": 3}
         self.check_attributes(result, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

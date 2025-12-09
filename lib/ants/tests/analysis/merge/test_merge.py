@@ -332,7 +332,3 @@ class TestMergeLSMs(ants.tests.TestCase):
 
         merged_cube = merge(primary, secondary, polygon)
         self.assertMaskedArrayEqual(merged_cube.data, target)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -19,6 +19,7 @@ dependencies:
   - nccmp
   - numba
   - numpy=1.26.0
+  - pre-commit
   - pydata-sphinx-theme
   - pyflakes
   - pykdtree
@@ -29,6 +30,7 @@ dependencies:
   - python=3.10.13
   - ruff
   - setuptools
+  - setuptools-scm
   - sphinx=7.2.6
   - sphinx-argparse
   - sphinx-copybutton

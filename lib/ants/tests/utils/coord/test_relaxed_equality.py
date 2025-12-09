@@ -69,7 +69,3 @@ class TestAll(ants.tests.TestCase):
     def test_unequal_lengths(self):
         coord2 = self.coord1[0:-1]
         self.assertFalse(relaxed_equality(self.coord1, coord2))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

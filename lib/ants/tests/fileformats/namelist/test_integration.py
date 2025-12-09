@@ -226,7 +226,3 @@ eta_rho = 0.05, 0.1625, 0.3125, 0.5, 0.8
 
         cube = self._run_um_vertical(callback=my_callback)
         self.assertEqual(cube.attributes["dummy_change"], "flop")
-
-
-if __name__ == "__main__":
-    ants.tests.main()

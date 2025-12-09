@@ -227,7 +227,3 @@ class TestMultiprocessingDomainDecompose(Common, ants.tests.TestCase):
 
 class TestDomainDecompose(Common, ants.tests.TestCase):
     decomposition_framework = decomp.DomainDecompose()
-
-
-if __name__ == "__main__":
-    ants.tests.main()

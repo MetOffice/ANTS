@@ -136,7 +136,7 @@ def dirpath_writeable(filepath):
 
     """
     # Note: utils is dependent on ants.config.CONFIG and so this function
-    # cannot move to utils without a circular dependency (#446).
+    # cannot move to utils without a circular dependency.
     filepath = _expand_path(filepath)
     dirpath = os.path.dirname(filepath)
     if not os.path.exists(dirpath):

@@ -117,7 +117,3 @@ class TestLicenseHeaders(Common, unittest.TestCase):
         msg = "There were license header failures."
         msg = "{}\n{}".format(msg, "\n".join(messages))
         self.assertFalse(messages, msg)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

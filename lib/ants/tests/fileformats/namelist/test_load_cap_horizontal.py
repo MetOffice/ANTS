@@ -96,7 +96,3 @@ class TestInterface(ants.tests.TestCase):
             {"grid": mock.sentinel.grid, "grid2": mock.sentinel.grid},
             ["dummy_filename", "dummy_filename2"],
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

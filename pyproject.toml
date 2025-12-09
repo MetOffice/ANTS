@@ -6,7 +6,7 @@ exclude = ".git"
 
 [build-system]
 # Minimum requirements for the build system to execute, defined by PEP 518.
-requires = ['setuptools']
+requires = ["setuptools>=80", "setuptools-scm[simple]>=8"]
 
 # Defined by PEP 517.
 build-backend = 'setuptools.build_meta'
@@ -26,7 +26,7 @@ filterwarnings = [
     'error',
 
     # And some specific cases where we ignore warnings.
-    # TODO: #2276 fix netCDF saving to work with future dask versions
+    # TODO: https://github.com/MetOffice/ANTS/issues/67 fix netCDF saving to work with future dask versions
     'ignore:The \`numpy.can_cast\` function is not implemented by Dask array:FutureWarning:dask',
 
     # Warning for behaviours internal to mule
@@ -47,8 +47,14 @@ filterwarnings = [
     # Warning for behaviour internal to iris when saving a pp file in tests
     'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
 
-    # Warning for tests for now deprecated functionality, see #2314:
-    'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning'
+    # Warning for tests for now deprecated functionality, see #34:
+    'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning',
+
+    # Warning for the optional dependency of mule not being present:
+    "ignore:Unable to import mule:UserWarning",
+
+    # Warning for the optional dependency of um_spiral_search (from shumlib) not being present:
+    "ignore:No module named 'um_spiral_search':UserWarning"
 
     # Additional filters are defined in ./lib/ants/tests/conftest.py, including:
     # 1. Warning when catopy downloads and caches Natural Earth data.
@@ -57,9 +63,6 @@ filterwarnings = [
 
 [tool.setuptools.packages.find]
 where = ["lib", "bin"]
-
-[tool.setuptools.dynamic]
-version = {attr = "ants.__version__"}
 
 [tool.setuptools]
 script-files = ["bin/ants-launch", "bin/ants-version"]

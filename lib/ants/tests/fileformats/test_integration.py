@@ -110,7 +110,8 @@ class TestExceptions(ants.tests.TestCase):
     def test_no_datum_warning(self):
         # Save and reload a cube without a datum.
 
-        # If this test passes unexpectedly, we can complete ticket #2294.
+        # If this test passes unexpectedly, we can complete ticket
+        # https://github.com/MetOffice/ANTS/issues/91.
         # Currently, iris raises a warning even if the source file does not
         # contain a datum. See https://github.com/SciTools/iris/issues/5749.
         cube = ants.tests.stock.geodetic((2, 2))
@@ -118,7 +119,3 @@ class TestExceptions(ants.tests.TestCase):
         with mock.patch("ants.fileformats.warnings.filterwarnings"):
             with warnings.catch_warnings(action="error", category=FutureWarning):
                 cube = ants.utils.cube.defer_cube(cube)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -92,7 +92,3 @@ class TestAll(ants.tests.TestCase):
         )
         warn_patch.assert_called_once_with(msg)
         self.assertArrayEqual(self.cube.data, tar)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

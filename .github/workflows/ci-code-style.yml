@@ -1,0 +1,63 @@
+name: CI Code Style
+on:
+    pull_request:
+        branches: main
+    push:
+        branches: main
+    workflow_dispatch:
+
+# Limit concurrently running workflow for a specific pull request.
+# Cancel and resubmit if a new push is made. See GitHub docs:
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+jobs:
+    code-style:
+        name: Run code style checks
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup python environment
+              uses: mamba-org/setup-micromamba@v2
+              with:
+                environment-file: environment.lock
+                environment-name: ci-env
+                cache-environment: true
+
+            - name: Run black
+              id: black
+              run: black --check .
+              shell: micromamba-shell {0}
+              continue-on-error: true
+
+            - name: Run isort
+              id: isort
+              run: isort --check .
+              shell: micromamba-shell {0}
+              continue-on-error: true
+
+            - name: Run flake8
+              id: flake8
+              run: flake8 --max-line-length 88 --extend-ignore E203
+              shell: micromamba-shell {0}
+              continue-on-error: true
+
+            - name: Collect failures
+              if: |
+                steps.black.outcome == 'failure' ||
+                steps.isort.outcome == 'failure' ||
+                steps.flake8.outcome == 'failure'
+              env:
+                BLACK_OUTCOME: ${{ steps.black.outcome }}
+                ISORT_OUTCOME: ${{ steps.isort.outcome }}
+                FLAKE8_OUTCOME: ${{ steps.flake8.outcome }}
+              run: |
+                echo "One or more code style checks failed:"
+                echo "black: $BLACK_OUTCOME"
+                echo "isort: $ISORT_OUTCOME"
+                echo "flake8: $FLAKE8_OUTCOME"
+                echo "See the logs for the failed checks for more details"
+                exit 1

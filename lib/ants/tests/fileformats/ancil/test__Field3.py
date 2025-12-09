@@ -16,6 +16,7 @@ def mock_field():
     )
 
 
+@ants.tests.skip_mule
 class Test_is_rotated(ants.tests.TestCase):
     def setUp(self):
         self.field = mock_field()
@@ -29,6 +30,7 @@ class Test_is_rotated(ants.tests.TestCase):
         self.assertFalse(self.field.is_rotated)
 
 
+@ants.tests.skip_mule
 class Test_is_regular(ants.tests.TestCase):
     def setUp(self):
         self.field = mock_field()
@@ -50,7 +52,3 @@ class Test_is_regular(ants.tests.TestCase):
         self.field.x = None
         self.field.y = None
         self.assertEqual(self.field.is_regular, (True, True))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

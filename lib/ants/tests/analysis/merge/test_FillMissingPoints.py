@@ -39,6 +39,7 @@ class TestAll(Common, ants.tests.TestCase):
             FillMissingPoints(self.source)
         spiral_patch.assert_called_once()
 
+    @ants.tests.skip_spiral
     def test_deprecation_warning_raised(self):
         FillMissingPoints(self.source)
         self.mock_warning.assert_called_once_with(
@@ -47,7 +48,3 @@ class TestAll(Common, ants.tests.TestCase):
             "moved to 'ants.analysis.UMSpiralSearch'.",
             FutureWarning,
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -38,7 +38,7 @@ import iris
 import iris.analysis.calculus
 import numpy as np
 
-from . import _merge
+from . import _merge, cover_mapping
 from ._merge import (
     FillABC,
     FillMissingPoints,
@@ -48,8 +48,6 @@ from ._merge import (
     horizontal_grid_reorder,
 )
 
-# Ensures documentation is promoted from _cover_mapping to this module (as a
-# consequence, also have to define remaining public methods):
 __all__ = [
     "MooreNeighbourhood",
     "UMSpiralSearch",
@@ -65,6 +63,7 @@ __all__ = [
     "KDTreeFill",
     "FillMissingPoints",
     "find_small_feature_seed_points",
+    "cover_mapping",
 ]
 
 

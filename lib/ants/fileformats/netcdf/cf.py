@@ -106,7 +106,7 @@ def _iris_dask_chunking_workaround(cubes):
     # If the innermost dimension is chunked, the netCDF save performance is
     # unacceptably slow.  We work around this by rechunking the innermost
     # dimension such that the entire dimension is a single chunk.  See
-    # https://github.com/SciTools/iris/issues/4448 or #1555 for more details.
+    # https://github.com/SciTools/iris/issues/4448 for more details.
     # This behaviour can be disabled via configuration.
     cubes = ants.utils.cube.as_cubelist(cubes)
     for cube in cubes:

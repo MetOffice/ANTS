@@ -141,7 +141,3 @@ class _Mock_FFV(object):
 class _Mock_Header(object):
     def __init__(self):
         self.raw = np.ones(152) * -32768
-
-
-if __name__ == "__main__":
-    ants.tests.main()

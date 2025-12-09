@@ -88,7 +88,3 @@ class TestAll(ants.tests.TestCase):
         with mock.patch(patch_func) as patched:
             save.netcdf(self.cubes, self.filename)
         self.assertTrue(patched.called)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

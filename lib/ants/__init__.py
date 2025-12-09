@@ -24,6 +24,18 @@ __all__ = [
 ]
 
 
-__version__ = "2.3.0dev"
+import warnings
+from importlib.metadata import PackageNotFoundError, version
 
+try:
+    __version__ = version("ANTS")
+except PackageNotFoundError as exc:
+    warnings.warn(
+        f"{exc}. Unknown ANTS version. "
+        "Consider installing ANTS into your environment. See the installation "
+        "instructions in the documentation for more details.",
+        stacklevel=0,
+    )
+
+    __version__ = "unknown"
 config._ensure_ants_cartopy_variable_not_set()

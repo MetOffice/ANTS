@@ -26,6 +26,13 @@ _RESOURCE_PATH = os.path.join(os.path.split(__file__)[0], "resources")
 SKIP_OPTIONAL_TESTS = True
 
 
+# Define test decorators to skip tests if an optional dependency is missing.
+# This needs a new decorator to be defined for each optional dependency.
+# There's two parts to using the decorator:  firstly, in the test we import
+# the thing to be skipped from the location where the import is allowed to
+# fail (e.g. from `ants.fileformats.ancil import mule` for mule, rather than a
+# direct `import mule`); and secondly, using the @skip_X decorator in any
+# tests that rely on the optional dependency.
 def _skip_importable(module, name):
     skip = unittest.skipIf(
         condition=not module and SKIP_OPTIONAL_TESTS,
@@ -41,7 +48,7 @@ def skip_gdal(fn):
 
     Example usage:
         @skip_gdal
-        class MygdalTest(test.IrisTest):
+        class MygdalTest(ants.tests.TestCase):
             ...
 
     """
@@ -55,7 +62,7 @@ def skip_f90nml(fn):
 
     Example usage:
         @skip_f90nml
-        class Myf90nmlTest(test.IrisTest):
+        class Myf90nmlTest(ants.tests.TestCase):
             ...
 
     """
@@ -69,7 +76,7 @@ def skip_stratify(fn):
 
     Example usage:
         @skip_stratify
-        class MyStratifyTest(test.IrisTest):
+        class MyStratifyTest(ants.tests.TestCase):
             ...
 
     """
@@ -83,7 +90,7 @@ def skip_esmpy(fn):
 
     Example usage:
         @skip_esmpy
-        class MyESMPYTests(test.IrisTest):
+        class MyESMPYTests(ants.tests.TestCase):
             ...
 
     """
@@ -106,11 +113,24 @@ def skip_spiral(fn):
 
     Example usage:
         @skip_spiral
-        class MySprialTests(test.IrisTest):
+        class MySpiralTests(ants.tests.TestCase):
             ...
 
     """
     return _skip_importable(ants.analysis._merge.spiral, "spiral")(fn)
+
+
+def skip_mule(fn):
+    """
+    Decorator to choose whether to run tests, based on the availability of mule.
+
+    Example usage:
+        @skip_mule
+        class MyMuleTests(ants.tests.TestCase):
+            ...
+
+    """
+    return _skip_importable(ants.fileformats.ancil.mule, "mule")(fn)
 
 
 def get_data_path(relative_path):

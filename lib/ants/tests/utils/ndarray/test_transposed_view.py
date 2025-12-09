@@ -77,7 +77,3 @@ class TestMaskedArray(Common, ants.tests.TestCase):
         arr2[:] = np.ma.masked
         arr2[0, 0] = 50
         self.assertTrue(self.arr.mask.all())
-
-
-if __name__ == "__main__":
-    ants.tests.main()

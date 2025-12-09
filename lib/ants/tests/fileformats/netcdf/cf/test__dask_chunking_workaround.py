@@ -71,7 +71,3 @@ class TestAll(ants.tests.TestCase):
             with mock.patch("ants.fileformats.netcdf.cf._rechunk") as mock_rechunk:
                 _iris_dask_chunking_workaround(cube)
         mock_rechunk.assert_not_called()
-
-
-if __name__ == "__main__":
-    ants.tests.main()

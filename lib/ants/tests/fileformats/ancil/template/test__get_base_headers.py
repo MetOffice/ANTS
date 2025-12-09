@@ -10,6 +10,7 @@ import iris
 from ants.fileformats.ancil.template import _get_base_headers
 
 
+@ants.tests.skip_mule
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         cube1 = iris.cube.Cube([0])
@@ -32,7 +33,3 @@ class TestAll(ants.tests.TestCase):
         self.assertEqual(
             len(cubes_subset), actual["integer_constants"]["num_field_types"]
         )
-
-
-if __name__ == "__main__":
-    ants.tests.main()

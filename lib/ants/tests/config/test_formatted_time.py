@@ -19,7 +19,3 @@ class TestConfigForBeingAndEndFormatting(ants.tests.TestCase):
         for item in test_items:
             with self.assertRaises(TimeConstraintFormatException):
                 formatted_time(item)
-
-
-if __name__ == "__main__":
-    ants.tests.main()

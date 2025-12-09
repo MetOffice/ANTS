@@ -123,7 +123,3 @@ class TestND(Common, ants.tests.TestCase):
 
         self.assertEqual(result.coord_dims(tar_x), (0,))
         self.assertEqual(result.coord_dims(tar_y), (1,))
-
-
-if __name__ == "__main__":
-    ants.tests.main()

@@ -92,7 +92,3 @@ class TestWarning(ants.tests.TestCase):
 
         with self.assertRaisesRegex(FutureWarning, message):
             find_small_feature_seed_points(np.ones((2, 2)), 3, False, False, True)
-
-
-if __name__ == "__main__":
-    ants.tests.main()
