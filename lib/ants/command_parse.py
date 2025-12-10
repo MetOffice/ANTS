@@ -33,6 +33,11 @@ class AntsArgParser(argparse.ArgumentParser):
             sources <SOURCE1> <SOURCE2> ... <SOURCEN>     Source data path(s).
             --output <OUTPUT>, -o <OUTPUT>                Output filepath
             --ants-config <ANTS_CONFIG>                   Configuration path.
+            --ignore-metadata-files                       Stops the application from
+                                                          searching for metadata files
+                                                          with the same name as the
+                                                          source and loading them
+                                                          alongside the source.
 
         Additionally, there are standardised optional arguments and these are
         activated by passing the relevant keyword argument.  See 'Parameters'
@@ -169,6 +174,13 @@ class AntsArgParser(argparse.ArgumentParser):
             "--netcdf-only",
             action="store_true",
             help="Only write out a netCDF file.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-files",
+            action="store_true",
+            help="Turn off the automatic loading of metadata files alongside source "
+            "files",
             required=False,
         )
         if time_constraints:

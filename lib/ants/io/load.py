@@ -357,6 +357,8 @@ def _customised_load(func):
                 FutureWarning,
             )
             ignore_metadata_files = False
+            print("args: ", args)
+            print("kwargs: ", kwargs)
             if "ignore_metadata_files" in kwargs:
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
             print(
