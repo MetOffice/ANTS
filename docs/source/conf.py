@@ -142,7 +142,7 @@ html_context = {
 html_baseurl = "https://metoffice.github.io/ANTS/"
 sitemap_locales = [None]
 sitemap_url_scheme = "{link}"
-html_last_updated_fmt = ""
+html_last_updated_fmt = "%d %B %Y"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
