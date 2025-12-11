@@ -25,7 +25,7 @@ filterwarnings = [
     'error',
 
     # Ignore warning raised when ANTS is not installed into an environment
-    'ignore:No package metadata was found for ANTS. Unknown ANTS version. Consider installing ANTS into your environment. See the installation instructions in the documentation for more details.:UserWarning',
+    'ignore:No package metadata was found for ANTS. ANTS version set to .*. Consider installing ANTS into your environment. See the installation instructions in the documentation for more details.:UserWarning',
 
     # And some specific cases where we ignore warnings.
     # TODO: https://github.com/MetOffice/ANTS/issues/67 fix netCDF saving to work with future dask versions
