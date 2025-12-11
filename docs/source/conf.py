@@ -136,9 +136,10 @@ html_context = {
 }
 
 # Settings for site map
-html_baseurl = "https://code.metoffice.gov.uk/doc/ancil/ants/latest/"
+html_baseurl = "https://metoffice.github.io/ANTS/"
 sitemap_locales = [None]
 sitemap_url_scheme = "{link}"
+html_last_updated_fmt = "%d %B %Y"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -149,6 +150,9 @@ sitemap_url_scheme = "{link}"
 # Include accessibility in footer
 html_theme_options = {
     "github_url": "https://github.com/MetOffice/ANTS",
+    "footer_center": [
+        "last-updated",
+    ],
     "footer_end": [
         "accessibility",
         "theme-version",
