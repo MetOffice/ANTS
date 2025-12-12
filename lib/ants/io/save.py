@@ -86,8 +86,7 @@ def ancil(cubes, filename):
     set so applications apart from the UM can read the ancillary. This
     includes:
 
-    * XCONV - https://code.metoffice.gov.uk/trac/ancil/ticket/118
-    * integer_constants(3) is set to 1 if there's no valid value for it
+    * XCONV - integer_constants(3) is set to 1 if there's no valid value for it
     """
     if filename.endswith(".nc"):
         raise ValueError("F03 UM ancillary files cannot be saved with a .nc extension.")

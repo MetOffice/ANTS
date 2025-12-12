@@ -202,9 +202,6 @@ class TestCase(unittest.TestCase):
             If True, prints differences between the arrays.
 
         """
-        # TODO: should be updated to assert_array_almost_equal_nulp.  Using
-        # assert_array_almost_equal for now as a stepping stone.
-        # https://code.metoffice.gov.uk/trac/ancil/ticket/1480
         numpy.testing.assert_array_almost_equal(
             actual, expected, decimal=decimal, err_msg=error_message, verbose=verbose
         )

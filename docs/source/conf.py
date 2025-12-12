@@ -76,7 +76,7 @@ intersphinx_mapping = {
         None,
     ),
     "iris": (f"https://scitools-iris.readthedocs.io/en/v{iris_version}", None),
-    "mule": ("https://code.metoffice.gov.uk/doc/um/mule/latest", "mule-objects.inv"),
+    "mule": ("https://metoffice.github.io/mule/", None),
     "numpy": (f"https://numpy.org/doc/{numpy_version}/", None),
     "shapely": (f"https://shapely.readthedocs.io/en/{shapely_version}/", None),
     "dask": ("https://docs.dask.org/en/stable/", None),
@@ -84,20 +84,9 @@ intersphinx_mapping = {
 
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 extlinks = {
-    "anciltrac": ("https://code.metoffice.gov.uk/trac/ancil/%s", "ancil trac %s"),
-    "ancilwiki": ("https://code.metoffice.gov.uk/trac/ancil/wiki/%s", "ancil wiki %s"),
-    "antsworkingpractices": (
-        "https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices%s",
-        "%s",
-    ),
     "contrib": (
         "https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk/%s",
         "contrib %s",
-    ),
-    "fcm": ("http://metomi.github.io/fcm/doc/%s", "fcm %s"),
-    "source": (
-        "https://code.metoffice.gov.uk/trac/ancil/browser/ants/trunk/%s",
-        "source %s",
     ),
     "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "MOSRS #%s"),
     "issue": ("https://github.com/MetOffice/ANTS/issues/%s", "Issue #%s"),
@@ -140,7 +129,7 @@ html_context = {
 }
 
 # Settings for site map
-html_baseurl = "https://code.metoffice.gov.uk/doc/ancil/ants/latest/"
+html_baseurl = "https://metoffice.github.io/ANTS/"
 sitemap_locales = [None]
 sitemap_url_scheme = "{link}"
 
@@ -164,13 +153,6 @@ html_theme_options = {
 
 linkcheck_ignore = [
     r"https://code.metoffice.gov.uk/trac/ancil/newticket.*",
-    # Needed due to authentication and redirects on MOSRS breaking linkcheck
-    # when linking to specific anchors.  The URLs that need to be matched are
-    # currently:
-    # https://code.metoffice.gov.uk/doc/um/mule/latest/mule.html#mule.UMFile
-    # https://code.metoffice.gov.uk/doc/um/mule/latest/mule.html#mule.Field3
-    # https://code.metoffice.gov.uk/doc/um/mule/latest/mule/ancil.html#mule.ancil.AncilFile
-    r"https://code.metoffice.gov.uk/doc/um/mule/latest/mule.*\.html\#",
     # Ignore ANTS GitHub while it is private.
     # TODO: Remove from ignore list when repository goes public.
     r"https://github.com/MetOffice/ANTS.*",

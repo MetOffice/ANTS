@@ -75,12 +75,12 @@ Add details of any further testing here.
 
 |**Other**| |
 | --- | --- |
-| For non-Met Office staff, have you signed and returned the [Contributor Licence Agreement](https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html)? | **YES/NO/NA** |
+| For non-Met Office staff, have you signed and returned the [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)? | **YES/NO/NA** |
 | Are the ticket components, keywords, etc. correct? | **YES/NO** |
 | Have links to all linked tickets been provided in the ticket description? | **YES/NO/NA** |
 | Have you <requested a code reviewer>? | **YES/NO** |
 | Has source data for rose stem been added or changed?  If so, does the licence for the source data allow us to store derived works as sources and KGOs in the repository?  Please include a link to the licence.  | **YES/NO** |
-| I confirm that all code is my own and that my contributions are not subject to copyright or license restrictions (see [Contributor Licence Agreement](https://code.metoffice.gov.uk/doc/ancil/ants/latest/appendixB_CLA.html)). | **your name** |
+| I confirm that all code is my own and that my contributions are not subject to copyright or license restrictions (see [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)). | **your name** |
 | I confirm I have not knowingly violated intellectual property rights (IPR) and have taken [sensible measures to prevent doing so](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#LicencecopyrightandIPR), including appropriate [attribution for usage of Generative AI](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#AIassistanceandattribution). I confirm that this work is my own, and I understand that it is my responsibility to ensure I am not violating others’ IPR.  This includes taking reasonable steps to ensure that all tools used while creating this contribution did not infringe IPR. | **your name** |
 
 <div>

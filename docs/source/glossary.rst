@@ -45,4 +45,4 @@ Glossary
       A function that takes in only one argument.
 
     Unified Model
-      Met Office's combined weather and climate forecasting operational model. See the `UM trac page`_.
+      Met Office's combined weather and climate forecasting operational model. See the `UM GitHub repository`_.
