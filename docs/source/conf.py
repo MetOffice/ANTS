@@ -82,6 +82,7 @@ intersphinx_mapping = {
     "dask": ("https://docs.dask.org/en/stable/", None),
 }
 
+# See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 extlinks = {
     "anciltrac": ("https://code.metoffice.gov.uk/trac/ancil/%s", "ancil trac %s"),
     "ancilwiki": ("https://code.metoffice.gov.uk/trac/ancil/wiki/%s", "ancil wiki %s"),
@@ -98,7 +99,10 @@ extlinks = {
         "https://code.metoffice.gov.uk/trac/ancil/browser/ants/trunk/%s",
         "source %s",
     ),
-    "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "#%s"),
+    "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "MOSRS #%s"),
+    "issue": ("https://github.com/MetOffice/ANTS/issues/%s", "Issue #%s"),
+    "milestone": ("https://github.com/MetOffice/ANTS/milestone/%s?closed=1", None),
+    "pr": ("https://github.com/MetOffice/ANTS/pull/%s", "PR #%s"),
 }
 
 autodoc_default_options = {
@@ -145,7 +149,7 @@ sitemap_url_scheme = "{link}"
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
 
-# Link to ANTS Trac page
+# Link to ANTS GitHub page
 # Include accessibility in footer
 html_theme_options = {
     "github_url": "https://github.com/MetOffice/ANTS",
