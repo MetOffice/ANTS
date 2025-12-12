@@ -30,11 +30,15 @@ used for setting the environment variable.
 After installing ANTS, and confirming the unittests pass, the rose stem suite
 can be used to bootstrap a set of KGO files to protect against future changes.
 
-To do this, run the rose stem suite::
+To do this, run the rose stem suite:
+
+.. versionchanged:: 3.0.0
+   The rose stem workflow is now run via ``cylc vip`` rather than ``rose stem``.
+
+.. code-block::
 
   $ cd <working copy>
-  $ rose stem --group=all --workflow-name=generate_KGOs
-  $ cylc play generate_KGOs
+  $ cylc vip ./rose-stem -z group=all
 
 The rose stem tasks in the suite will fail, since there are no KGOs yet.  Wait
 for the suite to complete, and then run::
