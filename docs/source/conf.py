@@ -156,4 +156,6 @@ linkcheck_ignore = [
     # Ignore ANTS GitHub while it is private.
     # TODO: Remove from ignore list when repository goes public.
     r"https://github.com/MetOffice/ANTS.*",
+    # UM GitHub repo is private
+    "https://github.com/MetOffice/um",
 ]
