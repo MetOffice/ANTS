@@ -3,7 +3,7 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
-"""Generate a log file of rose suite test durations.
+"""Generate a log file of cylc workflow test durations.
 
 The module contains an entry point ``main`` function, an argparse ``parse_arguments``,
 function argparse ``type`` validator functions and a ``validate_sql_lite_db`` function.
@@ -114,13 +114,13 @@ def parse_arguments() -> argparse.Namespace:
     and ``verbosity``.
     """
     parser = argparse.ArgumentParser(
-        description="Generate a log of rose suite test durations.",
+        description="Generate a log of cylc workflow test durations.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "path_to_cylc_db",
         type=valid_file,
-        help="Path to a Rose Stem test suite Cylc db file",
+        help="Path to a Rose Stem test workflow Cylc db file",
     )
     parser.add_argument(
         "output_file_name",

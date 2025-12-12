@@ -1,6 +1,6 @@
 # Override default exlude pattern for black.
 # By default black will exlude files with "build" in the filepath, but ants is installed
-# to $ROSE_SUITE_DIR/share/fcm_make_ants/build and we want these files to be checked.
+# to $CYLC_WORKFLOW_RUN_DIR/share/fcm_make_ants/build and we want these files to be checked.
 [tool.black]
 exclude = ".git"
 

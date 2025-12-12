@@ -31,9 +31,9 @@ $ python kgo_file.nc test_output_.nc /specified/output/directory
 
 Notes
 -----
-- This module is integrated into the rose-stem test suite, and will trigger on
+- This module is integrated into the rose-stem test workflow, and will trigger on
   rose_ana check_nccmp failures.
-- If run automatically via the test suite, the plots will be saved in a
+- If run automatically via the test workflow, the plots will be saved in a
   "plot_comparisons" folder in the cylc run "share" directory - a link to this
   folder is printed to the plot_comparison task's job.out.
 - Supports .nc and f03 ancillary files.

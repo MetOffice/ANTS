@@ -14,7 +14,7 @@ locally. ANTS will look for the source data using an environment variable.
 Initial setup
 -------------
 
-Before running the rose stem suite, the environment variable
+Before running the rose stem workflow, the environment variable
 ``ANTS_SOURCES_DIRECTORY_DEFAULT`` needs to be set to point to a suitable central
 location for the :ref:`source directory <source-directory-structure>` corresponding
 to the version of ANTS being installed.  A version specific module file,

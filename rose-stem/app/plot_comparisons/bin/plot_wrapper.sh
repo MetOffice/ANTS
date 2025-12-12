@@ -4,7 +4,7 @@
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
 
-# Convenience script for automated generation of plots when used in ANTS-related rose-stem suites where
+# Convenience script for automated generation of plots when used in ANTS-related rose-stem workflows where
 # KGO checks are carried out under the rose_bunch application.
 #
 # Script assumes a convention where bunch item names are the same as the files being checked.

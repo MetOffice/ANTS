@@ -19,7 +19,7 @@ outputs (KGOs) for use in |rose stem| testing.
 Initial setup
 -------------
 
-Before running the rose stem suite, the environment variable
+Before running the rose stem workflow, the environment variable
 ``ANTS_KGO_DIRECTORY_DEFAULT`` needs to be set to point to a suitable central
 location for the :ref:`KGO directory <KGO-directory-structure>` corresponding
 to the version of ANTS being installed.  The following steps will populate
@@ -27,10 +27,10 @@ this directory with site specific KGO files.  A version specific module file,
 site-specific ``ants-launch`` script, or any other appropriate method can be
 used for setting the environment variable.
 
-After installing ANTS, and confirming the unittests pass, the rose stem suite
+After installing ANTS, and confirming the unittests pass, the rose stem workflow
 can be used to bootstrap a set of KGO files to protect against future changes.
 
-To do this, run the rose stem suite:
+To do this, run the rose stem workflow:
 
 .. versionchanged:: 3.0.0
    The rose stem workflow is now run via ``cylc vip`` rather than ``rose stem``.
@@ -40,12 +40,12 @@ To do this, run the rose stem suite:
   $ cd <working copy>
   $ cylc vip ./rose-stem -z group=all
 
-The rose stem tasks in the suite will fail, since there are no KGOs yet.  Wait
-for the suite to complete, and then run::
+The rose stem tasks in the workflow will fail, since there are no KGOs yet.  Wait
+for the workflow to complete, and then run::
 
   $ cp -r ~/cylc-run/generate_KGOs/runN/share/data/* $ANTS_KGO_DIRECTORY_DEFAULT
 
-At this point, re-running the rose stem suite should result in a passing suite.
+At this point, re-running the rose stem workflow should result in a passing workflow.
 
 This process should be repeated for contrib, with the
 ``CONTRIB_KGO_DIRECTORY_DEFAULT`` environment variable.

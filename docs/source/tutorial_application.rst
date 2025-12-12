@@ -35,7 +35,7 @@ covers all steps of the :doc:`ancillary_generation_pipeline`. In real use
 cases though, it is often preferable to write multiple separate applications,
 connected via a workflow, to avoid writing monolithic, complex, and expensive
 to run individual applications. See :contrib:`contrib<>` and the associated
-rose-stem suite for examples of such implementations and breakdowns.
+rose-stem workflow for examples of such implementations and breakdowns.
 
 As prerequisites for carrying out this tutorial we assume:
 
