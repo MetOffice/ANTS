@@ -17,7 +17,7 @@ This website is run by the Model Inputs and Outputs team at the `Met Office`_. W
 - change the colours of the site
 - navigate most of the website using a keyboard
 - use most of the website using a screen reader with browsers that support one
-- we’ve also made the website text as simple as possible to understand
+- we've also made the website text as simple as possible to understand
 
 `AbilityNet`_ has advice on making your device easier to use if you have a disability.
 
@@ -34,7 +34,7 @@ Feedback and contact information
 --------------------------------
 
 If you need information on this website in a different format like large print, easy
-read, audio recording or braille please email `miao@metoffice.gov.uk`_ and we will look into it.
+read, audio recording or braille please email miao@metoffice.gov.uk and we will look into it.
 
 We aim to respond to all reasonable requests for accessible information.
 
@@ -43,7 +43,7 @@ Reporting accessibility problems with this website
 
 We are always looking to improve the accessibility of this website. If you find any
 problems not listed on this page or think we are not meeting accessibility requirements,
-please email `miao@metoffice.gov.uk`_.
+please email miao@metoffice.gov.uk.
 
 Enforcement procedure
 ---------------------
@@ -100,9 +100,8 @@ Content that is not within the scope of the accessibility regulations
 How we tested this website
 --------------------------
 
-Due to this documentation being hosted internally, there are restrictions whern using
-tools to test for accessibility. These restrictions should be resolved when the
-codebase moves to GitHub.
+This was tested manually by developers for flow and navigation. The accessibility
+evaluation tool `WAVE`_ was also used to evaluate this website's accessibility.
 
 What we are doing to improve accessibility
 ------------------------------------------
@@ -113,13 +112,14 @@ accessibility at each release to highlight potential accessibility issues.
 
 Preparation of this accessibility statement
 -------------------------------------------
-This statement was prepared on 20 August 2025. It was last reviewed on 20 August 2025.
+This statement was prepared on 20 August 2025. It was last reviewed on 15 December 2025.
 
 .. _AbilityNet: https://abilitynet.org.uk/
 .. _2018 legislation: https://www.legislation.gov.uk/uksi/2018/952/regulation/4
 .. _Equality Advisory and Support Service: https://www.equalityadvisoryservice.com/
 .. _sphinx.ext.autodoc:  https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
 .. _sphinx.ext.autosummary: https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html
+.. _WAVE: https://wave.webaim.org/
 .. _WCAG 2.2 1.4.3 Contrast: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
 .. _WCAG 2.1 success criteria 2.4.4 Link Purpose: https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html
 .. _WCAG 2.4.6 Headings and Labels: https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html

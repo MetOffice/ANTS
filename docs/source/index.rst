@@ -31,8 +31,8 @@ Contributions welcome
 
 ANTS development is ongoing as it supports new ancillary science implementations,
 new datasets, and new domains. Your assistance in reporting
-`bugs <https://code.metoffice.gov.uk/trac/ancil/newticket?component=ants&milestone=Ants%20Support&cc=miao@metoffice.gov.uk>`_
-and `documentation <https://code.metoffice.gov.uk/trac/ancil/newticket?component=ants&milestone=Ants%20Support&type=documentation&cc=miao@metoffice.gov.uk>`_
+`bugs <https://github.com/MetOffice/ANTS/issues/new?template=bug-report.md>`_
+and `documentation <https://github.com/MetOffice/ANTS/issues/new?template=documentation-request.md>`_
 issues is gratefully received.  We're particularly keen to identify where the
 documentation could be clearer - suggested improvements are not necessary but
 are appreciated.  If you'd prefer not to open a ticket, you can also

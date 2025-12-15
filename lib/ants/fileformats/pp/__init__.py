@@ -288,8 +288,8 @@ def cube2pp(cube, field_coords=None):
                 raise ValueError(
                     "\nZero not allowed as a reference year.\n"
                     "Ensure that dates are representative of the data.\n"
-                    "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-                    "latest/appendixA_time_handling.html#date-information"
+                    "See https://metoffice.github.io/ANTS/\n"
+                    "appendixA_time_handling.html#date-information"
                 )
             if cube.coord("time").units.calendar in ["proleptic_gregorian"]:
                 cube = cube.copy(cube.lazy_data())
@@ -316,8 +316,8 @@ def cube2pp(cube, field_coords=None):
         if iris_msg in list(err.args):
             msg = (
                 "\nEnsure that dates are representative of the data. See "
-                "https://code.metoffice.gov.uk/doc/ancil/ants/"
-                "appendixA.html#date-information"
+                "https://metoffice.github.io/ANTS/"
+                "appendixA_time_handling.html#date-information"
             )
             err_msg[0] += msg
             err.args = err_msg

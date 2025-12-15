@@ -1,0 +1,42 @@
+.. include:: /common.txt
+
+************************
+ANTS 3.0 (December 2025)
+************************
+
+This release is primarily driven by migration to
+`GitHub <https://github.com/MetOffice/ANTS>`_.
+For a full list of changes see the :milestone:`3.0 release milestone <1>`.
+
+.. important::
+  The Contributor Licence Agreement (CLA) has been updated (:pr:`35`).
+  All contributors must re-sign the CLA, see :doc:`/contributing`.
+
+Features
+========
+- :pr:`27`: |Mule| is now an optional dependency in ANTS.
+- :pr:`30`: :doc:`ants-launch </antslaunch>` now includes datetime stamps in
+  log messages to aid debugging.
+
+Bugs Fixed
+==========
+
+Incompatible Changes
+====================
+- The rose stem test workflow is now run via the ``cylc vip`` command, rather
+  than the ``rose stem`` command (part of :pr:`11`).
+  See :doc:`/tutorial_rose_stem`.
+
+Infrastructure
+==============
+- :pr:`37`: Unit tests are run with GitHub Actions as part of continuous
+  integration (CI).
+- :pr:`38`: Documentation is built with GitHub Actions as part of continuous
+  integration (CI).
+- :pr:`86`: `pre-commit <https://pre-commit.com/>`_ hooks are now supported in
+  ANTS.
+- :pr:`90`: `setuptools-scm <https://setuptools-scm.readthedocs.io/en/latest/>`_
+  is now used to set the version number automatically from git metadata.
+
+Documentation
+=============

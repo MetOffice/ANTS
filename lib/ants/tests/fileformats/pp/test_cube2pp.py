@@ -50,8 +50,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_dim_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -71,8 +71,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_dim_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -91,8 +91,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_dim_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -107,8 +107,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_dim_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -123,8 +123,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_aux_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -139,8 +139,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_aux_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
@@ -155,8 +155,8 @@ class TestYearZero(ants.tests.TestCase):
         cube.add_aux_coord(time_coord, 0)
         msg = "\nZero not allowed as a reference year.\n"
         "Ensure that dates are representative of the data.\n"
-        "See https://code.metoffice.gov.uk/doc/ancil/ants/ \n"
-        "latest/appendixA_time_handling.html#date-information"
+        "See https://metoffice.github.io/ANTS/ \n"
+        "appendixA_time_handling.html#date-information"
         with self.assertRaisesRegex(ValueError, msg):
             pp.cube2pp(cube)
 
