@@ -16,14 +16,14 @@
 
 .. Links
 
-.. _ANTS Documentation: https://code.metoffice.gov.uk/doc/ancil/ants/latest/index.html
+.. _ANTS Documentation: https://metoffice.github.io/ANTS/
 .. _Cylc Documentation: https://cylc.github.io/cylc-doc/stable/html/index.html
 .. _Iris Documentation: https://scitools-iris.readthedocs.io/en/stable/index.html
 .. _JULES trac page: https://code.metoffice.gov.uk/trac/jules
 .. _Met Office: https://www.metoffice.gov.uk/
 .. _LFRic trac page: https://code.metoffice.gov.uk/trac/lfric/
-.. _Mule Documentation: https://code.metoffice.gov.uk/doc/um/mule/latest/
+.. _Mule Documentation: https://metoffice.github.io/mule/
 .. _NetCDF Documentation: https://www.unidata.ucar.edu/software/netcdf/
 .. _Rose Stem Documentation: https://metomi.github.io/rose/doc/html/tutorial/rose/furthertopics/rose-stem.html
 .. _Shapely Documentation: https://shapely.readthedocs.io/en/latest/index.html
-.. _UM trac page: https://code.metoffice.gov.uk/trac/um
+.. _UM GitHub repository: https://github.com/MetOffice/um
