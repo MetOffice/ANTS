@@ -17,7 +17,6 @@
 .. Links
 
 .. _ANTS Documentation: https://code.metoffice.gov.uk/doc/ancil/ants/latest/index.html
-.. _miao@metoffice.gov.uk: mailto:miao@metoffice.gov.uk
 .. _Cylc Documentation: https://cylc.github.io/cylc-doc/stable/html/index.html
 .. _Iris Documentation: https://scitools-iris.readthedocs.io/en/stable/index.html
 .. _JULES trac page: https://code.metoffice.gov.uk/trac/jules

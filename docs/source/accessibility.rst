@@ -17,7 +17,7 @@ This website is run by the Model Inputs and Outputs team at the `Met Office`_. W
 - change the colours of the site
 - navigate most of the website using a keyboard
 - use most of the website using a screen reader with browsers that support one
-- we’ve also made the website text as simple as possible to understand
+- we've also made the website text as simple as possible to understand
 
 `AbilityNet`_ has advice on making your device easier to use if you have a disability.
 
@@ -34,7 +34,7 @@ Feedback and contact information
 --------------------------------
 
 If you need information on this website in a different format like large print, easy
-read, audio recording or braille please email `miao@metoffice.gov.uk`_ and we will look into it.
+read, audio recording or braille please email miao@metoffice.gov.uk and we will look into it.
 
 We aim to respond to all reasonable requests for accessible information.
 
@@ -43,7 +43,7 @@ Reporting accessibility problems with this website
 
 We are always looking to improve the accessibility of this website. If you find any
 problems not listed on this page or think we are not meeting accessibility requirements,
-please email `miao@metoffice.gov.uk`_.
+please email miao@metoffice.gov.uk.
 
 Enforcement procedure
 ---------------------
