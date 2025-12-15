@@ -100,9 +100,8 @@ Content that is not within the scope of the accessibility regulations
 How we tested this website
 --------------------------
 
-Due to this documentation being hosted internally, there are restrictions whern using
-tools to test for accessibility. These restrictions should be resolved when the
-codebase moves to GitHub.
+This was tested manually by developers for flow and navigation. The accessibility
+evaluation tool `WAVE`_ was also used to evaluate this website's accessibility.
 
 What we are doing to improve accessibility
 ------------------------------------------
@@ -113,7 +112,7 @@ accessibility at each release to highlight potential accessibility issues.
 
 Preparation of this accessibility statement
 -------------------------------------------
-This statement was prepared on 20 August 2025. It was last reviewed on 20 August 2025.
+This statement was prepared on 20 August 2025. It was last reviewed on 15 December 2025.
 
 .. _AbilityNet: https://abilitynet.org.uk/
 .. _2018 legislation: https://www.legislation.gov.uk/uksi/2018/952/regulation/4
