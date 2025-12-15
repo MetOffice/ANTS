@@ -119,6 +119,7 @@ This statement was prepared on 20 August 2025. It was last reviewed on 15 Decemb
 .. _Equality Advisory and Support Service: https://www.equalityadvisoryservice.com/
 .. _sphinx.ext.autodoc:  https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
 .. _sphinx.ext.autosummary: https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html
+.. _WAVE: https://wave.webaim.org/
 .. _WCAG 2.2 1.4.3 Contrast: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
 .. _WCAG 2.1 success criteria 2.4.4 Link Purpose: https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html
 .. _WCAG 2.4.6 Headings and Labels: https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html
