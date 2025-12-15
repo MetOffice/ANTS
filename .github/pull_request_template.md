@@ -72,7 +72,7 @@ Add details of any further testing here.
 - [ ] The ticket labels, milestones, etc. are correct
 - [ ] Links to all related tickets have been provided in the ticket description
 - [ ]  I have requested a code reviewer
-- [ ] Source data has been added or changed - please include a link to the license (so we can check that it will allow us to store derived works as sources and KGOs in the repository)
+- [ ] Source data has been added or changed - please include a link to the license
 
 | | |
 |---|---|
