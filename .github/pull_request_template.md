@@ -93,5 +93,5 @@ Add workflow_status.log contents for ANTS rose-stem here.
 </div>
 <br>
 <div>
-Add workflow_status.log contents for contrib rose-stem here.
+Add trac_status.log contents for contrib rose-stem here.
 </div>
