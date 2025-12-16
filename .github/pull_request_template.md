@@ -70,7 +70,7 @@ Add details of any further testing here.
 - [ ] I read the [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)
 - [ ] I have added my name and affiliation to the [Contributors list](https://github.com/MetOffice/ANTS/blob/main/CONTRIBUTING.rst#code-contributors) if I am not already on there.
 - [ ] The issue labels, milestones, etc. are correct
-- [ ] Links to all related tickets have been provided in the ticket description
+- [ ] Links to all related issues have been provided in the pull request description
 - [ ]  I have requested a code reviewer
 - [ ] Source data has been added or changed - please include a link to the license
 
