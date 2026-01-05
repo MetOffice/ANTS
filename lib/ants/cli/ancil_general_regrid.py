@@ -37,18 +37,19 @@ from ants.utils.cube import create_time_constrained_cubes
 
 def load_data(
     source,
-    ignore_metadata_files,
     target_grid=None,
     target_landseamask=None,
     land_fraction_threshold=None,
     begin=None,
     end=None,
+    ignore_metadata_files=None,
 ):
     source_cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_files)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
     if target_grid:
-        target_cube = ants.io.load.load_grid(target_grid)
+        target_cube = ants.io.load.load_grid(target_grid,
+                                             ignore_metadata_files=ignore_metadata_files)
     else:
         target_cube = ants.io.load.load_landsea_mask(
             target_landseamask, land_fraction_threshold
@@ -120,7 +121,7 @@ def main(
         provided source(s) consistent with the provided land sea mask.
         This should only be provided if a target land sea mask is also
         provided via target_lsm_path.
-    invert_mask : :obj:`bool`, optional
+    ignore_metadata_files : :obj:`bool`, optional
         When set to True, files containing metadata will not be loaded alongside data
         and added as attributes to the cube.
 
