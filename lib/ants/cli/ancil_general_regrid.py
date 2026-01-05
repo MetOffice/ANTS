@@ -44,12 +44,15 @@ def load_data(
     end=None,
     ignore_metadata_files=None,
 ):
-    source_cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_files)
+    source_cubes = ants.io.load.load(
+        source, ignore_metadata_files=ignore_metadata_files
+    )
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
     if target_grid:
-        target_cube = ants.io.load.load_grid(target_grid,
-                                             ignore_metadata_files=ignore_metadata_files)
+        target_cube = ants.io.load.load_grid(
+            target_grid, ignore_metadata_files=ignore_metadata_files
+        )
     else:
         target_cube = ants.io.load.load_landsea_mask(
             target_landseamask, land_fraction_threshold

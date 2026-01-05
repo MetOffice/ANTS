@@ -57,12 +57,16 @@ def load_data(
         respectively.
 
     """
-    primary_cubes = ants.io.load.load(primary_source, ignore_metadata_files=ignore_metadata_files)
+    primary_cubes = ants.io.load.load(
+        primary_source, ignore_metadata_files=ignore_metadata_files
+    )
     if begin is not None:
         primary_cubes = create_time_constrained_cubes(primary_cubes, begin, end)
     alternate_cubes = None
     if alternate_source:
-        alternate_cubes = ants.io.load.load(alternate_source,ignore_metadata_files=ignore_metadata_files)
+        alternate_cubes = ants.io.load.load(
+            alternate_source, ignore_metadata_files=ignore_metadata_files
+        )
         if begin is not None:
             alternate_cubes = create_time_constrained_cubes(alternate_cubes, begin, end)
 
@@ -97,7 +101,7 @@ def main(
     end,
     netcdf_only,
     search_method,
-    ignore_metadata_files
+    ignore_metadata_files,
 ):
     """
     Perform merge and fill operation on the provided sources.
@@ -161,7 +165,7 @@ def main(
         land_fraction_threshold,
         begin,
         end,
-        ignore_metadata_files
+        ignore_metadata_files,
     )
 
     result = primary_cubes
@@ -254,7 +258,7 @@ def cli_interface():
         end=args.end,
         netcdf_only=args.netcdf_only,
         search_method=args.search_method,
-        ignore_metadata_files=args.ignore_metadata_files
+        ignore_metadata_files=args.ignore_metadata_files,
     )
 
 

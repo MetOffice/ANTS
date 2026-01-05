@@ -232,12 +232,16 @@ def load_landsea_mask(filename, land_threshold=None):
     """
     try:
         # Is it a landsea mask field?
-        lbm = ants.io.load.load_cube(filename, "land_binary_mask", ignore_metadata_files=True)
+        lbm = ants.io.load.load_cube(
+            filename, "land_binary_mask", ignore_metadata_files=True
+        )
         lbm = lbm.copy(lbm.data.astype("bool", copy=False))
     except iris.exceptions.ConstraintMismatchError:
         try:
             # Is it a land fraction field?
-            land_fraction = ants.io.load.load_cube(filename, "vegetation_area_fraction",ignore_metadata_files=True)
+            land_fraction = ants.io.load.load_cube(
+                filename, "vegetation_area_fraction", ignore_metadata_files=True
+            )
             lbm = land_fraction.copy(land_fraction.data > land_threshold)
             lbm.rename("land_binary_mask")
         except iris.exceptions.ConstraintMismatchError:
@@ -361,8 +365,8 @@ def _customised_load(func):
             print("args: ", args)
             print("kwargs: ", kwargs)
             print("boo")
-            print('ignore_metadata_files' in kwargs)
-            if 'ignore_metadata_files' in kwargs:
+            print("ignore_metadata_files" in kwargs)
+            if "ignore_metadata_files" in kwargs:
                 print("its here!!!")
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
             print(

@@ -98,7 +98,7 @@ def cli_interface():
         args.output,
         args.grid_staggering,
         args.netcdf_only,
-        args.ignore_metadata_files
+        args.ignore_metadata_files,
     )
 
 
