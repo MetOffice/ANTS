@@ -1,6 +1,6 @@
 # Override default exlude pattern for black.
 # By default black will exlude files with "build" in the filepath, but ants is installed
-# to $ROSE_SUITE_DIR/share/fcm_make_ants/build and we want these files to be checked.
+# to $CYLC_WORKFLOW_RUN_DIR/share/fcm_make_ants/build and we want these files to be checked.
 [tool.black]
 exclude = ".git"
 
@@ -24,6 +24,9 @@ tmp_path_retention_policy = "none"
 filterwarnings = [
     # During unittesting only, treat all warnings as errors by default:
     'error',
+
+    # Ignore warning raised when ANTS is not installed into an environment
+    'ignore:No package metadata was found for ANTS. ANTS version set to .*. Consider installing ANTS into your environment. See the installation instructions in the documentation for more details.:UserWarning',
 
     # And some specific cases where we ignore warnings.
     # TODO: https://github.com/MetOffice/ANTS/issues/67 fix netCDF saving to work with future dask versions
@@ -77,8 +80,8 @@ license = {file ="LICENSE.txt"}
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
     "License :: OSI Approved :: BSD License",
-    "Operating System :: Unix",
 ]
 
 [project.scripts]

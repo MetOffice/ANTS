@@ -35,13 +35,12 @@ covers all steps of the :doc:`ancillary_generation_pipeline`. In real use
 cases though, it is often preferable to write multiple separate applications,
 connected via a workflow, to avoid writing monolithic, complex, and expensive
 to run individual applications. See :contrib:`contrib<>` and the associated
-rose-stem suite for examples of such implementations and breakdowns.
+rose-stem workflow for examples of such implementations and breakdowns.
 
 As prerequisites for carrying out this tutorial we assume:
 
 * Familiarity with `Python <https://www.python.org/>`_
 * Familiarity with `Iris <https://scitools-iris.readthedocs.io/en/stable/>`_
-* Familiarity with :fcm:`fcm<>`
 * Access to and ability to activate an environment with ANTS and its dependencies installed
 
 And for the next steps, familiarity with:
@@ -444,7 +443,7 @@ implementing rose-stem testing, see the example "Sample" application in
 :contrib:`contrib<>`.
 
 For the latest guidance on what would be expected from a finalised
-application visit the :antsworkingpractices:`ANTS Working Practices<>` page.
+application visit the ANTS Working Practices page.
 
 Summary
 -------

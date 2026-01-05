@@ -40,9 +40,12 @@ Glossary
     rose stem
       Rose Stem is a testing system for use with Rose. It provides a user-friendly way of defining source trees and tasks on the
       command line which are then passed by Rose Stem to the suite as Jinja2 variables. See the `Rose Stem Documentation`_.
+      ANTS previously made use of the rose stem system for functional testing,
+      but from v3.0, the workflow is run via the ``cylc vip`` command, rather
+      than using ``rose stem``.
 
     unary operation
       A function that takes in only one argument.
 
     Unified Model
-      Met Office's combined weather and climate forecasting operational model. See the `UM trac page`_.
+      Met Office's combined weather and climate forecasting operational model. See the `UM GitHub repository`_.

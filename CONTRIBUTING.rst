@@ -22,7 +22,7 @@ To support the ANTS developers in identifying the problem, please provide:
 Due to the complexity of some workflows it can be hard to understand what
 is being run/intended, so when providing a recipe for repeating your issue
 please try and provide details of the script(s) being run and the inputs and
-arguments being used beyond just a pointer to "task X in suite Y".
+arguments being used beyond just a pointer to "task X in workflow Y".
 
 Feature Requests
 ----------------
@@ -288,3 +288,4 @@ Contributor Licence Agreement:
 * Josh Rackham (Met Office)
 * Harold Dyson (Met Office)
 * Theo Geddes (Met Office)
+* Andrew Clark (Met Office)
