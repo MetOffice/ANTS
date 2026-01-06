@@ -434,6 +434,8 @@ class _CallbackMetadata(object):
         will run the user callback
         """
         print("callback has been added")
+        if type(filename) is list:
+            filename = filename[0]
         metadata_filenames = "".join([filename, ".*"])
         metadata_files = glob.glob(metadata_filenames)
         if metadata_files != []:

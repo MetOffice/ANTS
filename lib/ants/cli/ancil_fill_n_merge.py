@@ -19,13 +19,13 @@ from ants.utils.cube import create_time_constrained_cubes
 
 def load_data(
     primary_source,
-    ignore_metadata_files,
     alternate_source=None,
     validity_polygon_filepath=None,
     target_mask_filepath=None,
     land_fraction_threshold=None,
     begin=None,
     end=None,
+    ignore_metadata_files=None
 ):
     """
     Load the necessary data for performing a merge and fill operation.
