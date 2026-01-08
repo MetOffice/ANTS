@@ -438,6 +438,7 @@ class _CallbackMetadata(object):
             filename = filename[0]
         metadata_filenames = "".join([filename, ".*"])
         metadata_files = glob.glob(metadata_filenames)
+        print("m_file: ", metadata_files)
         if metadata_files != []:
             self._retrieve_metadata(metadata_files, cube)
         if self._user_callback is not None:
@@ -457,15 +458,31 @@ class _CallbackMetadata(object):
             The cube being loaded.
 
         """
+        valid_metadata_names = ["license", "attribution", "restrictions"]
+        other_license= ["lisense", "licence", "lisence"]
         for metadata_file in metadata_files:
-            open_file = open(metadata_file, "r")
-            metadata = open_file.readlines()
-            open_file.close()
             file_name_splits = str(metadata_file).split(".")
             attribute_name = file_name_splits[-1]
-            cube.attributes[attribute_name] = metadata
-            with open("written_license.txt", "a") as file:
-                file.write("".join(metadata))
+            if attribute_name in other_license:
+                warnings.warn(f"The attribute name {attribute_name} has been changed to "
+                              "license, in line with ANTS working practices.", category=UserWarning)
+                attribute_name = "license"
+            if attribute_name not in valid_metadata_names:
+                warnings.warn(f"Attribute {attribute_name} is not a valid metadata file "
+                              "name. Accepted metadata names are license, attribution "
+                              "and restrictions.", category=UserWarning)
+            else:
+                print("cube attributes", cube.attributes)
+                if attribute_name in cube.attributes:
+                    raise AttributeError(f"The {attribute_name} is already an attribute on the "
+                                "cube. To ignore metadata files, use the "
+                                "--ignore-metadata-files flag.")
+                open_file = open(metadata_file, "r")
+                metadata = open_file.readlines()
+                open_file.close()
+                cube.attributes[attribute_name] = metadata
+                with open("written_license.txt", "a") as file:
+                    file.write("".join(metadata))
 
 
 def load_cube(*args, **kwargs):
