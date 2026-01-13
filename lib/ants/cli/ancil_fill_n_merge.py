@@ -25,7 +25,7 @@ def load_data(
     land_fraction_threshold=None,
     begin=None,
     end=None,
-    ignore_metadata_files=None
+    ignore_metadata_files=None,
 ):
     """
     Load the necessary data for performing a merge and fill operation.

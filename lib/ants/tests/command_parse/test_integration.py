@@ -213,7 +213,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=1990,
             end=1996,
             netcdf_only=False,
-            ignore_metadata_files=False
+            ignore_metadata_files=False,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -282,7 +282,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             "/path/to/lsm",
             "-o",
             "/path/to/output",
-            "--ignore-metadata-files"
+            "--ignore-metadata-files",
         ]
         with mock.patch("sys.argv", new=new):
             parser = AntsArgParser(target_lsm=True)

@@ -56,8 +56,8 @@ See Also
 
 """
 import copy
-import warnings
 import glob
+import warnings
 from contextlib import contextmanager
 from functools import wraps
 
@@ -374,9 +374,10 @@ def _customised_load(func):
                 ignore_metadata_files,
                 type(ignore_metadata_files),
             )
-            if ignore_metadata_files == False:
+            if not ignore_metadata_files:
                 print("doing the thing")
-                # Do the handling for each way a user callback can be passed in through iris
+                # Do the handling for each way a user callback can be passed in through
+                # iris
                 user_callback = None
                 if len(args) == 3:
                     user_callback = args[2]
@@ -459,24 +460,32 @@ class _CallbackMetadata(object):
 
         """
         valid_metadata_names = ["license", "attribution", "restrictions"]
-        other_license= ["lisense", "licence", "lisence"]
+        other_license = ["lisense", "licence", "lisence"]
         for metadata_file in metadata_files:
             file_name_splits = str(metadata_file).split(".")
             attribute_name = file_name_splits[-1]
             if attribute_name in other_license:
-                warnings.warn(f"The attribute name {attribute_name} has been changed to "
-                              "license, in line with ANTS working practices.", category=UserWarning)
+                warnings.warn(
+                    f"The attribute name {attribute_name} has been changed to "
+                    "license, in line with ANTS working practices.",
+                    category=UserWarning,
+                )
                 attribute_name = "license"
             if attribute_name not in valid_metadata_names:
-                warnings.warn(f"Attribute {attribute_name} is not a valid metadata file "
-                              "name. Accepted metadata names are license, attribution "
-                              "and restrictions.", category=UserWarning)
+                warnings.warn(
+                    f"Attribute {attribute_name} is not a valid metadata file "
+                    "name. Accepted metadata names are license, attribution "
+                    "and restrictions.",
+                    category=UserWarning,
+                )
             else:
                 print("cube attributes", cube.attributes)
                 if attribute_name in cube.attributes:
-                    raise AttributeError(f"The {attribute_name} is already an attribute on the "
-                                "cube. To ignore metadata files, use the "
-                                "--ignore-metadata-files flag.")
+                    raise AttributeError(
+                        f"The {attribute_name} is already an attribute on the "
+                        "cube. To ignore metadata files, use the "
+                        "--ignore-metadata-files flag."
+                    )
                 open_file = open(metadata_file, "r")
                 metadata = open_file.readlines()
                 open_file.close()
