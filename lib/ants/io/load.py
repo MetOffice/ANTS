@@ -361,21 +361,9 @@ def _customised_load(func):
                 FutureWarning,
             )
             ignore_metadata_files = False
-            print("the func: ", func)
-            print("args: ", args)
-            print("kwargs: ", kwargs)
-            print("boo")
-            print("ignore_metadata_files" in kwargs)
             if "ignore_metadata_files" in kwargs:
-                print("its here!!!")
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
-            print(
-                "ignore metadata files: ",
-                ignore_metadata_files,
-                type(ignore_metadata_files),
-            )
             if not ignore_metadata_files:
-                print("doing the thing")
                 # Do the handling for each way a user callback can be passed in through
                 # iris
                 user_callback = None
@@ -384,8 +372,6 @@ def _customised_load(func):
                 else:
                     if "callback" in kwargs:
                         user_callback = kwargs.pop("callback")
-                print("first args: ", args)
-                print("first kwargs: ", kwargs)
                 args, kwargs = _add_callback(
                     _CallbackMetadata(user_callback), *args, **kwargs
                 )
@@ -434,16 +420,13 @@ class _CallbackMetadata(object):
         The method that runs when iris runs the callback. Collects the filenames and
         will run the user callback
         """
-        print("callback has been added")
         if type(filename) is list:
             filename = filename[0]
         metadata_filenames = "".join([filename, ".*"])
         metadata_files = glob.glob(metadata_filenames)
-        print("m_file: ", metadata_files)
         if metadata_files != []:
             self._retrieve_metadata(metadata_files, cube)
         if self._user_callback is not None:
-            print("should have added user callback")
             self._user_callback(cube, field, filename)
 
     def _retrieve_metadata(self, metadata_files, cube):
@@ -479,7 +462,6 @@ class _CallbackMetadata(object):
                     category=UserWarning,
                 )
             else:
-                print("cube attributes", cube.attributes)
                 if attribute_name in cube.attributes:
                     raise AttributeError(
                         f"The {attribute_name} is already an attribute on the "
