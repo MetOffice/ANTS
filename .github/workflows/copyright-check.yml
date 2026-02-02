@@ -22,7 +22,7 @@ jobs:
               uses: actions/checkout@v4
             - name: LS
               id: ls
-              run: echo ls
+              run: ls
 
             - name: Check copyright line 1
               id: copyright-check1
