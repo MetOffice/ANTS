@@ -1,0 +1,52 @@
+name: Copyright Check
+on:
+    pull_request:
+        branches: main
+    push:
+        branches: main
+    workflow_dispatch:
+
+# Limit concurrently running workflow for a specific pull request.
+# Cancel and resubmit if a new push is made. See GitHub docs:
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    copyright:
+        name: Run Copyright statement checks
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Check copyright line 1
+              id: copyright-check1
+              run: grep -rLx --include=*.py --include=*.sh '# (C) Crown Copyright, Met Office. All rights reserved.' . >> "$GREP1_OUTPUT"
+              shell: micromamba-shell {0}
+              continue-on-error: false
+            - name: Check copyright line 2
+              id: copyright-check2
+              run: grep -rLx --include=*.py --include=*.sh '#' . >> "$GREP2_OUTPUT"
+              shell: micromamba-shell {0}
+              continue-on-error: false
+            - name: Check copyright line 3
+              id: copyright-check3
+              run: grep -rLx --include=*.py --include=*.sh '# This file is part of ANTS and is released under the BSD 3-Clause license.' . >> "$GREP3_OUTPUT"
+              shell: micromamba-shell {0}
+              continue-on-error: false
+            - name: Check copyright line 4
+              id: copyright-check4
+              run: grep -rLx --include=*.py --include=*.sh '# See LICENSE.txt in the root of the repository for full licensing details.' . >> "$GREP4_OUTPUT"
+              shell: micromamba-shell {0}
+              continue-on-error: false
+            - name: Verify Copyright statements
+              if: |
+                  steps.copyright-check1.GREP1_OUTPUT != '' ||
+                  steps.copyright-check2.GREP2_OUTPUT != '' ||
+                  steps.copyright-check3.GREP3_OUTPUT != '' ||
+                  steps.copyright-check4.GREP4_OUTPUT != ''
+              run: |
+                echo "One or more checks failed:"
+
