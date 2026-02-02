@@ -26,7 +26,7 @@ jobs:
 
             - name: Check copyright line 1
               id: copyright-check1
-              run: grep -rLx --include=*.py --include=*.sh '# (C) Crown Copyright, Met Office. All rights reserved.' . >> "$GREP1_OUTPUT"
+              run: grep -rLx --include=*.py --include=*.sh '# (C) Crown Copyright, Met Office. All rights reserved.' .
               continue-on-error: false
             - name: Check copyright line 2
               id: copyright-check2
