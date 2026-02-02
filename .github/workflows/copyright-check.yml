@@ -20,6 +20,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+            - name: LS
+              id: ls
+              run: echo ls
 
             - name: Check copyright line 1
               id: copyright-check1
