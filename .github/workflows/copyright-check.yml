@@ -24,22 +24,18 @@ jobs:
             - name: Check copyright line 1
               id: copyright-check1
               run: grep -rLx --include=*.py --include=*.sh '# (C) Crown Copyright, Met Office. All rights reserved.' . >> "$GREP1_OUTPUT"
-              shell: micromamba-shell {0}
               continue-on-error: false
             - name: Check copyright line 2
               id: copyright-check2
               run: grep -rLx --include=*.py --include=*.sh '#' . >> "$GREP2_OUTPUT"
-              shell: micromamba-shell {0}
               continue-on-error: false
             - name: Check copyright line 3
               id: copyright-check3
               run: grep -rLx --include=*.py --include=*.sh '# This file is part of ANTS and is released under the BSD 3-Clause license.' . >> "$GREP3_OUTPUT"
-              shell: micromamba-shell {0}
               continue-on-error: false
             - name: Check copyright line 4
               id: copyright-check4
               run: grep -rLx --include=*.py --include=*.sh '# See LICENSE.txt in the root of the repository for full licensing details.' . >> "$GREP4_OUTPUT"
-              shell: micromamba-shell {0}
               continue-on-error: false
             - name: Verify Copyright statements
               if: |
