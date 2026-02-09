@@ -21,17 +21,11 @@ class Common(metaclass=abc.ABCMeta):
         # Only checks the directory from which ants was imported.
         ants_path = Path(ants.__file__).resolve(strict=True)
         working_directory = str(ants_path.parents[2])
-        print("working dir: ", ants_path.parent)
-        print("working dir0: ", ants_path.parents[0])
-        print("working dir1: ", ants_path.parents[1])
-        print("working dir2: ", ants_path.parents[2])
-        print("wd: ", working_directory[2])
         self.all_filepaths = [
             os.path.join(dirpath, filename)
             for dirpath, _, filenames in os.walk(working_directory)
             for filename in filenames
         ]
-        print("filepaths: ", self.all_filepaths)
         self._exclude = [
             os.path.join("tests", "resources"),
             os.path.join("tests", "results"),
@@ -117,7 +111,6 @@ class TestLicenseHeaders(Common, unittest.TestCase):
 
     def test_license_headers(self):
         files = self.get_files()
-        print("files: ", files)
         messages = []
         for fnme in files:
             messages.extend(self.check_license_header(fnme))

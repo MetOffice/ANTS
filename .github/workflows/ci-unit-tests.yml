@@ -19,8 +19,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: LS
-              run: ls lib/ants/tests
+
             - name: Setup python environment
               uses: mamba-org/setup-micromamba@v2
               with:
