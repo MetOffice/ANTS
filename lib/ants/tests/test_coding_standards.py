@@ -23,7 +23,7 @@ class Common(metaclass=abc.ABCMeta):
         working_directory = str(ants_path.parents)
         self.all_filepaths = [
             os.path.join(dirpath, filename)
-            for dirpath, _, filenames in os.walk(working_directory)
+            for dirpath, _, filenames in os.walk(working_directory[2])
             for filename in filenames
         ]
         self._exclude = [
@@ -90,7 +90,7 @@ class TestLicenseHeaders(Common, unittest.TestCase):
         : list of str
         List of filenames for python files.
         """
-        return self._get_files(include_list=[r".*\.py$"])
+        return self._get_files(include_list=[r".*\.py$", r".*\.sh$"])
 
     @staticmethod
     def check_license_header(filename):
