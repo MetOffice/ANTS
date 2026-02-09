@@ -21,7 +21,7 @@ class Common(metaclass=abc.ABCMeta):
         # Only checks the directory from which ants was imported.
         ants_path = Path(ants.__file__).resolve(strict=True)
         working_directory = str(ants_path.parents)
-        print("working dir: ", working_directory[0])
+        print("working dir: ", ants_path.parent)
         self.all_filepaths = [
             os.path.join(dirpath, filename)
             for dirpath, _, filenames in os.walk(working_directory[2])
