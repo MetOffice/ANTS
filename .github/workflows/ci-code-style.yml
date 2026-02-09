@@ -45,6 +45,12 @@ jobs:
               shell: micromamba-shell {0}
               continue-on-error: true
 
+            - name: Run copyright check
+              id: copyright
+              run: pytest -s lib/ants/tests/test_coding_standards.py
+              shell: micromamba-shell {0}
+              continue-on-error: true
+
             - name: Collect failures
               if: |
                 steps.black.outcome == 'failure' ||
