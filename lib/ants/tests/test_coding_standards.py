@@ -22,6 +22,9 @@ class Common(metaclass=abc.ABCMeta):
         ants_path = Path(ants.__file__).resolve(strict=True)
         working_directory = str(ants_path.parents)
         print("working dir: ", ants_path.parent)
+        print("working dir0: ", ants_path.parents[0])
+        print("working dir1: ", ants_path.parents[1])
+        print("working dir2: ", ants_path.parents[2])
         self.all_filepaths = [
             os.path.join(dirpath, filename)
             for dirpath, _, filenames in os.walk(working_directory[2])
