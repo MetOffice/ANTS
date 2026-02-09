@@ -26,6 +26,7 @@ class Common(metaclass=abc.ABCMeta):
             for dirpath, _, filenames in os.walk(working_directory[2])
             for filename in filenames
         ]
+        print("filepaths: ", self.all_filepaths)
         self._exclude = [
             os.path.join("tests", "resources"),
             os.path.join("tests", "results"),
