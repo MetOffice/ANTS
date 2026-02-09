@@ -111,6 +111,7 @@ class TestLicenseHeaders(Common, unittest.TestCase):
 
     def test_license_headers(self):
         files = self.get_files()
+        print("files: ", files)
         messages = []
         for fnme in files:
             messages.extend(self.check_license_header(fnme))
