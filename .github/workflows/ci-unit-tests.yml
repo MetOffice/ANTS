@@ -20,7 +20,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: LS
-              run: ls lib/tests
+              run: ls lib/ants/tests
             - name: Setup python environment
               uses: mamba-org/setup-micromamba@v2
               with:
