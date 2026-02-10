@@ -64,6 +64,8 @@ jobs:
                 set -eu
                 PATH=$GITHUB_WORKSPACE/mule/_build/bin:${PATH:-}
                 PYTHONPATH=$GITHUB_WORKSPACE/mule/_build/lib:${PYTHONPATH:-}
+                echo "PATH: $PATH"
+                echo "PYTHONPATH: $PYTHONPATH"
                 mule-version
                 pytest --verbose $GITHUB_WORKSPACE/ANTS
               shell: micromamba-shell {0}
