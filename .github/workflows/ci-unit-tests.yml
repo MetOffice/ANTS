@@ -42,13 +42,13 @@ jobs:
                 cache-environment: true
 
             - name: Install shumlib
-              working-directory: $GITHUB_WORKSPACE/shumlib
+              working-directory: ./shumlib
               run: |
                 echo "Compiling shumlib using $(gfortran --version)"
                 make -f ./make/vm-x86-gfortran-gcc.mk check
 
             - name: Install Mule
-              working-directory: $GITHUB_WORKSPACE/mule
+              working-directory: ./mule
               run: |
                 ./admin/install_mule.sh --spiral_lib --packing_lib \
                                         --shumlib_path $GITHUB_WORKSPACE/shumlib/build/vm-x86-gfortran-gcc \
@@ -56,7 +56,7 @@ jobs:
               shell: micromamba-shell {0}
 
             - name: Install ANTS
-              run: pip install $GITHUB_WORKSPACE/ANTS
+              run: pip install ./ANTS
               shell: micromamba-shell {0}
 
             - name: Run pytest
