@@ -63,7 +63,7 @@ jobs:
               run: |
                 set -eu
                 PATH=$GITHUB_WORKSPACE/mule/_build/bin:${PATH:-}
-                PYTHONPATH=$GITHUB_WORKSPACE/mule/_build/lib:${PYTHONPATH:-}
+                PYTHONPATH=$GITHUB_WORKSPACE/mule/_build/lib
                 echo "PATH: $PATH"
                 echo "PYTHONPATH: $PYTHONPATH"
                 mule-version
