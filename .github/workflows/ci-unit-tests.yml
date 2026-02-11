@@ -27,7 +27,7 @@ jobs:
               with:
                 repository: MetOffice/shumlib
                 path: shumlib
-                tag: 2025.10.1
+                ref: 2025.10.1
 
             - name: Checkout mule
               uses: actions/checkout@v4
