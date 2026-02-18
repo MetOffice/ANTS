@@ -33,12 +33,17 @@ jobs:
                 path: mule
                 ref: ${{ env.MULE_VERSION }}
 
+            - name: Get OS version
+              id: os-version
+              run: |
+                echo "OS_VERSION=$(gcc --version | head -1)" >> "$GITHUB_OUTPUT"
+
             - name: Cache shumlib build
               id: cache-shumlib-build
               uses: actions/cache@v4
               with:
                 path: shumlib/build/${{ env.SHUMLIB_PLATFORM }}
-                key: shumlib-${{ env.SHUMLIB_VERSION }}-${{ env.SHUMLIB_PLATFORM }}-${{ runner.name }}
+                key: shumlib-${{ env.SHUMLIB_VERSION }}-${{ env.SHUMLIB_PLATFORM }}-${{ steps.os-version.outputs.OS_VERSION }}
 
             - if: ${{ steps.cache-shumlib-build.outputs.cache-hit != 'true' }}
               name: Checkout shumlib
