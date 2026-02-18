@@ -76,7 +76,7 @@ intersphinx_mapping = {
         None,
     ),
     "iris": (f"https://scitools-iris.readthedocs.io/en/v{iris_version}", None),
-    "mule": ("https://metoffice.github.io/mule/", None),
+    "mule": ("https://metoffice.github.io/mule/mule/", None),
     "numpy": (f"https://numpy.org/doc/{numpy_version}/", None),
     "shapely": (f"https://shapely.readthedocs.io/en/{shapely_version}/", None),
     "dask": ("https://docs.dask.org/en/stable/", None),
