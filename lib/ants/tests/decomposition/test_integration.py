@@ -100,9 +100,18 @@ def _binary_setup():
 
 class Common(object):
     def setUp(self):
+        # Need to remove slurm_ntasks environment variable (if
+        # present).  Hence, want to preserve original environment to restore
+        # it on test completion:
+        self._original_environment = os.environ.copy()
+        os.environ.pop("SLURM_NTASKS", None)
+
         patch = mock.patch("warnings.warn")
         self.mock_warnings = patch.start()
         self.addCleanup(patch.stop)
+
+    def tearDown(self):
+        os.environ = self._original_environment
 
     def _assert_metadata_equal(self, actual_results, expected_results):
         for result, expected in zip(
