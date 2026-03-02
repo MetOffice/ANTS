@@ -1,6 +1,6 @@
 .. meta::
    :description lang=en: Tutorial on developing ANTS based applications
-   :keywords: contribute, contrib, application, development, tutorial
+   :keywords: contribute, ancillary-file-science, application, development, tutorial
    :property=og:locale: en_GB
 
 .. _writing-applications:
@@ -10,9 +10,10 @@ Writing an ANTS based application
 =================================
 
 The ANTS library provides a toolkit of functionality common to many ancillary
-generating applications. The user-written applications themselves are held
-under the :contrib:`contrib<>` project. An example application can be found in
-:contrib:`contrib<>` under the "Sample" App.
+generating applications. The user-written applications used for the standard
+model configurations within the Momentum partnerhsip are held under the
+:ancillary-file-science:`ancillary-file-science<>` project (must be signed in
+to an account with appropriate GitHub permissions for access to that link).
 
 An application will usually contain code to carry out the following steps:
 
@@ -34,7 +35,8 @@ In the tutorial here, we will write an ancillary generating application that
 covers all steps of the :doc:`ancillary_generation_pipeline`. In real use
 cases though, it is often preferable to write multiple separate applications,
 connected via a workflow, to avoid writing monolithic, complex, and expensive
-to run individual applications. See :contrib:`contrib<>` and the associated
+to run individual applications. See
+:ancillary-file-science:`ancillary-file-science<>` and the associated
 rose-stem workflow for examples of such implementations and breakdowns.
 
 As prerequisites for carrying out this tutorial we assume:
@@ -51,19 +53,21 @@ And for the next steps, familiarity with:
 Initial setup
 -------------
 
-To get started with you will want to check out a copy of :contrib:`contrib<>`
-and create a branch where you will be working on your implementation. You will
-also need an environment active with ANTS installed into it so that you can
-carry out interactive development and testing of your application.
+To get started with you will want to check out a copy of
+:ancillary-file-science:`ancillary-file-science<>` and create a branch where
+you will be working on your implementation. You will also need an environment
+active with ANTS installed into it so that you can carry out interactive
+development and testing of your application.
 
 Create App Directory
 --------------------
 
-Having got your working copy of your branch checked out, we need to create
-our application in the appropiate place. Ancillary generation applications live
-in the "Apps" directory of contrib. For now, create a directory under "Apps"
-called "Tutorial", and within that create an "ancil_tutorial.py" where we will
-be carrying out the coding exercise in this tutorial.
+Having got your working copy of your branch checked out, we need to create our
+application in the appropiate place. Ancillary generation applications live in
+the "Apps" directory of ``ancillary-file-science``. For now, create a
+directory under "Apps" called "Tutorial", and within that create an
+"ancil_tutorial.py" where we will be carrying out the coding exercise in this
+tutorial.
 
 In your editor of choice, open up the ancil_tutorial.py file and update it so
 it contains the following:
@@ -85,7 +89,7 @@ it contains the following:
       also as a ancillary file.
 
     The application implements a few features of ANTS that are common to
-    contrib applications.
+    ancillary applications.
     """
     import ants
     import ants.regrid
@@ -167,14 +171,15 @@ for regridding to later in our implementation.
 Add File Loading
 ----------------
 
-For our next step, we are going to need some data. For this, we will be
-using the ``sample_source.nc`` and ``sample_target.nc`` files stored in the
-``rose-stem/sources`` directory of contrib. Take a moment to inspect and
-familiarise yourself with these files using your netCDF tool of choice e.g.
-``ncdump -h <file>`` to inspect the contents. As we go about implementing
-our application we will use ``print()`` statements to provide debugging to
-confirm what we have done is what we expect. You should see outputs consistent
-with what you saw inspecting the file in your chosen netCDF tool.
+For our next step, we are going to need some data. For this, we will be using
+the ``sample_source.nc`` and ``sample_target.nc`` files stored in the
+``rose-stem/sources`` directory of ancillary-file-science. Take a moment to
+inspect and familiarise yourself with these files using your netCDF tool of
+choice e.g.  ``ncdump -h <file>`` to inspect the contents. As we go about
+implementing our application we will use ``print()`` statements to provide
+debugging to confirm what we have done is what we expect. You should see
+outputs consistent with what you saw inspecting the file in your chosen netCDF
+tool.
 
 To load our source data into our application we will make use of the
 ``load_cube`` routine from ANTS. Update the ``load_data()`` routine as follows:
@@ -356,7 +361,7 @@ routines in :mod:`ants.io.save` we imported earlier - ``ancil`` and ``netcdf``.
 
 Firstly, lets update our ``if __name__ == "__main__":`` section to pass through
 the argument to main for what file to save to, along with whether we want to
-only save in netcdf (a convention we follow across contrib apps where
+only save in netcdf (a convention we follow across ancillary apps where
 applicable) as:
 
 .. code-block:: python
@@ -431,16 +436,17 @@ Next Steps
 ----------
 
 With your application now written, your next step would be to add pytest style
-unittests for the routines in the application. These would be stored in a tests
-subdirectory of the ``Apps/Tutorial`` directory you created earlier. We will
-not go into detail of doing that here, but because we broke down our code into
-constituent parts rather than leaving it all under ``main()`` we are more
+unittests for the routines in the application. These would be stored in a
+tests subdirectory of the ``Apps/Tutorial`` directory you created earlier. We
+will not go into detail of doing that here, but because we broke down our code
+into constituent parts rather than leaving it all under ``main()`` we are more
 easily able to test the code. With unittests written, your final step would be
-to integrate your new application into the rose-stem framework in contrib,
-providing a representative workflow with some cutdown/representative/synthetic
-low resolution data. For examples of adding unittests and up-to-date way of
-implementing rose-stem testing, see the example "Sample" application in
-:contrib:`contrib<>`.
+to integrate your new application into the rose-stem framework in
+``ancillary-file-science``, providing a representative workflow with some
+cutdown/representative/synthetic low resolution data. For examples of adding
+unittests and up-to-date way of implementing rose-stem testing, see the
+example "Sample" application in
+:ancillary-file-science:`ancillary-file-science<>`.
 
 For the latest guidance on what would be expected from a finalised
 application visit the ANTS Working Practices page.
@@ -477,7 +483,7 @@ for splitting up and parallelising operation, noting that care will be needed
 to ensure its usage is appropriate for the codes being parallelised.
 
 Finally, it is also always worth taking a look at the existing ancillary
-generation applications in :contrib:`contrib<>` to see what has been done
-before. It may be that related implementations already exist for what you are
-intending to do, or that ideas for how to use parts of the
-:doc:`API docs <lib/modules>` in your processing chain.
+generation applications in :ancillary-file-science:`ancillary-file-science<>`
+to see what has been done before. It may be that related implementations
+already exist for what you are intending to do, or that ideas for how to use
+parts of the :doc:`API docs <lib/modules>` in your processing chain.

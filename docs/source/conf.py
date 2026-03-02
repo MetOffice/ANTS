@@ -84,9 +84,9 @@ intersphinx_mapping = {
 
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 extlinks = {
-    "contrib": (
-        "https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk/%s",
-        "contrib %s",
+    "ancillary-file-science": (
+        "https://github.com/MetOffice/ancillary-file-science/%s",
+        "ancillary-file-science %s",
     ),
     "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "MOSRS #%s"),
     "issue": ("https://github.com/MetOffice/ANTS/issues/%s", "Issue #%s"),
