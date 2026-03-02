@@ -8,9 +8,10 @@
 What is ANTS?
 =============
 
-ANTS is a Python library that provides interfaces and routines for carrying out
-common operations needed to produce |ancillary files|. It is built on top of |Iris|
-and uses |Mule| to write |Unified Model| (UM) ancillary files.
+``ANTS`` is a Python library that provides interfaces and routines for
+carrying out common operations needed to produce |ancillary files|. It is
+built on top of |Iris| and uses |Mule| to write |Unified Model| (UM) ancillary
+files.
 
 In addition, some standard applications are provided to support:
 
@@ -23,7 +24,7 @@ In addition, some standard applications are provided to support:
 What is ANTS not?
 =================
 
-While ANTS provides a library for carrying out common operations needed
+While ``ANTS`` provides a library for carrying out common operations needed
 for ancillary generation, it is:
 
  * not where ancillary science routines live
@@ -35,19 +36,19 @@ Related areas
 =============
 
 When carrying out work generating or writing new ancillary generation code, a
-number of areas beyond the ANTS library itself will likely be encountered.
+number of areas beyond the ``ANTS`` library itself will likely be encountered.
 
 .. _ancillary_file_science_introduction:
 
 Ancillary-file-science
 ----------------------
 
-Ancillary-file-science is a central location for the lodging of ANTS based
-ancillary science routines. The codes in there are owned by scientists, with
-technical advice and assurance provided by the ANTS developers. A |rose stem|
-workflow exists in ``ancillary-file-science`` to enable routine testing of the
-ancillary science routines lodged there - known as "Apps" - as updates are
-made to the ANTS library.
+The ``ancillary-file-science`` repository is a central location for the
+lodging of ANTS based ancillary science routines. The codes in there are owned
+by scientists, with technical advice and assurance provided by the ``ANTS``
+developers. A |rose stem| workflow exists in ``ancillary-file-science`` to
+enable routine testing of the ancillary science routines lodged there - known
+as "Apps" - as updates are made to the ``ANTS`` library.
 
 .. _Datasets_introduction:
 
@@ -66,10 +67,11 @@ write a new "pre-processor" for it. You will want to refer to the relevant
 ``ancillary-file-science`` App to understand what is needed and there may be
 related pre-processors available that you could use as starting points.
 
-Ideally, files input into ancillary science routines should be in |netCDF| format
-as ANTS (and Iris) is well optimised for working with this format. It also has
-the added benefit of allowing metadata to be recorded with the data itself -
-allowing capture of provenance, licensing, and distribution information.
+Ideally, files input into ancillary science routines should be in |netCDF|
+format as ``ANTS`` (and Iris) is well optimised for working with this
+format. It also has the added benefit of allowing metadata to be recorded with
+the data itself - allowing capture of provenance, licensing, and distribution
+information.
 
 .. _Workflows_introduction:
 
@@ -77,12 +79,13 @@ Ancillary Workflows
 -------------------
 
 Ancillary Workflows are |cylc| based workflows (suites) that are owned,
-maintained, and developed by science teams and are not maintained by the ANTS
-developers. These workflows will often include one or more jobs running
-``ancillary-file-science`` Apps to process "Master Files" into ancillary
-files, and are the typical entry point for someone wanting to produce a new
-ancillary file rather than the ANTS library itself. Examples of these are the
-Global Atmosphere (GA), Regional Atmosphere (RA), and |JULES| suites.
+maintained, and developed by science teams and are not maintained by the
+``ANTS`` developers. These workflows will often include one or more jobs
+running ``ancillary-file-science`` Apps to process "Master Files" into
+ancillary files, and are the typical entry point for someone wanting to
+produce a new ancillary file rather than the ``ANTS`` library itself. Examples
+of these are the Global Atmosphere (GA), Regional Atmosphere (RA), and |JULES|
+suites.
 
 The CAP
 -------
@@ -90,27 +93,27 @@ The CAP
 The CAP was a Fortran based libary previously used to generate Unified Model
 ancillary files. It is, however, long since unmaintained and unsupported. Much
 work has been put into providing ``ancillary-file-science`` implementation of
-equivalent, or newer, science to enable migration away from the CAP to ANTS
-based ``ancillary-file-science`` implementations.
+equivalent, or newer, science to enable migration away from the CAP to
+``ANTS`` based ``ancillary-file-science`` implementations.
 
 UG-ANTS / UG-Ancillary-file-science
 -----------------------------------
 
 With the move to |LFRic|, our models move to using a |cubesphere| grid and it
 becomes necessary to have tooling and write new science routines to support
-the new grid and model requirements. ANTS does not support generation of the
-unstructured grid ancillary files needed for this. Instead, a separate UG-ANTS
-and associated ``ug-ancillary-file-science`` are being developed. Due to the
-various complexities both in terms of implementations needed, along with the
-structure of the existing ANTS and ``ancillary-file-science`` codes, an active
-decision was made to develop these as distinct, separate things. These
-libraries follow the same principles as regular ANTS and
-``ancillary-file-science`` - UG-ANTS is the underpinning Python library, and
-``ug-ancillary-file-science`` is where ancillary science routines for
-generating UGrid ancillary files live.
+the new grid and model requirements. ``ANTS`` does not support generation of
+the unstructured grid ancillary files needed for this. Instead, a separate
+``UG-ANTS`` and associated ``ug-ancillary-file-science`` are being
+developed. Due to the various complexities both in terms of implementations
+needed, along with the structure of the existing ``ANTS`` and
+``ancillary-file-science`` codes, an active decision was made to develop these
+as distinct, separate things. These libraries follow the same principles as
+regular ``ANTS`` and ``ancillary-file-science`` - ``UG-ANTS`` is the
+underpinning Python library, and ``ug-ancillary-file-science`` is where
+ancillary science routines for generating UGrid ancillary files live.
 
 Contacting Us
 =============
 
-If you want support with ANTS, want to report a bug, or are interested in
+If you want support with ``ANTS``, want to report a bug, or are interested in
 contributing new functionality feel free to :ref:`contact us<about>`.
