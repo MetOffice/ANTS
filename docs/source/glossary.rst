@@ -13,7 +13,7 @@ Glossary
       A function that takes in two arguments.
 
     contrib
-      The legacy name for the `ancillary-file-science`_ repository.  This repository contains the applications for generating the ancillary files for a variety of Momentum model configurations.
+      The legacy name for the `ancillary-file-science`_ repository (link requires being logged in to a GitHub account with appropriate permissions).  This repository contains the applications for generating the ancillary files for a variety of Momentum model configurations.
 
     cubesphere
       An unstructured mesh alternate to the traditional lat-lon grid.
