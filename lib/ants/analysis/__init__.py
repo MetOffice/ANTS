@@ -68,16 +68,18 @@ __all__ = [
 
 
 def calc_grad(source):
-    """
-    .. attention::
-       The calc_grad routine has been removed from the core ants library at version 2.2.
-       It has been moved to Apps/Orography/orography_utils.py in the contrib
-       repository.
-       Attempting to use this function will result in an ImportError.
+    """.. attention::
+
+       The calc_grad routine has been removed from the core ants library at
+       version 2.2.  It has been moved to Apps/Orography/orography_utils.py in
+       the ancillary-file-science repository.  Attempting to use this function
+       will result in an ImportError.
+
     """
     raise ImportError(
         "The calc_grad routine has been removed from the core ants library. It has been"
-        " moved to Apps/Orography/orography_utils.py in the contrib repository."
+        " moved to Apps/Orography/orography_utils.py in the ancillary-file-science "
+        "repository."
     )
 
 
