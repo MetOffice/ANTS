@@ -1,0 +1,28 @@
+.. include:: /common.txt
+
+************************
+ANTS 3.1 (TBC)
+************************
+
+This release is primarily driven by migration of the ancillary science code to
+`GitHub <https://github.com/MetOffice/ancillary-file-science>`_.
+For a full list of changes see the :milestone:`3.1 release milestone <3>`.
+
+Features
+========
+
+Bugs Fixed
+==========
+
+Incompatible Changes
+====================
+
+Infrastructure
+==============
+- :pr:`118`: |Mule| and `shumlib <https://github.com/MetOffice/shumlib>` are now
+  installed into the continuous integration environment as part of GitHub Actions
+  for running unit tests. This means that the full set of unit tests can now
+  be run in GitHub Actions.
+
+Documentation
+=============
