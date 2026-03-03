@@ -93,5 +93,5 @@ Add workflow_status.log contents for ANTS rose-stem here.
 </div>
 <br>
 <div>
-Add trac_status.log contents for ancillary-file-science rose-stem here.
+Add workflow_status.log contents for ancillary-file-science rose-stem here.
 </div>

@@ -1,5 +1,6 @@
 .. |ancillary files| replace:: :term:`ancillary files`
 .. |binary| replace:: :term:`binary<binary operation>`
+.. |contrib| replace:: :term:`contrib`
 .. |cubesphere| replace:: :term:`cubesphere`
 .. |cylc| replace:: :term:`cylc`
 .. |Iris| replace:: :term:`Iris`
