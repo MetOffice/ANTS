@@ -68,8 +68,8 @@ __all__ = [
 
 
 def calc_grad(source):
-    """.. attention::
-
+    """
+    .. attention::
        The calc_grad routine has been removed from the core ants library at
        version 2.2.  It has been moved to Apps/Orography/orography_utils.py in
        the ancillary-file-science repository.  Attempting to use this function
