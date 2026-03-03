@@ -157,9 +157,8 @@ html_theme_options = {
 
 linkcheck_ignore = [
     r"https://code.metoffice.gov.uk/trac/ancil/newticket.*",
-    # Ignore ANTS GitHub while it is private.
-    # TODO: Remove from ignore list when repository goes public.
-    r"https://github.com/MetOffice/ANTS.*",
     # UM GitHub repo is private
     "https://github.com/MetOffice/um",
+    # ancillary-file-science repo is private
+    "https://github.com/MetOffice/ancillary-file-science",
 ]

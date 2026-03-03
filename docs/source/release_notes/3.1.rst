@@ -19,7 +19,7 @@ Incompatible Changes
 
 Infrastructure
 ==============
-- :pr:`118`: |Mule| and `shumlib <https://github.com/MetOffice/shumlib>` are now
+- :pr:`118`: |Mule| and `shumlib <https://github.com/MetOffice/shumlib>`_ are now
   installed into the continuous integration environment as part of GitHub Actions
   for running unit tests. This means that the full set of unit tests can now
   be run in GitHub Actions.
