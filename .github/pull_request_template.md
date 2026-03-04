@@ -24,7 +24,7 @@ If the answer to an item on the list is not applicable, feel free to replace the
 
 ### Testing
 
-For core ANTS only tests, the bare minimum that will be accepted is the `--group=unittests` but many, if not most, changes will need to test other groups to ensure they meet reviewer expectations. In general, it should be possible and is advised to run the `--group=all` group prior to review submission as this will catch any consequential issues. **Additionally** you **must** run the `ancillary-file-science` tests, pointing at your branch, with `--group=all` to capture any behaviour changes affecting Science codes.
+For core ANTS only tests, the bare minimum that will be accepted is the `group=unittests` but many, if not most, changes will need to test other groups to ensure they meet reviewer expectations. In general, it should be possible and is advised to run the `group=all` group prior to review submission as this will catch any consequential issues. **Additionally** you **must** run the `ancillary-file-science` tests, pointing at your branch, with `group=all` to capture any behaviour changes affecting Science codes.
 
 If your change will alter existing science results, you will need to seek appropriate Scientific validation and confirm that the model has been initialised with your new development. Inspecting a change in xconv/pyplot/visualiser of choice is not sufficient to demonstrate the model can be initialised from your file.
 
@@ -32,8 +32,8 @@ If your change will alter existing science results, you will need to seek approp
 
 **Impact of change**
 
-- [ ] This will maintain results for ANTS `rose stem --group=all` tests
-- [ ] This will this maintain results for ancillary-file-science `rose stem --group=all` tests
+- [ ] This will maintain results for ANTS `cylc vip ./rose-stem -z group=all` tests
+- [ ] This will this maintain results for ancillary-file-science `cylc vip ./rose-stem -z group=all` tests
 - [ ] If this change adds a new capability, evidence has been supplied to show testing of ancillary generation across different resolutions e.g. For global ancillary generation capabilities for use in NWP n1280e is expected to have been tested
 - [ ] This change has significantly impacted required resources (runtime and memory) in existing ancillary generation (if yes, give details)
 - [ ] This change alters existing ancils
@@ -86,7 +86,7 @@ Please add any further notes here.  If Generative AI tools have been used, a bri
 --------
 ### Rose stem logs
 
-Please copy in the contents of your trac_status.log file(s) below (found in the cylc-run directory for your rose stem run) to your rose-stem testing here. **Note**: if your changes lead to a change in answers, you must run `rose stem --group=all` to help ensure all affected configurations has been flagged up.
+Please copy in the contents of your trac_status.log file(s) below (found in the cylc-run directory for your rose stem run) to your rose-stem testing here. **Note**: if your changes lead to a change in answers, you must run `cylc vip ./rose-stem -z group=all` to help ensure all affected configurations has been flagged up.
 
 <div>
 Add workflow_status.log contents for ANTS rose-stem here.
