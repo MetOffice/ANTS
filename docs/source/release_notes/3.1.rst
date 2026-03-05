@@ -1,8 +1,8 @@
 .. include:: /common.txt
 
-************************
-ANTS 3.1 (TBC)
-************************
+*********************
+ANTS 3.1 (March 2026)
+*********************
 
 This release is primarily driven by migration of the ancillary science code to
 `GitHub <https://github.com/MetOffice/ancillary-file-science>`_.
