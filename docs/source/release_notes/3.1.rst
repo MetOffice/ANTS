@@ -10,19 +10,26 @@ For a full list of changes see the :milestone:`3.1 release milestone <3>`.
 
 Features
 ========
+None
 
 Bugs Fixed
 ==========
+None
 
 Incompatible Changes
 ====================
+None
 
 Infrastructure
 ==============
-- :pr:`118`: |Mule| and `shumlib <https://github.com/MetOffice/shumlib>`_ are now
+- :pr:`116`: Add unit test for checking copyright statements automatically in code
+- :pr:`118`:  |Mule| and `shumlib <https://github.com/MetOffice/shumlib>`_ are now
   installed into the continuous integration environment as part of GitHub Actions
   for running unit tests. This means that the full set of unit tests can now
-  be run in GitHub Actions.
+  be run in GitHub Actions
+- :pr:`129`: Update PR template to using ``cylc vip`` and correct invocation of groups
+- :pr:`128`: Fix workflow log generator counts table
 
 Documentation
 =============
+- :pr:`127`: Rename ``contrib`` to ``ancillary-file-science`` in documentation
