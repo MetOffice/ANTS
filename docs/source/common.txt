@@ -1,5 +1,6 @@
 .. |ancillary files| replace:: :term:`ancillary files`
 .. |binary| replace:: :term:`binary<binary operation>`
+.. |contrib| replace:: :term:`contrib`
 .. |cubesphere| replace:: :term:`cubesphere`
 .. |cylc| replace:: :term:`cylc`
 .. |Iris| replace:: :term:`Iris`
@@ -16,6 +17,7 @@
 
 .. Links
 
+.. _ancillary-file-science: https://github.com/MetOffice/ancillary-file-science
 .. _ANTS Documentation: https://metoffice.github.io/ANTS/
 .. _Cylc Documentation: https://cylc.github.io/cylc-doc/stable/html/index.html
 .. _Iris Documentation: https://scitools-iris.readthedocs.io/en/stable/index.html

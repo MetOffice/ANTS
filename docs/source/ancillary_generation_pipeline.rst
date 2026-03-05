@@ -1,6 +1,6 @@
 .. meta::
    :description lang=en: Ancillary Generation Pipeline
-   :keywords: ANTS, ancillary, pipeline, contrib
+   :keywords: ANTS, ancillary, pipeline, ancillary-file-science
    :property=og:locale: en_GB
 
 .. include:: common.txt
@@ -10,8 +10,8 @@ Ancillary Generation Pipeline
 =============================
 
 The generation of an ancillary file is usually carried out by one or more
-:ref:`Contrib_introduction` scripts, as run by one or more tasks within
-:ref:`Workflows_introduction`.
+:ref:`ancillary_file_science_introduction` scripts, as run by one or more
+tasks within :ref:`Workflows_introduction`.
 
 .. image:: resource/ancillary_generation_pipeline.png
     :alt: Ancillary Generation Pipeline image showing the processing of a
@@ -19,8 +19,8 @@ The generation of an ancillary file is usually carried out by one or more
           processing on the new grid, and saving to an ancillary file.
 
 Regardless of how the code itself is divided up into different scripts in
-:ref:`Contrib_introduction`, a typical ANTS based ancillary generation pipeline
-will usually consist of the following key stages:
+:ref:`ancillary_file_science_introduction`, a typical ANTS based ancillary
+generation pipeline will usually consist of the following key stages:
 
 Load Master File
 ----------------
@@ -63,9 +63,9 @@ specific operations can now be carried out. These might be filtering
 operations, generating derivative data fields, mappings, etc. This will take
 the form of Python code operating on Iris cubes. This code might use generic
 operations available via the ANTS library or more specific science routines
-implemented in :ref:`Contrib_introduction`. At the end of this step, all
-science operations should have been applied, required metadata set, and all
-required data generated ready for saving.
+implemented in :ref:`ancillary_file_science_introduction`. At the end of this
+step, all science operations should have been applied, required metadata set,
+and all required data generated ready for saving.
 
 Save to Ancillary File Format
 -----------------------------

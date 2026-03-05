@@ -84,9 +84,9 @@ intersphinx_mapping = {
 
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 extlinks = {
-    "contrib": (
-        "https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk/%s",
-        "contrib %s",
+    "ancillary-file-science": (
+        "https://github.com/MetOffice/ancillary-file-science/%s",
+        "ancillary-file-science %s",
     ),
     "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "MOSRS #%s"),
     "issue": ("https://github.com/MetOffice/ANTS/issues/%s", "Issue #%s"),
@@ -156,7 +156,6 @@ html_theme_options = {
 # -- Options for link checking -----------------------------------------------
 
 linkcheck_ignore = [
-    r"https://code.metoffice.gov.uk/trac/ancil/newticket.*",
     # UM GitHub repo is private
     "https://github.com/MetOffice/um",
     # ancillary-file-science repo is private

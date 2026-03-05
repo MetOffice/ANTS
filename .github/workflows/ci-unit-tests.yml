@@ -16,21 +16,74 @@ jobs:
     pytest:
         name: Run unit tests
         runs-on: ubuntu-24.04
+        env:
+          SHUMLIB_VERSION: 2025.10.1
+          SHUMLIB_PLATFORM: vm-x86-gfortran-gcc
+          MULE_VERSION: 2025.10.1
         steps:
-            - name: Checkout
+            - name: Checkout ANTS
               uses: actions/checkout@v4
+              with:
+                path: ANTS
+
+            - name: Checkout mule
+              uses: actions/checkout@v4
+              with:
+                repository: MetOffice/mule
+                path: mule
+                ref: ${{ env.MULE_VERSION }}
+
+            - name: Get OS version
+              id: os-version
+              run: |
+                echo "OS_VERSION=$(gfortran --version | head -1)" | tee --append "$GITHUB_OUTPUT"
+
+            - name: Cache shumlib build
+              id: cache-shumlib-build
+              uses: actions/cache@v4
+              with:
+                path: shumlib/build/${{ env.SHUMLIB_PLATFORM }}
+                key: shumlib-${{ env.SHUMLIB_VERSION }}-${{ env.SHUMLIB_PLATFORM }}-[${{ steps.os-version.outputs.OS_VERSION }}]
+
+            - if: ${{ steps.cache-shumlib-build.outputs.cache-hit != 'true' }}
+              name: Checkout shumlib
+              uses: actions/checkout@v4
+              with:
+                repository: MetOffice/shumlib
+                path: shumlib
+                ref: ${{ env.SHUMLIB_VERSION }}
+
+            - if: ${{ steps.cache-shumlib-build.outputs.cache-hit != 'true' }}
+              name: Install shumlib
+              working-directory: ./shumlib
+              run: |
+                echo "Compiling shumlib using $(gfortran --version)"
+                make -f ./make/${{ env.SHUMLIB_PLATFORM }}.mk check
 
             - name: Setup python environment
               uses: mamba-org/setup-micromamba@v2
               with:
-                environment-file: environment.lock
+                environment-file: ./ANTS/environment.lock
                 environment-name: ci-env
                 cache-environment: true
 
+            - name: Install Mule
+              working-directory: ./mule
+              run: |
+                ./admin/install_mule.sh --spiral_lib \
+                                        --shumlib_path $GITHUB_WORKSPACE/shumlib/build/${{ env.SHUMLIB_PLATFORM }} \
+                                        ./_build/lib ./_build/bin
+              shell: micromamba-shell {0}
+
             - name: Install ANTS
-              run: pip install .
+              run: pip install ./ANTS
               shell: micromamba-shell {0}
 
             - name: Run pytest
-              run: pytest --verbose
+              run: |
+                set -eu
+                export PATH=$GITHUB_WORKSPACE/mule/_build/bin:${PATH:-}
+                export PYTHONPATH=$GITHUB_WORKSPACE/mule/_build/lib:${PYTHONPATH:-}
+                mule-version
+                pytest --verbose $GITHUB_WORKSPACE/ANTS
               shell: micromamba-shell {0}
