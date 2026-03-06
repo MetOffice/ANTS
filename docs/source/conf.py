@@ -76,7 +76,7 @@ intersphinx_mapping = {
         None,
     ),
     "iris": (f"https://scitools-iris.readthedocs.io/en/v{iris_version}", None),
-    "mule": ("https://metoffice.github.io/mule/", None),
+    "mule": ("https://metoffice.github.io/mule/mule/", None),
     "numpy": (f"https://numpy.org/doc/{numpy_version}/", None),
     "shapely": (f"https://shapely.readthedocs.io/en/{shapely_version}/", None),
     "dask": ("https://docs.dask.org/en/stable/", None),
@@ -84,9 +84,9 @@ intersphinx_mapping = {
 
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 extlinks = {
-    "contrib": (
-        "https://code.metoffice.gov.uk/trac/ancil/browser/contrib/trunk/%s",
-        "contrib %s",
+    "ancillary-file-science": (
+        "https://github.com/MetOffice/ancillary-file-science/%s",
+        "ancillary-file-science %s",
     ),
     "ticket": ("https://code.metoffice.gov.uk/trac/ancil/ticket/%s", "MOSRS #%s"),
     "issue": ("https://github.com/MetOffice/ANTS/issues/%s", "Issue #%s"),
@@ -156,10 +156,8 @@ html_theme_options = {
 # -- Options for link checking -----------------------------------------------
 
 linkcheck_ignore = [
-    r"https://code.metoffice.gov.uk/trac/ancil/newticket.*",
-    # Ignore ANTS GitHub while it is private.
-    # TODO: Remove from ignore list when repository goes public.
-    r"https://github.com/MetOffice/ANTS.*",
     # UM GitHub repo is private
     "https://github.com/MetOffice/um",
+    # ancillary-file-science repo is private
+    "https://github.com/MetOffice/ancillary-file-science",
 ]

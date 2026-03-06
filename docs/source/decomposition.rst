@@ -1,6 +1,6 @@
 .. meta::
    :description lang=en: ANTS Decomposition Framework
-   :keywords: decomposition, contrib, application, development
+   :keywords: decomposition, application, development
    :property=og:locale: en_GB
 
 .. _decomposition:

@@ -25,7 +25,10 @@ used for setting the environment variable.
 
 Source directory structure
 --------------------------
-The rose stem tests will assume the source data has the following structure::
+
+The rose stem tests will assume the source data has the following structure
+(using the legacy |contrib| name rather than ``ancillary-file-science`` for
+consistency with existing installations)::
 
   ANTS
     ├── developer
