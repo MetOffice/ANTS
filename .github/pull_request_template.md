@@ -4,7 +4,7 @@ To be completed prior to review request **and updated** as required during the r
 
 If the answer to an item on the list is not applicable, feel free to replace the checkbox with 'N/A' to give extra clarity.
 
-**All developers are reminded to follow the [ancil working practices](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices)**
+**All developers are reminded to follow the [ancil working practices](https://metoffice.github.io/ancil-working-practices)**
 
 -----
 
@@ -67,7 +67,7 @@ Add details of any further testing here.
 ------
 
 **Other**
-- [ ] I read the [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)
+- [ ] I have read the [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)
 - [ ] I have added my name and affiliation to the [Contributors list](https://github.com/MetOffice/ANTS/blob/main/CONTRIBUTING.rst#code-contributors) if I am not already on there.
 - [ ] The issue labels, milestones, etc. are correct
 - [ ] Links to all related issues have been provided in the pull request description
@@ -77,7 +77,7 @@ Add details of any further testing here.
 | | |
 |---|---|
 | I confirm that all code is my own and that my contributions are not subject to copyright or license restrictions (see [Contributor Licence Agreement](https://metoffice.github.io/ANTS/contributing.html#contributor-licence-agreement-v1-1)). | **your name** |
-| I confirm I have not knowingly violated intellectual property rights (IPR) and have taken [sensible measures to prevent doing so](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#LicencecopyrightandIPR), including appropriate [attribution for usage of Generative AI](https://code.metoffice.gov.uk/trac/ancil/wiki/ANTS/WorkingPractices#AIassistanceandattribution). I confirm that this work is my own, and I understand that it is my responsibility to ensure I am not violating others’ IPR.  This includes taking reasonable steps to ensure that all tools used while creating this contribution did not infringe IPR. | **your name** |
+| I confirm I have not knowingly violated intellectual property rights (IPR) and have taken [sensible measures to prevent doing so](https://metoffice.github.io/ancil-working-practices/working_practices/developer/licence-attribution.html), including appropriate [attribution for usage of Generative AI](https://metoffice.github.io/ancil-working-practices/working_practices/developer/licence-attribution.html#ai-assistance-and-attribution). I confirm that this work is my own, and I understand that it is my responsibility to ensure I am not violating others’ IPR.  This includes taking reasonable steps to ensure that all tools used while creating this contribution did not infringe IPR. | **your name** |
 
 <div>
 Please add any further notes here.  If Generative AI tools have been used, a brief summary (e.g. "Github copilot used to add extra unittests") should be provided.
