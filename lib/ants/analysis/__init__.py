@@ -56,6 +56,7 @@ __all__ = [
     "merge",
     "standard_deviation",
     "floodfill",
+    "flood_fill"
     "find_similar_region",
     "make_consistent_with_lsm",
     "horizontal_grid_reorder",
@@ -247,7 +248,7 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
     return result
 
 
-def _floodfill_neighbour_identify(
+def _flood_fill_neighbour_identify(
     shape, coords, seed_point, extended_neighbourhood, wraparound
 ):
     (yy, xx) = seed_point
@@ -275,12 +276,27 @@ def floodfill(
     array, seed_point, fill_value, extended_neighbourhood=False, wraparound=False
 ):
     """
-    Floodfill via an iterative algorithm.
+    .. deprecated:: ??
+        Use :func:`ants.analysis.flood_fill` instead.
+    """
+    warnings.warn(
+        "ants.analysis.floodfill has been deprecated. Please use "
+        "ants.analysis.flood_fill instead.",
+        FutureWarning,
+    )
+
+    return flood_fill(array, seed_point, fill_value, extended_neighbourhood, wraparound)
+
+def flood_fill(
+    array, seed_point, fill_value, extended_neighbourhood=False, wraparound=False
+):
+    """
+    Flood fill via an iterative algorithm.
 
     Parameters
     ----------
     array : :class:`~numpy.ndarray`
-        The array to apply the floodfill.
+        The array to apply the flood fill.
     seed_point : tuple
         The starting (y, x) index (the seed point).
     fill_value : int or float
@@ -318,7 +334,7 @@ def floodfill(
         yy, xx = coords.pop()
         if array[yy, xx] == value_at_seed:
             array[yy, xx] = fill_value
-            _floodfill_neighbour_identify(
+            _flood_fill_neighbour_identify(
                 array.shape, coords, (yy, xx), extended_neighbourhood, wraparound
             )
 
@@ -399,7 +415,7 @@ def find_small_feature_seed_points(
     while candidate_inds:
         seed_point = candidate_inds.pop()
         filled = array.copy()
-        floodfill(filled, seed_point, fill_value, extended_neighbourhood, wraparound)
+        flood_fill(filled, seed_point, fill_value, extended_neighbourhood, wraparound)
 
         filled_inds = np.where(filled == fill_value)
         filled_inds = list(zip(list(filled_inds[0]), list(filled_inds[1])))
@@ -423,7 +439,7 @@ def find_similar_region(
     """
     Return a set of indices where the connecting neighbours have the same value
 
-    This function is functionaly equivelent :func:`floodfill`, except that
+    This function is functionaly equivelent :func:`flood fill`, except that
     here the fill locations are returned rather than filled.
 
     Parameters
@@ -470,7 +486,7 @@ def find_similar_region(
         if not visited[yy, xx] and array[yy, xx] == src_value:
             visited[yy, xx] = True
             indices.add((yy, xx))
-            _floodfill_neighbour_identify(
+            _flood_fill_neighbour_identify(
                 array.shape, coords, (yy, xx), extended_neighbourhood, wraparound
             )
     return tuple([[ind[i] for ind in list(indices)] for i in range(array.ndim)])

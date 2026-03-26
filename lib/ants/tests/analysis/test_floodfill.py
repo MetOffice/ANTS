@@ -4,13 +4,13 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 import ants.tests
 import numpy as np
-from ants.analysis import floodfill
+from ants.analysis import flood_fill, floodfill
 from ants.exceptions import FloodfillError
 
 
 class TestValues(ants.tests.TestCase):
     def testall(self):
-        # Ensure that the array that is returned has the floodfill applied to
+        # Ensure that the array that is returned has the flood fill applied to
         # it.
         array = np.ones((5, 4))
         array[1:3, 1:3] = 10
@@ -18,7 +18,7 @@ class TestValues(ants.tests.TestCase):
         target = array.copy()
         target[target == 10] = 5
 
-        floodfill(array, (2, 2), 5)
+        flood_fill(array, (2, 2), 5)
         self.assertArrayEqual(array, target)
 
     def test_nofill(self):
@@ -28,14 +28,14 @@ class TestValues(ants.tests.TestCase):
         array[2, 2] = 5
         message = "The value at location 2x2 already has this fill value."
         with self.assertRaisesRegex(FloodfillError, message):
-            floodfill(array, (2, 2), 5)
+            flood_fill(array, (2, 2), 5)
 
     def test_1Dfill_error(self):
         # Raise a suitable exception when a 1D array is passed in for filling.
         array = np.ones((5))
         message = "The provided array should be 2D but that provided is 1D"
         with self.assertRaisesRegex(ValueError, message):
-            floodfill(array, (0, 0), 5)
+            flood_fill(array, (0, 0), 5)
 
     def test_no_wrap(self):
         # Ensure that wraparound filling doesn't happen when it shouldn't
@@ -45,7 +45,7 @@ class TestValues(ants.tests.TestCase):
         target = array.copy()
         target[:, 0:2] = 5
 
-        floodfill(array, (0, 0), 5, wraparound=False)
+        flood_fill(array, (0, 0), 5, wraparound=False)
         self.assertArrayEqual(array, target)
 
     def test_wraparound(self):
@@ -56,7 +56,7 @@ class TestValues(ants.tests.TestCase):
         target = np.ones((5, 5)) * 5
         target[:, 2] = 10
 
-        floodfill(array, (0, 0), 5, wraparound=True)
+        flood_fill(array, (0, 0), 5, wraparound=True)
         self.assertArrayEqual(array, target)
 
     def test_non_extended_neighbourhood(self):
@@ -68,7 +68,7 @@ class TestValues(ants.tests.TestCase):
         target = array.copy()
         target[1:3, 1:3] = 5
 
-        floodfill(array, (2, 2), 5, extended_neighbourhood=False)
+        flood_fill(array, (2, 2), 5, extended_neighbourhood=False)
         self.assertArrayEqual(array, target)
 
     def test_extended_neighbourhood(self):
@@ -81,7 +81,7 @@ class TestValues(ants.tests.TestCase):
         target[1:3, 1:3] = 5
         target[0, 0] = 5
 
-        floodfill(array, (2, 2), 5, extended_neighbourhood=True)
+        flood_fill(array, (2, 2), 5, extended_neighbourhood=True)
         self.assertArrayEqual(array, target)
 
     def test_wraparound_extended(self):
@@ -94,5 +94,15 @@ class TestValues(ants.tests.TestCase):
         target[0:2, 0:2] = 5
         target[2, -1] = 5
 
-        floodfill(array, (0, 0), 5, extended_neighbourhood=True, wraparound=True)
+        flood_fill(array, (0, 0), 5, extended_neighbourhood=True, wraparound=True)
         self.assertArrayEqual(array, target)
+
+    def test_deprecation_warning(self):
+        # Test that calling the deprecated function floodfill will raise a
+        # FutureWarning
+        array = np.ones(5)
+        message = "ants.analysis.floodfill has been deprecated. Please use " \
+                  "ants.analysis.flood_fill instead."
+
+        with self.assertRaisesRegex(FutureWarning, message):
+            floodfill(array, (0, 0), 5)
