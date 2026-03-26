@@ -440,7 +440,7 @@ def find_similar_region(
     """
     Return a set of indices where the connecting neighbours have the same value
 
-    This function is functionaly equivelent :func:`flood fill`, except that
+    This function is functionaly equivelent :func:`flood_fill`, except that
     here the fill locations are returned rather than filled.
 
     Parameters
