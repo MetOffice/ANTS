@@ -56,7 +56,7 @@ __all__ = [
     "merge",
     "standard_deviation",
     "floodfill",
-    "flood_fill"
+    "flood_fill",
     "find_similar_region",
     "make_consistent_with_lsm",
     "horizontal_grid_reorder",
@@ -286,6 +286,7 @@ def floodfill(
     )
 
     return flood_fill(array, seed_point, fill_value, extended_neighbourhood, wraparound)
+
 
 def flood_fill(
     array, seed_point, fill_value, extended_neighbourhood=False, wraparound=False

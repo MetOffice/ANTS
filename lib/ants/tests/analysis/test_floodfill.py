@@ -101,8 +101,10 @@ class TestValues(ants.tests.TestCase):
         # Test that calling the deprecated function floodfill will raise a
         # FutureWarning
         array = np.ones(5)
-        message = "ants.analysis.floodfill has been deprecated. Please use " \
-                  "ants.analysis.flood_fill instead."
+        message = (
+            "ants.analysis.floodfill has been deprecated. Please use "
+            "ants.analysis.flood_fill instead."
+        )
 
         with self.assertRaisesRegex(FutureWarning, message):
             floodfill(array, (0, 0), 5)
