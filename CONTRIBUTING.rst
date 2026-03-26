@@ -289,3 +289,4 @@ Contributor Licence Agreement:
 * Harold Dyson (Met Office)
 * Theo Geddes (Met Office)
 * Andrew Clark (Met Office)
+* Jennifer Hickson (Met Office)
