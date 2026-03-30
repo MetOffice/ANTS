@@ -1,0 +1,28 @@
+.. include:: /common.txt
+
+*********************
+ANTS 4.0 (? 2026)
+*********************
+
+For a full list of changes see the :milestone:`4.0 release milestone <2>`.
+
+Features
+========
+
+Bugs Fixed
+==========
+
+Deprecations
+============
+- :pr:`143`: ``ants.analysis.floodfill`` has been renamed to
+  ``ants.analysis.flood_fill``; ``ants.analysis.floodfill`` has been deprecated.
+
+Incompatible Changes
+====================
+
+Infrastructure
+==============
+
+Documentation
+=============
+

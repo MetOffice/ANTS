@@ -276,7 +276,7 @@ def floodfill(
     array, seed_point, fill_value, extended_neighbourhood=False, wraparound=False
 ):
     """
-    .. deprecated:: ??
+    .. deprecated:: vn4.0
         Use :func:`ants.analysis.flood_fill` instead.
     """
     warnings.warn(
