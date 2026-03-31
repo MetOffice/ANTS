@@ -25,17 +25,17 @@ class NoCoverageError(IndexError):
 
 class FloodfillError(ValueError):
     """
-    Raised where the seed point already has the value being floodfilled.
+    Raised where the seed point already has the value being flood filled.
 
     """
 
     def __init__(self, message):
         """
-        Raised where the seed point already has the value being floodfilled.
+        Raised where the seed point already has the value being flood filled.
 
         Args:
 
-        * Message to explain the seed point already has the value being floodfilled.
+        * Message to explain the seed point already has the value being flood filled.
 
         """
         self.message = message

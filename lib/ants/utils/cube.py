@@ -1467,7 +1467,7 @@ def extract_region_by_geometry(cube: iris.cube.Cube, geom: shapely.Polygon):
 
     * The "extraction geometry" is the geometry we use to extract the cube sub region,
       using a buffer of 0.25 * region size
-    * The "containment geometry" is the geometry we use to constrain the floodfill,
+    * The "containment geometry" is the geometry we use to constrain the flood fill,
       using a buffer of 0.2 * region size
 
     Parameters
