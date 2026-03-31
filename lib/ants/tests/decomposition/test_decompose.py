@@ -3,6 +3,7 @@
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
 import copy
+import os
 import unittest.mock as mock
 
 import ants.tests
@@ -22,6 +23,12 @@ class TestAll(ants.tests.TestCase):
         new_config = copy.copy(ants.config.GlobalConfiguration())
         new_config.__init__()
 
+        # Similarly, need to remove slurm_ntasks environment variable (if
+        # present).  Hence, want to preserve original environment to restore
+        # it on test completion:
+        self._original_environment = os.environ.copy()
+        os.environ.pop("SLURM_NTASKS", None)
+
         patch = mock.patch("ants.decomposition.CONFIG", new=new_config)
         self.mock_config = patch.start()
         self.addCleanup(patch.stop)
@@ -37,6 +44,9 @@ class TestAll(ants.tests.TestCase):
         self.addCleanup(patch.stop)
 
         self.cube = ants.tests.stock.geodetic((2, 2), name="source")
+
+    def tearDown(self):
+        os.environ = self._original_environment
 
     @mock.patch("ants.utils.cube.defer_cube")
     def test_default_args(self, *args):
