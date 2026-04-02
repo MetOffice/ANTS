@@ -56,6 +56,7 @@ See Also
 
 """
 import copy
+import glob
 import warnings
 from contextlib import contextmanager
 from functools import wraps
@@ -231,18 +232,22 @@ def load_landsea_mask(filename, land_threshold=None):
     """
     try:
         # Is it a landsea mask field?
-        lbm = ants.io.load.load_cube(filename, "land_binary_mask")
+        lbm = ants.io.load.load_cube(
+            filename, "land_binary_mask", ignore_metadata_files=True
+        )
         lbm = lbm.copy(lbm.data.astype("bool", copy=False))
     except iris.exceptions.ConstraintMismatchError:
         try:
             # Is it a land fraction field?
-            land_fraction = ants.io.load.load_cube(filename, "vegetation_area_fraction")
+            land_fraction = ants.io.load.load_cube(
+                filename, "vegetation_area_fraction", ignore_metadata_files=True
+            )
             lbm = land_fraction.copy(land_fraction.data > land_threshold)
             lbm.rename("land_binary_mask")
         except iris.exceptions.ConstraintMismatchError:
             # It looks like we are wanting to extract a landsea mask from some
             # other field.
-            cube = ants.io.load.load(filename)[0]
+            cube = ants.io.load.load(filename, ignore_metadata_files=True)[0]
             y = cube.coord(axis="y")
             x = cube.coord(axis="x")
             cube = cube.slices((y, x)).next()
@@ -355,6 +360,21 @@ def _customised_load(func):
                 "iris.FUTURE.datum_support flag.",
                 FutureWarning,
             )
+            ignore_metadata_files = False
+            if "ignore_metadata_files" in kwargs:
+                ignore_metadata_files = kwargs.pop("ignore_metadata_files")
+            if not ignore_metadata_files:
+                # Do the handling for each way a user callback can be passed in through
+                # iris
+                user_callback = None
+                if len(args) == 3:
+                    user_callback = args[2]
+                else:
+                    if "callback" in kwargs:
+                        user_callback = kwargs.pop("callback")
+                args, kwargs = _add_callback(
+                    _CallbackMetadata(user_callback), *args, **kwargs
+                )
             # Use context manager to avoid permanently modifying iris behaviour.
             with ants_format_agent():
                 cubes = func(*args, **kwargs)
@@ -368,6 +388,92 @@ def _customised_load(func):
         return cubes
 
     return load_function
+
+
+def _add_callback(callback, *args, **kwargs):
+    """
+    Adds both the ants callback and the user provided callback (if any) to the
+    load.
+    """
+    args = list(args)
+    if len(args) == 1:
+        kwargs["callback"] = callback
+    elif len(args) == 3:
+        args[2] = callback
+    args = tuple(args)
+    return args, kwargs
+
+
+class _CallbackMetadata(object):
+    """Callback for collecting metadata from sidecar files.
+
+    This callback will load additional metadata files with the naming convention:
+    filename.<metadata> and append the contents of those files to the cube
+    attributes.
+    """
+
+    def __init__(self, user_callback):
+        self._user_callback = user_callback
+
+    def __call__(self, cube, field, filename):
+        """
+        The method that runs when iris runs the callback. Collects the filenames and
+        will run the user callback
+        """
+        if type(filename) is list:
+            filename = filename[0]
+        metadata_filenames = "".join([filename, ".*"])
+        metadata_files = glob.glob(metadata_filenames)
+        if metadata_files != []:
+            self._retrieve_metadata(metadata_files, cube)
+        if self._user_callback is not None:
+            self._user_callback(cube, field, filename)
+
+    def _retrieve_metadata(self, metadata_files, cube):
+        """
+        Reads in the contents of each file and adds an attribute to the cube with the
+        name of the file.
+
+        Parameters
+        ----------
+        metadata_files: list
+            The list of filenames that contain metadata for the cube.
+        cube : :class:`iris.cube.Cube`
+            The cube being loaded.
+
+        """
+        valid_metadata_names = ["license", "attribution", "restrictions"]
+        other_license = ["lisense", "licence", "lisence"]
+        for metadata_file in metadata_files:
+            file_name_splits = str(metadata_file).split(".")
+            attribute_name = file_name_splits[-1]
+            if attribute_name in other_license:
+                warnings.warn(
+                    f"The attribute name {attribute_name} has been changed to "
+                    "license, in line with ANTS working practices.",
+                    category=UserWarning,
+                )
+                attribute_name = "license"
+            if attribute_name not in valid_metadata_names:
+                warnings.warn(
+                    f"Attribute {attribute_name} is not a valid metadata file "
+                    "name. Accepted metadata names are license, attribution "
+                    "and restrictions.",
+                    category=UserWarning,
+                )
+            else:
+                if attribute_name in cube.attributes:
+                    raise AttributeError(
+                        f"The {attribute_name} is already an attribute on the "
+                        "cube. To ignore metadata files, use the "
+                        "--ignore-metadata-files flag."
+                    )
+                open_file = open(metadata_file, "r")
+                metadata = open_file.readlines()
+                open_file.close()
+                cube.attributes[attribute_name] = metadata
+                with open("written_license.txt", "a") as file:
+                    file.write("".join(metadata))
 
 
 def load_cube(*args, **kwargs):
