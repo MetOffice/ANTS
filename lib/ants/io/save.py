@@ -23,7 +23,6 @@ specifying ``saver='ukca'`` (see :func:`ants.io.save.ukca_netcdf`).
 import os
 import sys
 import warnings
-from datetime import datetime
 
 import ants.utils.cube
 import iris

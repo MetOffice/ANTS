@@ -710,7 +710,6 @@ def update_history(cube, string, date=None, add_date=True):
             FutureWarning,
         )
 
-
     cubes = ants.utils.cube.as_cubelist(cube)
 
     if add_date:
