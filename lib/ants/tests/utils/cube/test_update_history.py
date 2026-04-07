@@ -37,6 +37,16 @@ class TestAll(ants.tests.TestCase):
         update_history(self.cube, msg, add_date=False)
         self.assertRegex(self.cube.attributes["history"], pattern)
 
+    def test_update_cubelist(self):
+        # Pass a cubelist to all be updated
+        cubelist = iris.cube.CubeList([iris.cube.Cube(0), iris.cube.Cube(0)])
+
+        msg = "some test string"
+        pattern = self.isodate_pattern + msg
+        update_history(cubelist, msg)
+        self.assertRegex(cubelist[0].attributes["history"], pattern)
+        self.assertRegex(cubelist[1].attributes["history"], pattern)
+
     def test_deprecation_warning(self):
         # Use date argument to specify a date. A warning
         # should be raised as this argument is deprecated.
