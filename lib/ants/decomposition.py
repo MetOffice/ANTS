@@ -172,8 +172,8 @@ def _guess_split(sources, target=None):
         if not isinstance(target, iris.cube.Cube):
             target = target[0]
         dtype = np.promote_types(dtype, target.dtype)
-        if (np.prod(target.shape) * np.nbytes[dtype]) > (
-            np.prod(source.shape) * np.nbytes[dtype]
+        if (np.prod(target.shape) * np.dtype(dtype).itemsize) > (
+            np.prod(source.shape) * np.dtype(dtype).itemsize
         ):
             largest_array = target
 
@@ -186,7 +186,7 @@ def _guess_split(sources, target=None):
     z_elements = np.prod(rem_shape)
 
     # Number of points which amount to size_bytes footprint.
-    n_elements = int((size_bytes) / np.nbytes[dtype])
+    n_elements = int((size_bytes) / np.dtype(dtype).itemsize)
 
     # Split such that ~square extracts occur for likely optimisation of saving.
     shape = np.array(largest_array.shape)
