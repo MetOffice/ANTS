@@ -10,6 +10,8 @@ from ants.utils.cube import update_history
 class TestAll(ants.tests.TestCase):
     def setUp(self):
         self.cube = iris.cube.Cube(0)
+        self.cube2 = iris.cube.Cube(0)
+        self.cubelist = iris.cube.CubeList([self.cube, self.cube2])
         self.isodate_pattern = r"\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:" r"\d{2,2}: "
 
     def test_no_existing_history(self):
@@ -39,13 +41,11 @@ class TestAll(ants.tests.TestCase):
 
     def test_update_cubelist(self):
         # Pass a cubelist to all be updated
-        cubelist = iris.cube.CubeList([iris.cube.Cube(0), iris.cube.Cube(0)])
-
         msg = "some test string"
         pattern = self.isodate_pattern + msg
-        update_history(cubelist, msg)
-        self.assertRegex(cubelist[0].attributes["history"], pattern)
-        self.assertRegex(cubelist[1].attributes["history"], pattern)
+        update_history(self.cubelist, msg)
+        for cube in self.cubelist:
+            self.assertRegex(cube.attributes["history"], pattern)
 
     def test_deprecation_warning(self):
         # Use date argument to specify a date. A warning

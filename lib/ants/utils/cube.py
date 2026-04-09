@@ -689,16 +689,17 @@ def update_history(cube, string, date=None, add_date=True):
 
     Parameters
     ----------
-    cube : :class:`~iris.cube.Cube` or :class:`~iris.cube.Cubelist`
-        Cube or Cubelist to modify its history attribute.
-        If Cubelist then all Cubes will be given an identical history update.
+    cube : :class:`~iris.cube.Cube` or :class:`~iris.cube.CubeList`
+        Cube or CubeList to modify its history attribute.
+        If CubeList then all Cubes will be given an identical history update.
     string : str
         Content to populate the history attribute.
     add_date : :obj:`bool`, optional
         Boolean to determine whether the date should be prepended to
         the history content string. True by default.
 
-    date : This option was deprecated at vn4.0.
+    .. deprecated::
+        date : This option was deprecated at vn4.0
     """
 
     if date:
@@ -710,7 +711,7 @@ def update_history(cube, string, date=None, add_date=True):
             FutureWarning,
         )
 
-    cubes = ants.utils.cube.as_cubelist(cube)
+    cubes = as_cubelist(cube)
 
     if add_date:
         date = datetime.today()
@@ -721,9 +722,10 @@ def update_history(cube, string, date=None, add_date=True):
         history = string
 
     for cc in cubes:
+        cube_history = history
         if "history" in cc.attributes:
-            history = "\n".join([history, cc.attributes["history"]])
-        cc.attributes["history"] = history
+            cube_history = "\n".join([history, cc.attributes["history"]])
+        cc.attributes["history"] = cube_history
 
 
 def get_slices(source, ylim, xlim, pad_width=0):
