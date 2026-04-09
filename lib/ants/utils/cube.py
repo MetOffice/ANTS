@@ -689,37 +689,40 @@ def update_history(cube, string, date=None, add_date=True):
 
     Parameters
     ----------
-    cube : :class:`~iris.cube.Cube`
-        Cube to modify its history attribute.
+    cube : :class:`~iris.cube.Cube` or :class:`~iris.cube.CubeList`
+        Cube or CubeList to modify its history attribute.
+        If CubeList then all Cubes will be given an identical history update.
     string : str
         Content to populate the history attribute.
-    date : :obj:`datetime.datetime`, optional
-        ISO-format date stamp for the history atribute update.  If not
-        provided, the current date is determined.
     add_date : :obj:`bool`, optional
         Boolean to determine whether the date should be prepended to
         the history content string. True by default.
-
     """
 
-    if date and not add_date:
-        raise RuntimeError(
-            "Incompatible arguments provided: the date argument is set "
-            f"to {date} and the add_date argument is set to False."
+    if date:
+        warnings.warn(
+            "The date option in ants.utils.cube.update_history has been deprecated."
+            "If add_date is true then the current date and time will be used. "
+            "Cubelists can be passed directly to update_history to be updated with an "
+            "identical history attribute.",
+            FutureWarning,
         )
 
+    cubes = as_cubelist(cube)
+
     if add_date:
-        if not date:
-            date = datetime.today()
+        date = datetime.today()
         date = date.replace(microsecond=0)
 
-        history = "{}: {}".format(date.isoformat(), string)
+        history = f"{date.isoformat()}: {string}"
     else:
         history = string
 
-    if "history" in cube.attributes:
-        history = "\n".join([history, cube.attributes["history"]])
-    cube.attributes["history"] = history
+    for cc in cubes:
+        cube_history = history
+        if "history" in cc.attributes:
+            cube_history = "\n".join([history, cc.attributes["history"]])
+        cc.attributes["history"] = cube_history
 
 
 def get_slices(source, ylim, xlim, pad_width=0):

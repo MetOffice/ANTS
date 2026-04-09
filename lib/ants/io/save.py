@@ -23,7 +23,6 @@ specifying ``saver='ukca'`` (see :func:`ants.io.save.ukca_netcdf`).
 import os
 import sys
 import warnings
-from datetime import datetime
 
 import ants.utils.cube
 import iris
@@ -185,8 +184,7 @@ def netcdf(
 
     if update_history:
         if history_message is not None:
-            for cube in cubes:
-                ants.utils.cube.update_history(cube, history_message)
+            ants.utils.cube.update_history(cubes, history_message)
         else:
             _update_history_cmd(cubes)
 
@@ -295,7 +293,6 @@ def _update_history_cmd(cube):
 
     """
     metadata = ants.config.CONFIG["ants_metadata"]["history"]
-    date = datetime.today().replace(microsecond=0)
     cubes = ants.utils.cube.as_cubelist(cube)
 
     # In some cases it may be desireable to combine data from different processing
@@ -317,8 +314,7 @@ def _update_history_cmd(cube):
         for cc in cubes:
             cc.attributes["history"] = combined_history
 
-    for cc in cubes:
-        items = sys.argv[:]
-        items[0] = os.path.basename(items[0])
-        items.append("({})".format(metadata)) if metadata else None
-        ants.utils.cube.update_history(cc, " ".join(items), date)
+    items = sys.argv[:]
+    items[0] = os.path.basename(items[0])
+    items.append(f"({metadata})") if metadata else None
+    ants.utils.cube.update_history(cubes, " ".join(items))
