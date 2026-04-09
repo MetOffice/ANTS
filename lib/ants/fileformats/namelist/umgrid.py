@@ -642,7 +642,7 @@ class VerticalLevels(object):
         _eta_rho.insert(0, 0.0)
         # rho level above model top not in namelist.  Instead, derived after
         # conversion to self._brlev, so use NAN as a placeholder:
-        _eta_rho.append(np.NAN)
+        _eta_rho.append(np.nan)
 
         self._eta_rho = np.array(_eta_rho, dtype=np.float64)
         # brlev defines level_height.lower bounds
