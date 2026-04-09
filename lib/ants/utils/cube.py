@@ -697,9 +697,6 @@ def update_history(cube, string, date=None, add_date=True):
     add_date : :obj:`bool`, optional
         Boolean to determine whether the date should be prepended to
         the history content string. True by default.
-
-    .. deprecated::
-        date : This option was deprecated at vn4.0
     """
 
     if date:
