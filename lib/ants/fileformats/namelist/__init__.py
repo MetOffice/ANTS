@@ -112,7 +112,7 @@ def load_um_vertical(filenames, callback=None):
         FutureWarning,
     )
 
-    return load_vertical(filenames, True, callback)
+    return load_vertical(filenames, callback=callback, remove_level_zero=True)
 
 
 def load_lfric_vertical(filenames, callback=None):
@@ -127,10 +127,10 @@ def load_lfric_vertical(filenames, callback=None):
         FutureWarning,
     )
 
-    return load_vertical(filenames, False, callback)
+    return load_vertical(filenames, callback=callback, remove_level_zero=False)
 
 
-def load_vertical(filenames, remove_level_zero=True, callback=None):
+def load_vertical(filenames, callback=None, remove_level_zero=True):
     """
     Load the vertical namelist definition.
 
@@ -138,6 +138,8 @@ def load_vertical(filenames, remove_level_zero=True, callback=None):
     ----------
     filenames : str
         Pathname of a Fortran namelist file, or a list of such paths.
+    callback : function
+        Iris callback function with the signature (cube, field, filename)
     remove_level_zero : bool
         Apply a correction to the loaded namelist to remove the zeroth level,
         and modify the boundaries of the first level to compensate.
