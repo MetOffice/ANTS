@@ -150,12 +150,12 @@ def load_lfric_vertical(filenames, callback=None):
     return _load_vertical(filenames, False, callback)
 
 
-def _load_vertical(filenames, apply_um_workaround=True, callback=None):
+def _load_vertical(filenames, remove_level_zero=True, callback=None):
     groups = _gen_dict(filenames)
 
     result = None
     if "vertlevs" in groups:
-        result = VerticalLevels(groups).get_cube(apply_um_workaround)
+        result = VerticalLevels(groups).get_cube(remove_level_zero)
     else:
         msg = "No supported groups found: {}.  Supported groups include: {}."
         raise ValueError(msg.format(list(groups.keys()), "vertlevs"))

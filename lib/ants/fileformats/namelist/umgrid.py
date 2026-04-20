@@ -789,7 +789,7 @@ class VerticalLevels(object):
         )
         return sigma
 
-    def _UM_workaround(self, cube):
+    def _remove_level_zero(self, cube):
         """Remove zeroth level from vertical level specification."""
         # Discard the zeroth level:
         result = cube.extract(
@@ -804,7 +804,7 @@ class VerticalLevels(object):
         um_level_height_bounds[0, 0] = original_level_height_bounds[0, 0]
         return result
 
-    def get_cube(self, apply_UM_workaround=True):
+    def get_cube(self, remove_level_zero=True):
         """
         Returns a one dimensional cube with the vertical coordinates attached.
 
@@ -822,6 +822,6 @@ class VerticalLevels(object):
         target.add_dim_coord(self.model_level_number, 0)
         target.add_aux_coord(self.sigma, 0)
         target.add_aux_coord(self.level_height, 0)
-        if apply_UM_workaround:
-            target = self._UM_workaround(target)
+        if remove_level_zero:
+            target = self._remove_level_zero(target)
         return target
