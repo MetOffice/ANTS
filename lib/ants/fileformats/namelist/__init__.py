@@ -103,39 +103,44 @@ def _gen_dict(filenames):
 def load_um_vertical(filenames, callback=None):
     """
     Load the vertical namelist definition.
-
-    Applies a correction to the loaded namelist to be consistent with the UM
-    expectations.  Specifically, removes the zeroth level, and modifies the
-    boundaries of the first level to compensate.
-
-    Parameters
-    ----------
-    filenames : str
-        Pathname of a Fortran namelist file, or a list of such paths.
-
-    Returns
-    -------
-    : :class:`iris.cube.Cube`
-        Cube representing the vertical grid defined.
-
-    See Also
-    --------
-    :class:`umgrid.VerticalLevels` : for the vertical definition specification.
-
     """
-    return _load_vertical(filenames, True, callback)
+
+    warnings.warn(
+        "load_um_vertical has been deprecated. Please use "
+        "ants.fileformats.namelist.load_vertical with option "
+        "remove_level_zero=True",
+        FutureWarning,
+    )
+
+    return load_vertical(filenames, True, callback)
 
 
 def load_lfric_vertical(filenames, callback=None):
     """
     Load the vertical namelist definition.
+    """
 
-    Includes the zeroth level in the returned cube.
+    warnings.warn(
+        "load_lfric_vertical has been deprecated. Please use "
+        "ants.fileformats.namelist.load_vertical with option "
+        "remove_level_zero=False",
+        FutureWarning,
+    )
+
+    return load_vertical(filenames, False, callback)
+
+
+def load_vertical(filenames, remove_level_zero=True, callback=None):
+    """
+    Load the vertical namelist definition.
 
     Parameters
     ----------
     filenames : str
         Pathname of a Fortran namelist file, or a list of such paths.
+    remove_level_zero : bool
+        Apply a correction to the loaded namelist to remove the zeroth level,
+        and modify the boundaries of the first level to compensate.
 
     Returns
     -------
@@ -147,10 +152,6 @@ def load_lfric_vertical(filenames, callback=None):
     :class:`umgrid.VerticalLevels` : for the vertical definition specification.
 
     """
-    return _load_vertical(filenames, False, callback)
-
-
-def _load_vertical(filenames, remove_level_zero=True, callback=None):
     groups = _gen_dict(filenames)
 
     result = None
