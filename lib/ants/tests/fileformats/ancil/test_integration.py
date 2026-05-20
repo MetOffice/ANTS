@@ -33,7 +33,7 @@ class _BaseCommon(object):
         elif nlat is not None and nlon is not None:
             raise RuntimeError("Overspecified, both data and 'nlat/nlon' " "specified")
         else:
-            (nlat, nlon) = data.shape[-2:]
+            nlat, nlon = data.shape[-2:]
         # Mask an element since we lose the fill_value when the array is not
         # masked.
         if np.ma.isMaskedArray(data):

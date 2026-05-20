@@ -4,21 +4,24 @@ channels:
 dependencies:
   - black
   - cftime
-  - dask=2023.11.0
-  - esmf=8.4.2=mpi_mpich_h2a0de38_103
-  - esmpy=8.4.2
+  - dask
+  - esmf=*=nompi_*
+  - esmpy
   - f90nml
   - flake8
-  - gdal=3.9.1
+  - gdal
   - geovista
-  - iris-esmf-regrid>=0.9
+  - hdf5=*=nompi_*
+  - iris-esmf-regrid
   - iris-sample-data
-  - iris=3.7.1
+  - iris
   - isort
+  - libnetcdf!=4.9.1=nompi_*
   - mo_pack
   - nccmp
+  - netcdf-fortran=*=nompi_*
   - numba
-  - numpy=1.26.0
+  - numpy=2.3.5
   - pre-commit
   - pydata-sphinx-theme
   - pyflakes
@@ -27,11 +30,11 @@ dependencies:
   - pytest-cov
   - pytest-xdist
   - python-stratify
-  - python=3.10.13
+  - python=3.12.12
   - ruff
   - setuptools
   - setuptools-scm
-  - sphinx=7.2.6
+  - sphinx
   - sphinx-argparse
   - sphinx-copybutton
   - sphinx-sitemap

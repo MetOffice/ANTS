@@ -6,6 +6,7 @@ import logging
 
 import dask
 import iris
+import numpy as np
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,7 +66,11 @@ def as_lazy_data(data, chunks=None, asarray=False):
     This is for ants core library usage ONLY!
 
     """
-    return iris._lazy_data.as_lazy_data(data, chunks=chunks, asarray=asarray)
+    print("data:", data)
+    print("chunks: ", chunks)
+    print("asarray: ", asarray)
+    meta = np.empty(data.shape, data.dtype)
+    return iris._lazy_data.as_lazy_data(data, chunks=chunks, asarray=asarray, meta=meta)
 
 
 def _is_masked_array(dask_array):

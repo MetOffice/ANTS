@@ -9,6 +9,7 @@ See `GDAL - Geospatial Data Abstraction Library <https://gdal.org>`_ for more
 information.
 
 """
+
 import copy
 import warnings
 
@@ -64,7 +65,15 @@ class _GdalDataProxy(object):
         #       the saving of netcdf3 output properly (auto type-casting etc.)
         dtype = np.dtype(dtype)
         if dtype.name.startswith("uint"):
-            dtype = np.dtype(np.sctypeDict[dtype.num + 1])
+            if (dtype.name) == "uint8":
+                dtype = np.dtype("int16")
+            elif (dtype.name) == "uint16":
+                dtype = np.dtype("int32")
+            elif (dtype.name) == "uint32":
+                dtype = np.dtype("int64")
+            else:
+                dtype = np.dtype("int128")
+
         self.dtype = dtype
         self.path = path
         self.raster_band_index = raster_band_index
@@ -302,6 +311,7 @@ def load_cubes(filenames, callback=None):
         dataset = gdal.Open(fname, GA_ReadOnly)
         if dataset is None:
             raise IOError("gdal failed to open raster image")
+        print("boop")
 
         # Get metadata applies to all raster bands
         transform = dataset.GetGeoTransform()
@@ -346,6 +356,8 @@ def load_cubes(filenames, callback=None):
             proxy = _GdalDataProxy(
                 num_xy, dtype, fname, iraster, iband.GetNoDataValue()
             )
+            print("bop")
+            print(proxy)
             data = as_lazy_data(proxy)
             cube = iris.cube.Cube(data)
             cube.add_dim_coord(x, 1)

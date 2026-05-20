@@ -28,10 +28,12 @@ it fits the definition of a zonal mean. This ensures that a zonal mean output
 is produced, regardless of the number of longitude
 points in the regrid target.
 """
+
 import ants
 import ants.decomposition as decomp
 import ants.io.save as save
 import ants.utils
+import numpy as np
 from ants.utils.cube import create_time_constrained_cubes
 
 
@@ -125,6 +127,7 @@ def main(
     A single data cube with the regridded data.
 
     """
+    np._set_promotion_state("weak_and_warn")
     source_cubes, target_cube = load_data(
         source_path,
         target_path,

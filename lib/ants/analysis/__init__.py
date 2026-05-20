@@ -29,6 +29,7 @@ The meaning in iris is discussed in the `iris documentation
 <https://scitools-iris.readthedocs.io/en/latest/userguide/merge_and_concat.html>`_.
 
 """
+
 import warnings
 
 import ants
@@ -251,7 +252,7 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
 def _flood_fill_neighbour_identify(
     shape, coords, seed_point, extended_neighbourhood, wraparound
 ):
-    (yy, xx) = seed_point
+    yy, xx = seed_point
     if yy > 0:
         coords.add((yy - 1, xx))
     if yy < (shape[0] - 1):
@@ -320,7 +321,7 @@ def flood_fill(
         When True, support wraparound in 'x', otherwise stop at the boundary.
 
     """
-    (y, x) = seed_point
+    y, x = seed_point
     if array.ndim != 2:
         msg = "The provided array should be 2D but that provided is {}D"
         raise ValueError(msg.format(array.ndim))
@@ -473,7 +474,7 @@ def find_similar_region(
         identified as similar.
 
     """
-    (y, x) = seed_point
+    y, x = seed_point
     if array.ndim != 2:
         msg = "The provided array should be 2D but that provided is {}D"
         raise ValueError(msg.format(array.ndim))

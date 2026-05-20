@@ -54,11 +54,9 @@ def create_task_jobs_table(cursor: sqlite3.Cursor) -> None:
         An sqlite3 Cursor connected to a database.
 
     """
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS task_jobs (name TEXT NOT NULL,
+    cursor.execute("""CREATE TABLE IF NOT EXISTS task_jobs (name TEXT NOT NULL,
             time_run TEXT NOT NULL, time_run_exit TEXT NOT NULL,
-            submit_num TEXT NOT NULL)"""
-    )
+            submit_num TEXT NOT NULL)""")
     rows_to_insert_as_tuples = [
         (row["name"], row["time_run"], row["time_run_exit"], row["submit_num"])
         for row in SYNTHETIC_TASK_DATA
@@ -88,10 +86,8 @@ def create_task_states_table(cursor: sqlite3.Cursor) -> None:
         An sqlite3 Cursor connected to a database.
 
     """
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS task_states
-            (name TEXT NOT NULL,  submit_num TEXT NOT NULL)"""
-    )
+    cursor.execute("""CREATE TABLE IF NOT EXISTS task_states
+            (name TEXT NOT NULL,  submit_num TEXT NOT NULL)""")
     rows_to_insert_as_tuples = [
         (row["name"], row["submit_num"])
         for row in SYNTHETIC_TASK_DATA

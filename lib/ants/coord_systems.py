@@ -18,6 +18,7 @@ coordinate system equivalence:
  * :func:`ants.regrid.rectilinear`
 
 """
+
 import copy
 import re
 from abc import ABCMeta, abstractmethod

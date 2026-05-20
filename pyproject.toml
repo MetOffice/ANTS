@@ -56,7 +56,15 @@ filterwarnings = [
     "ignore:Unable to import mule:UserWarning",
 
     # Warning for the optional dependency of um_spiral_search (from shumlib) not being present:
-    "ignore:No module named 'um_spiral_search':UserWarning"
+    "ignore:No module named 'um_spiral_search':UserWarning",
+
+    # Warning for a deprecation within Mule:
+    "ignore::DeprecationWarning",
+
+    #iris FutureWarning
+    "ignore::FutureWarning:iris",
+
+    "ignore:Saving to netcdf with legacy-style attribute handling for backwards compatibility."
 
     # Additional filters are defined in ./lib/ants/tests/conftest.py, including:
     # 1. Warning when catopy downloads and caches Natural Earth data.
