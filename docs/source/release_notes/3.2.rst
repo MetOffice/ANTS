@@ -1,10 +1,10 @@
 .. include:: /common.txt
 
 *********************
-ANTS 4.0 (? 2026)
+ANTS 3.2 (June 2026)
 *********************
 
-For a full list of changes see the :milestone:`4.0 release milestone <2>`.
+For a full list of changes see the :milestone:`3.2 release milestone <4>`.
 
 Features
 ========
@@ -25,4 +25,3 @@ Infrastructure
 
 Documentation
 =============
-
