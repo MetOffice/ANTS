@@ -187,7 +187,7 @@ def standard_deviation(source, src_mean):
     return awm
 
 
-def merge(primary_cube, alternate_cube, validity_polygon=None):
+def merge(primary_cube, alternate_cube, validity_polygon=None, blending_distance=None):
     """
     Merges data from the alternative cube into the primary cube.
 
@@ -195,8 +195,15 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
     cube which lay outside the provided polygon, override the values of the
     primary at those locations.  Containment is defined as any cell corner
     which lies within the polygon.  "Within" explicitly does not include
-    those points which exactly lay on the polygon boundary.  Where multiple
-    primary and alternate cubes are provided, then these are paired
+    those points which exactly lay on the polygon boundary.
+
+    A blending between the sources can be applied by specifying the
+    ``blending_distance`` (for no blending, pass ``None``). A linear blending
+    between the primary and alternate sources will be applied in the region
+    immediately inside the polygon over the blending distance.
+    Beyond the blending distance, the alternate source is used.
+
+    Where multiple primary and alternate cubes are provided, then these are paired
     appropriately where possible.  Where these datasets are not defined on the
     same grid, the user should consider a regrid first to then utilise merge.
 
@@ -220,6 +227,12 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
         stacked together with the primary_cube taking priority over
         alternate_cube in the case of an overlap. A runtime error will be
         raised if the primary_cube is wholly within the validity_polygon.
+    blending_distance : float
+        Distance over which blending between the primary and alternate sources
+        is applied. Note that this is in units of grid cells, not a physical distance.
+        If ``None``, no blending is applied, and there will be a hard edge between
+        the two sources. This option is only valid with a provided validity polygon,
+        and with a single level field.
 
     Returns
     -------
@@ -235,17 +248,49 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
     primary_cubes = ants.utils.cube.as_cubelist(primary_cube)
     alternate_cubes = ants.utils.cube.as_cubelist(alternate_cube)
 
+    if blending_distance:
+        _validate_args_with_blending(
+            primary_cubes, alternate_cubes, validity_polygon, blending_distance
+        )
+
     # Group (sort) cubes so they are ordered in a way suitable for merging.
     primary_cubes, alternate_cubes = ants.utils.cube.sort_cubes(
         primary_cubes, alternate_cubes
     )
     result = iris.cube.CubeList([])
     for src1, src2 in zip(primary_cubes, alternate_cubes):
-        nsource = _merge.merge(src1, src2, validity_polygon)
+        nsource = _merge.merge(src1, src2, validity_polygon, blending_distance)
         result.append(nsource)
     if isinstance(primary_cube, iris.cube.Cube):
         result = result[0]
     return result
+
+
+def _validate_args_with_blending(
+    primary_cubes, alternate_cubes, validity_polygon, blending_distance
+):
+    """Specific validation for merge arguments when blending is provided."""
+    if validity_polygon is None:
+        raise ValueError(
+            "blending_distance can only be used with a validity_polygon. "
+            f"No polygon was provided, but got {blending_distance=}"
+        )
+
+    all_primary_single_level = all(map(ants.utils.cube.is_single_level, primary_cubes))
+    if not all_primary_single_level:
+        raise ValueError(
+            "Blending is only supported for single level data sources. "
+            "The primary data source is not single level"
+        )
+
+    all_alternate_single_level = all(
+        map(ants.utils.cube.is_single_level, alternate_cubes)
+    )
+    if not all_alternate_single_level:
+        raise ValueError(
+            "Blending is only supported for single level data sources. "
+            "The alternate data source is not single level"
+        )
 
 
 def _flood_fill_neighbour_identify(

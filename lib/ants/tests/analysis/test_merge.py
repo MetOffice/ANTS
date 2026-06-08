@@ -7,6 +7,7 @@ import unittest.mock as mock
 import ants.tests
 import iris
 import numpy as np
+import pytest
 from ants.analysis import merge
 
 
@@ -40,7 +41,42 @@ class Testall(ants.tests.TestCase):
         alternate_cube = self.generate_dummy_cube(shape=(4, 8))
 
         with mock.patch("ants.analysis._merge.merge") as mock_method:
-            merge(primary_cube, alternate_cube, None)
+            merge(primary_cube, alternate_cube, None, None)
 
-        mock_method.assert_called_once_with(primary_cube, alternate_cube, None)
+        mock_method.assert_called_once_with(primary_cube, alternate_cube, None, None)
         self.assertFalse(self.mock_fill.called)
+
+    def test_blending_distance_no_polygon(self):
+        primary_cube = self.generate_dummy_cube(shape=(4, 8))
+        alternate_cube = self.generate_dummy_cube(shape=(4, 8))
+        expected_msg = (
+            "blending_distance can only be used with a validity_polygon. "
+            "No polygon was provided, but got blending_distance=1.0"
+        )
+        with pytest.raises(ValueError, match=expected_msg):
+            merge(
+                primary_cube,
+                alternate_cube,
+                validity_polygon=None,
+                blending_distance=1.0,
+            )
+
+    def test_blending_distance_multi_level(self):
+        primary_cube = ants.tests.stock.simple_3d_time_varying()
+        alternate_cube = primary_cube.copy()
+
+        # doesn't matter what the validity polygon is, as long as *something* is passed
+        validity_polygon = [[0, 0], [1, 1]]
+
+        expected_msg = (
+            "Blending is only supported for single level data sources. "
+            "The primary data source is not single level"
+        )
+
+        with pytest.raises(ValueError, match=expected_msg):
+            merge(
+                primary_cube,
+                alternate_cube,
+                validity_polygon=validity_polygon,
+                blending_distance=1.0,
+            )

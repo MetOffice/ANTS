@@ -20,6 +20,7 @@ import numpy as np
 import numpy.lib.stride_tricks as stride
 import shapely
 from pykdtree.kdtree import KDTree
+from scipy.ndimage import distance_transform_edt
 from shapely.geometry import Polygon
 from shapely.vectorized import contains
 
@@ -485,7 +486,7 @@ def _unified_grid(cube, cube2):
     return merged_cube
 
 
-def merge(primary_cube, alternate_cube, validity_polygon=None):
+def merge(primary_cube, alternate_cube, validity_polygon=None, blending_distance=None):
     """
     Merges data from the alternative cube into the primary cube.
 
@@ -498,6 +499,12 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
     corresponding alternate cube data values.  The presence of a numpy.NAN
     in the primary cube dataset, overrides that elements validity defined in
     the cases of a specified validity polygon.
+
+    A blending between the sources can be applied by specifying the
+    ``blending_distance`` (for no blending, pass ``None``). A linear blending
+    between the primary and alternate sources will be applied in the region
+    immediately inside the polygon over the blending distance.
+    Beyond the blending distance, the alternate source is used.
 
     Parameters
     ----------
@@ -519,6 +526,11 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
         alternate_cube in the case of an overlap.
         If a validity polygon is provided and the entire primary_cube dataset
         is within the polygon then a Runtime error will be raised.
+    blending_distance : float
+        Distance over which blending between the primary and alternate sources
+        is applied. Note that this is in units of grid cells, not a physical distance.
+        If ``None``, no blending is applied, and there will be a hard edge between
+        the two sources.
 
     Raises
     ------
@@ -630,21 +642,31 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
 
         # Apply data which is outside of the polygon to the other.
         # Transpose the data (view) to allow broadcasting
-        pdata, pmask = horizontal_grid_reorder(merged_cube)
-        adata, amask = horizontal_grid_reorder(full_alternate_cube)
-        pdata[full_mask_outside] = adata[full_mask_outside]
-        pmask[full_mask_outside] = amask[full_mask_outside]
+        primary_data, primary_mask = horizontal_grid_reorder(merged_cube)
+        alternate_data, alternate_mask = horizontal_grid_reorder(full_alternate_cube)
+        if blending_distance:
+            is_circular = primary_cube.coord(axis="x").circular
+            primary_data[...] = blend_data(
+                from_array=alternate_data,
+                into_array=primary_data,
+                mask=~full_mask_outside,
+                blending_distance=blending_distance,
+                circular=is_circular,
+            )
+        else:
+            primary_data[full_mask_outside] = alternate_data[full_mask_outside]
+        primary_mask[full_mask_outside] = alternate_mask[full_mask_outside]
 
     # Identify overlap priority using np.nan values (these are assigned
     # when source cells are beyond the extent of the target grid whilst
     # regridding).
-    pdata, pmask = horizontal_grid_reorder(merged_cube)
-    adata, amask = horizontal_grid_reorder(full_alternate_cube)
-    slices = [slice(None)] * pdata.ndim
-    slices[2:] = [0] * (pdata.ndim - 2)
-    nan_mask = np.isnan(pdata[tuple(slices)])
-    pdata[nan_mask] = adata[nan_mask]
-    pmask[nan_mask] = amask[nan_mask]
+    primary_data, primary_mask = horizontal_grid_reorder(merged_cube)
+    alternate_data, alternate_mask = horizontal_grid_reorder(full_alternate_cube)
+    slices = [slice(None)] * primary_data.ndim
+    slices[2:] = [0] * (primary_data.ndim - 2)
+    nan_mask = np.isnan(primary_data[tuple(slices)])
+    primary_data[nan_mask] = alternate_data[nan_mask]
+    primary_mask[nan_mask] = alternate_mask[nan_mask]
 
     # Clear some memory if we can
     np.ma.MaskedArray.shrink_mask(merged_cube.data)
@@ -654,6 +676,127 @@ def merge(primary_cube, alternate_cube, validity_polygon=None):
             "Coverage of provided sources is not complete, unable to merge datasets."
         )
     return merged_cube
+
+
+def blend_data(
+    from_array: np.ndarray,
+    into_array: np.ndarray,
+    mask: np.ndarray,
+    blending_distance: float,
+    circular: bool = False,
+):
+    """Blend two data sources across a specified blending distance.
+
+    Returns an array with a weighted combination of data selected from the two
+    sources, as determined by the provided mask.
+
+    This is calculated as follows:
+
+    1. For all points where ``mask == False``, use the "from" source
+    2. For all points where ``mask == True``, determine the distance to the nearest
+       point in the "from" region.
+    3. If this distance is greater than the blending distance, use the "into" source.
+    4. If this distance is less than the blending distance, weight the two datasets
+       using a linear combination: blended = w * from_array + (1 - w) * into_array,
+       where w = distance / blending_distance.
+
+    The following diagram illustrates the blending in one dimension, with a
+    blending_distance of 4.
+
+    into                ___________
+                       /
+                      /
+    from  ___________/
+
+    mask  0000000000011111111111111
+
+    Parameters
+    ----------
+    from_array : np.ndarray
+        Source data to be blended from
+    into_array : np.ndarray
+        Source data to be blended into
+    mask : np.ndarray
+        A boolean mask identifying the two regions: False for the "from" source
+        region and True for the "into" source region.
+    blending_distance : float
+        Distance over which blending between the sources
+        is applied. Note that this is in units of grid cells, not a physical distance.
+        As such, this is resolution dependent. See notes for more detail.
+
+    Returns
+    -------
+    blended : nd.ndarray
+        The blended data
+
+    Notes
+    -----
+    The three arrays ``from_array``, ``into_array`` and ``mask``
+    must have the same shape.
+
+    This function uses :func:`scipy.ndimage.distance_transform_edt` to calculate
+    distances between points on the grid. As such, it has no knowledge of physical
+    distance or coordinate reference systems.
+
+    Warning
+    -------
+    This function does not support masked arrays. Passing a masked array may result
+    in unexpected behaviour.
+    """
+    _validate_blend_args(from_array, into_array, mask, blending_distance)
+
+    if circular:
+        # Pad either side of the domain to allow for wraparound in x
+        # Do not pad in y direction
+        pad_width_x = int(np.ceil(blending_distance))
+        pad_width = [(0, 0), (pad_width_x, pad_width_x)]
+        mask = np.pad(mask, pad_width, mode="wrap")
+
+    distance_into_region = distance_transform_edt(mask)
+    max_distance_into_region = distance_into_region.max()
+    if max_distance_into_region < blending_distance:
+        warnings.warn(
+            "All points within the region are within the blending distance. "
+            f"Specified {blending_distance=}, maximum distance into domain: "
+            f"{max_distance_into_region}"
+        )
+
+    if circular:
+        # Retrieve central slice of the padded distance array
+        npoints_x = from_array.shape[-1]
+        slice_x = slice(pad_width_x, pad_width_x + npoints_x)
+        distance_into_region = distance_into_region[:, slice_x]
+
+    into_weight = np.clip(distance_into_region / blending_distance, 0.0, 1.0)
+    blended = (into_weight * into_array) + (1 - into_weight) * from_array
+    return blended
+
+
+def _validate_blend_args(from_array, into_array, mask, blending_distance):
+    if blending_distance <= 0:
+        raise ValueError(
+            f"Invalid blending_distance: {blending_distance}. Must be greater than zero"
+        )
+    if from_array.ndim != 2:
+        raise ValueError(
+            "Can only blend 2-dimensional data, got data with "
+            f"{from_array.ndim} dimensions"
+        )
+    if from_array.shape != into_array.shape:
+        raise ValueError(
+            f"Cannot blend sources with different shapes: "
+            f"{from_array.shape} and {into_array.shape}"
+        )
+    if from_array.shape != mask.shape:
+        raise ValueError(
+            "Cannot blend sources as mask shape is inconsistent with source shape. "
+            f"Source shape: {from_array.shape}, Mask shape: {mask.shape}"
+        )
+    if blending_distance > min(from_array.shape) / 2:
+        raise ValueError(
+            f"Invalid {blending_distance=}: greater than half the domain size "
+            f"(shape={from_array.shape})"
+        )
 
 
 def _spiral_wrapper(
