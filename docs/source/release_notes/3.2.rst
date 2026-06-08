@@ -11,6 +11,8 @@ Features
 - :pr:`148`: Extend the functionality of :func:`ants.analysis.merge` - and by
   extension the :doc:`/ancil_fill_n_merge` command line script - to allow the
   blending of two sources.
+- :pr:`144`: History can now be updated on cubes in bulk, by passing a CubeList
+  to :func:`ants.utils.cube.update_history`.
 
 Bugs Fixed
 ==========
