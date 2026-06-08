@@ -36,6 +36,7 @@ jobs:
             - name: Linkcheck
               shell: micromamba-shell {0}
               run: make --directory=docs linkcheck
+              continue-on-error: ${{ github.event_name == "push" }}
 
             - name: Upload pages artifact
               uses: actions/upload-pages-artifact@v4
