@@ -8,9 +8,14 @@ For a full list of changes see the :milestone:`3.2 release milestone <4>`.
 
 Features
 ========
+- :pr:`148`: Extend the functionality of :func:`ants.analysis.merge` - and by
+  extension the :doc:`/ancil_fill_n_merge` command line script - to allow the
+  blending of two sources.
 
 Bugs Fixed
 ==========
+- :pr:`122`: Fixed a bug which prevented unit tests from successfully running
+  when using the SLURM scheduler.
 
 Deprecations
 ============
