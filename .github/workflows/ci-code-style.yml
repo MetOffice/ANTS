@@ -24,7 +24,7 @@ jobs:
               uses: mamba-org/setup-micromamba@v2
               with:
                 environment-file: environment.lock
-                environment-name: ci-env
+                environment-name: ci-env-3.2.0
                 cache-environment: true
 
             - name: Run black
