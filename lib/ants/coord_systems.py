@@ -140,7 +140,7 @@ EPSG_2_CRS = {4326: WGS84_GEODETIC, 27700: OSGB}
 
 def as_ants_crs(self):
     """
-    Return an ANTS coordinate system.
+    Return an iris coordinate system.
 
     Under most circumstances, return itself, unless the coordinate system can
     be treated as another, in which case, return its counterpart.  Here are
@@ -154,7 +154,7 @@ def as_ants_crs(self):
 
     Returns
     -------
-    :class:`ants.coord_systems.CFCRS`
+    :class:`iris.coord_systems.CoordSystem`
 
     Note
     ----

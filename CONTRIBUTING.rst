@@ -290,3 +290,4 @@ Contributor Licence Agreement:
 * Theo Geddes (Met Office)
 * Andrew Clark (Met Office)
 * Jennifer Hickson (Met Office)
+* Alasdair Roy (Met Office)
