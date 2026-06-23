@@ -5,7 +5,7 @@ ANTS is a versatile Python library for developing ancillary
 applications.
 
 Development practices for this repository are described in the
-`ANTS Working Practices<https://metoffice.github.io/ancil-working-practices/index.html>`_.
+`ANTS Working Practices <https://metoffice.github.io/ancil-working-practices/index.html>`_.
 
 Copyright and licence
 ---------------------
