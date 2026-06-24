@@ -94,7 +94,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             parser = AntsArgParser(target_lsm=False)
             args = parser.parse_args()
         self.assertIs(args.ants_config, None)
-    '''
+
+    """
     def test_missing_lbm(self):
         new = ["program", "/path/to/source", "-o", "/path/to/output"]
         with mock.patch("sys.argv", new=new) as argv:
@@ -106,7 +107,7 @@ class TestAntsArgParser(ants.tests.TestCase):
         #print("err: ", err.call_args_list)
         print(sys_exit.call_args_list)
         sys_exit.assert_called_once_with(2)
-    '''
+    """
 
     def test_configuration_parse(self):
         config_path = "/path/to/config/file"

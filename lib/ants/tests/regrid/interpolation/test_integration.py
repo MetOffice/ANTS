@@ -291,7 +291,6 @@ class TestAll(_Common, ants.tests.TestCase):
         self.assertTrue(len(res.coords("model_level_number", dim_coords=True)) > 0)
 
 
-
 @pytest.mark.parametrize(
     "name",
     [
