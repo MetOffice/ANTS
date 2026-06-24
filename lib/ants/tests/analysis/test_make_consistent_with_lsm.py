@@ -16,11 +16,6 @@ class TestRegular(ants.tests.TestCase):
         self.lsm.data = self.lsm.data.astype("bool")
 
     @mock.patch("ants.analysis.UMSpiralSearch")
-    def test_default_filler_called(self, patch_fill):
-        make_consistent_with_lsm(self.source, self.lsm, False)
-        patch_fill.assert_called_once_with(self.source, target_mask=self.lsm)
-
-    @mock.patch("ants.analysis.UMSpiralSearch")
     def test_filler_called(self, patch_fill):
         make_consistent_with_lsm(self.source, self.lsm, False, "spiral")
         patch_fill.assert_called_once_with(self.source, target_mask=self.lsm)
@@ -46,6 +41,11 @@ class TestKDTree(ants.tests.TestCase):
         self.source = ants.tests.stock.geodetic((2, 2))
         self.lsm = ants.tests.stock.geodetic((2, 2))
         self.lsm.data = self.lsm.data.astype("bool")
+
+    @mock.patch("ants.analysis.KDTreeFill")
+    def test_default_filler_called(self, patch_fill):
+        make_consistent_with_lsm(self.source, self.lsm, False)
+        patch_fill.assert_called_once_with(self.source, target_mask=self.lsm)
 
     @mock.patch("ants.analysis.KDTreeFill")
     def test_filler_called(self, patch_fill):
