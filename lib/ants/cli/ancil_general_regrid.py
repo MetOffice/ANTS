@@ -188,7 +188,7 @@ def _get_parser():
         "This should only be provided if a target land sea mask is provided via "
         "the ``--target-lsm`` option.",
         required=False,
-        default="spiral",
+        default="kdtree",
     )
     return parser
 

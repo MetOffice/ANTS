@@ -238,7 +238,7 @@ def _get_parser():
         type=str,
         help="Select the search method used when filling.",
         required=False,
-        default="spiral",
+        default="kdtree",
     )
     blending_help = (
         "Distance over which blending between the primary and alternate sources "
