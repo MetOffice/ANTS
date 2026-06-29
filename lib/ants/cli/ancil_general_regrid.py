@@ -117,7 +117,8 @@ def main(
         This specifies which search routine is used in making the
         provided source(s) consistent with the provided land sea mask.
         This should only be provided if a target land sea mask is also
-        provided via target_lsm_path.
+        provided via target_lsm_path. The methods currently supported
+        are "spiral" and "kdtree".
 
     Returns
     -------
