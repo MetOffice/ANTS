@@ -12,7 +12,7 @@ dependencies:
   - gdal
   - geovista
   - hdf5=*=nompi_*
-  - iris-esmf-regrid
+  - iris-esmf-regrid=0.15
   - iris-sample-data
   - iris
   - isort
