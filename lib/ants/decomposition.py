@@ -679,3 +679,443 @@ class MultiprocessingDomainDecompose(DomainDecompose):
             bag = db.from_sequence(parameters)
             results = bag.starmap(operation).compute()
         return results
+
+
+# =============================================================================
+# simple_split_and_process framework
+#
+# A simpler, more maintainable replacement for :func:`decompose`.  All private
+# helpers in this section are prefixed with ``_ssp_`` to make their ownership
+# clear and to avoid confusion with the helpers used by the existing framework.
+# =============================================================================
+
+
+def _ssp_compute_split_tuple_for_cube(cube, number_of_x_splits, number_of_y_splits):
+    """
+    Build a split-count tuple aligned with the cube's dimension order.
+
+    :func:`_mosaic_by_nsplits` requires one split count per cube dimension in
+    the same order as the cube's shape.  This function maps the caller-supplied
+    *x* and *y* split counts onto the correct positions using the cube's
+    horizontal coordinate dimensions.
+
+    Parameters
+    ----------
+    cube : :class:`iris.cube.Cube`
+        The cube whose dimension order is used to place the split counts.
+    number_of_x_splits : int
+        How many pieces to split the x (longitude) dimension into.
+    number_of_y_splits : int
+        How many pieces to split the y (latitude) dimension into.
+
+    Returns
+    -------
+    tuple of int
+        A tuple with length equal to ``cube.ndim``.  All non-horizontal
+        dimensions have a split count of 1 (no splitting).
+
+    """
+    # Start with 1 for every dimension (meaning "no split in this dimension").
+    split_counts = np.ones(cube.ndim, dtype=int)
+
+    x_coordinate, y_coordinate = ants.utils.cube.horizontal_grid(cube)
+    # coord_dims returns a tuple; for rectilinear grids each coordinate maps to
+    # exactly one dimension index.
+    x_dimension_index = cube.coord_dims(x_coordinate)[0]
+    y_dimension_index = cube.coord_dims(y_coordinate)[0]
+
+    split_counts[x_dimension_index] = number_of_x_splits
+    split_counts[y_dimension_index] = number_of_y_splits
+
+    return tuple(split_counts)
+
+
+def _ssp_generate_cube_pieces(cube, number_of_x_splits, number_of_y_splits):
+    """
+    Generator that yields sub-cubes produced by splitting the input cube.
+
+    The cube is divided horizontally into ``number_of_x_splits *
+    number_of_y_splits`` pieces using :func:`_mosaic_by_nsplits`.  Coordinate
+    bounds are guessed on the *full* cube before any splitting takes place;
+    guessing bounds on individual pieces can produce inconsistent results for
+    circular (global) coordinates due to floating-point representation of the
+    grid spacing.
+
+    Parameters
+    ----------
+    cube : :class:`iris.cube.Cube`
+        The cube to split.  Modified in-place to add coordinate bounds if they
+        are not already present.
+    number_of_x_splits : int
+        Number of pieces along the x (longitude) dimension.
+    number_of_y_splits : int
+        Number of pieces along the y (latitude) dimension.
+
+    Yields
+    ------
+    :class:`iris.cube.Cube`
+        Sub-cube pieces in row-major order (y varies slowest).
+
+    """
+    # Guess bounds on the FULL cube before splitting.  This is critical for
+    # circular (global) coordinates: guessing bounds on a sub-region can give
+    # a slightly different cell spacing than the full-resolution guess, which
+    # would make the pieces inconsistent with each other.
+    ants.utils.cube.guess_horizontal_bounds(cube)
+
+    split_tuple = _ssp_compute_split_tuple_for_cube(
+        cube, number_of_x_splits, number_of_y_splits
+    )
+
+    for slice_tuple in _mosaic_by_nsplits(cube.shape, split_tuple):
+        yield cube[slice_tuple]
+
+
+def _ssp_extract_source_region(source, target_piece, padding_cells):
+    """
+    Extract the sub-region of *source* that spatially covers *target_piece*.
+
+    This function is the owned extraction implementation for
+    :func:`simple_split_and_process`.  It is deliberately kept separate from
+    the existing :func:`ants._constraints._extract_overlap` so that it can be
+    diagnosed and refined through the test battery without affecting other code.
+
+    The function handles the following cases:
+
+    * **Same coordinate convention** (both -180:180 or both 0:360): a single
+      contiguous slice of the source is returned.
+    * **Wrap-around extraction** (source is circular and the required region
+      straddles the source edge, e.g. UK region from a 0:360 source): two
+      slice groups are extracted, re-wrapped to be contiguous, and concatenated.
+    * **Coordinate convention mismatch** (source uses 0:360, target uses
+      -180:180 or vice versa): after extraction the source x-coordinates are
+      shifted by a whole number of modulus periods to align with the target's
+      x-coordinate range, so that iris can perform interpolation correctly.
+    * **Padding**: the extraction window is expanded by ``padding_cells``
+      cells beyond the target bounds in both x and y, providing the stencil
+      context needed by the interpolation operation.
+
+    Parameters
+    ----------
+    source : :class:`iris.cube.Cube`
+        The full-resolution source cube.  Bounds are added in-place if absent.
+    target_piece : :class:`iris.cube.Cube`
+        A sub-region of the target grid that defines the extraction window.
+        Bounds are added in-place if absent.
+    padding_cells : int
+        Number of source cells to include beyond the target bounds on each
+        side.  A value of 1 is usually sufficient for linear interpolation.
+    Returns
+    -------
+    :class:`iris.cube.Cube`
+        A sub-cube of *source* whose horizontal extent covers *target_piece*
+        (plus padding), with x-coordinates normalised to be compatible with
+        the target's coordinate range.
+
+    Raises
+    ------
+    RuntimeError
+        If :func:`ants.utils.cube.get_slices` returns more than two slice
+        groups (more than one wrap-around boundary is not currently supported).
+
+    """
+    # Ensure coordinate bounds are present on both cubes.  We use BOUNDS (not
+    # coordinate points) to define the extraction window: this correctly
+    # captures source cells at the exact edges of target tile boundaries,
+    # where the cell centre may not lie within the target range but the cell
+    # edge does.
+    ants.utils.cube.guess_horizontal_bounds(source)
+    ants.utils.cube.guess_horizontal_bounds(target_piece)
+
+    source_x_coordinate, source_y_coordinate = ants.utils.cube.horizontal_grid(source)
+    target_x_coordinate, target_y_coordinate = ants.utils.cube.horizontal_grid(
+        target_piece
+    )
+
+    # Determine the bounding box of the target piece using its coordinate
+    # BOUNDS, not its centre points.
+    target_x_minimum = float(np.min(target_x_coordinate.bounds))
+    target_x_maximum = float(np.max(target_x_coordinate.bounds))
+    target_y_minimum = float(np.min(target_y_coordinate.bounds))
+    target_y_maximum = float(np.max(target_y_coordinate.bounds))
+
+    # Use ants.utils.cube.get_slices to identify which source cells overlap
+    # the target bounding box.  get_slices is wrap-around aware: when the
+    # extraction window straddles the source edge it returns two slice groups
+    # (one for each side of the wrap-around boundary).
+    source_overlap_slices = ants.utils.cube.get_slices(
+        source,
+        ylim=[target_y_minimum, target_y_maximum],
+        xlim=[target_x_minimum, target_x_maximum],
+        pad_width=padding_cells,
+    )
+
+    if len(source_overlap_slices) > 2:
+        raise RuntimeError(
+            f"Source region extraction returned {len(source_overlap_slices)} "
+            "slice groups; at most 2 are supported (one wrap-around boundary)."
+        )
+
+    # Identify the dimension index for the x-coordinate so we can inspect
+    # individual slice objects from get_slices.
+    x_dimension_index = source.coord_dims(source_x_coordinate)[0]
+
+    # Extract a sub-cube for each slice group.
+    extracted_cube_pieces = iris.cube.CubeList(
+        [source[slice_tuple] for slice_tuple in source_overlap_slices]
+    )
+
+    if len(extracted_cube_pieces) == 2:
+        # Two pieces arise when the extraction window wraps around the source
+        # edge (e.g. UK target from a 0:360 source crosses the 0/360 boundary).
+        # The two pieces have x-coordinates in disjoint ranges; we must
+        # re-wrap them to a common base so they are contiguous and can be
+        # concatenated by iris.
+        x_modulus = getattr(source_x_coordinate.units, "modulus", None)
+        if x_modulus is not None:
+            # Choose the contiguity base as the minimum x-bound of the
+            # highest-indexed slice group.  The highest index corresponds to
+            # the "left" edge of the full extraction window in the periodic
+            # domain (e.g. the 350:360 cells when extracting the UK from a
+            # 0:360 source).
+            highest_start_index = max(
+                slice_tuple[x_dimension_index].start
+                for slice_tuple in source_overlap_slices
+            )
+            x_contiguity_base = float(
+                source_x_coordinate.bounds[highest_start_index].min()
+            )
+
+            for piece in extracted_cube_pieces:
+                piece_x_coordinate = piece.coord(axis="x")
+                piece_x_coordinate.points = ants.utils.ndarray.wrap_lons(
+                    piece_x_coordinate.points, x_contiguity_base, x_modulus
+                )
+                piece_x_coordinate.bounds = ants.utils.ndarray.wrap_lons(
+                    piece_x_coordinate.bounds, x_contiguity_base, x_modulus
+                )
+
+        # Sort pieces by their first x-coordinate value so that iris
+        # concatenate_cube sees them in ascending order.
+        extracted_cube_pieces = iris.cube.CubeList(
+            sorted(
+                extracted_cube_pieces,
+                key=lambda piece: piece.coord(axis="x").points[0],
+            )
+        )
+
+    extracted_cube = extracted_cube_pieces.concatenate_cube()
+
+    # Normalise the extracted source x-coordinates to be compatible with the
+    # target's x-coordinate range.
+    #
+    # When source and target use different longitude conventions (0:360 vs
+    # -180:180), the extracted source cells may have x-values like 347-367
+    # while the target has x-values like -10 to 3.  Without this step iris
+    # cannot find the source cells that bracket the target grid points.
+    #
+    # The fix: shift the extracted source x-coordinates by a whole number of
+    # modulus periods until the source centre-of-mass aligns with the target
+    # centre-of-mass.  A whole-period shift is transparent to interpolation.
+    extracted_x_coordinate = extracted_cube.coord(axis="x")
+    x_modulus = getattr(extracted_x_coordinate.units, "modulus", None)
+    if x_modulus is not None:
+        extracted_x_centre = float(np.mean(extracted_x_coordinate.points))
+        target_x_centre = (target_x_minimum + target_x_maximum) / 2.0
+        number_of_periods_to_shift = round(
+            (target_x_centre - extracted_x_centre) / x_modulus
+        )
+        if number_of_periods_to_shift != 0:
+            coordinate_shift = number_of_periods_to_shift * x_modulus
+            extracted_x_coordinate.points = (
+                extracted_x_coordinate.points + coordinate_shift
+            )
+            extracted_x_coordinate.bounds = (
+                extracted_x_coordinate.bounds + coordinate_shift
+            )
+
+    ants.utils.cube.derive_circular_status(extracted_cube)
+    return extracted_cube
+
+
+def _ssp_concatenate_result_pieces(result_pieces):
+    """
+    Reassemble a list of per-piece operation results into a single cube.
+
+    The pieces are expected to be spatially adjacent and non-overlapping, as
+    produced by applying an operation to the pieces generated by
+    :func:`_ssp_generate_cube_pieces`.
+
+    After concatenation:
+
+    * The circular attribute of the x-coordinate is re-derived, since it may
+      have been lost when the cube was split into regional pieces.
+    * The dtype of the result is checked against the first piece; if
+      concatenation has silently changed it (which should not happen but is
+      guarded against as a known past source of bugs) an explicit cast is
+      applied.
+
+    Parameters
+    ----------
+    result_pieces : list of :class:`iris.cube.Cube`
+        Ordered list of result cubes to assemble.  Must be non-empty.
+
+    Returns
+    -------
+    :class:`iris.cube.Cube`
+        The fully reassembled result cube.
+
+    """
+    # Realise lazy data on every piece before inspecting dtype.  Iris may
+    # return a cube whose .dtype property reflects the lazy (dask) graph's
+    # input dtype (e.g. int32 from the source array) rather than the dtype
+    # of the computed output.  Accessing .data forces computation and ensures
+    # that .dtype subsequently returns the true output dtype.
+    for piece in result_pieces:
+        _ = piece.data  # noqa: F841 — side-effect: realises lazy computation
+
+    # Iris concatenate_cube requires all pieces to share the same dtype.
+    # Even after realisation, pieces may differ (e.g. some regrid pieces
+    # return float64, others int32 when source and target grids coincide
+    # exactly at some tiles).  Promote all pieces to the common dtype before
+    # concatenating.
+    common_dtype = np.result_type(*[piece.dtype for piece in result_pieces])
+    for piece in result_pieces:
+        if piece.dtype != common_dtype:
+            piece.data = piece.data.astype(common_dtype)
+
+    assembled_cube = iris.cube.CubeList(result_pieces).concatenate_cube()
+
+    # Restore the circular attribute on the x-coordinate where appropriate.
+    # The attribute is lost when a global cube is split into regional pieces
+    # (each piece is not global, so derive_circular_status removes it), but
+    # after reassembly the full extent is restored.
+    ants.utils.cube.derive_circular_status(assembled_cube)
+
+    # Guard against silent dtype changes during concatenation.  The iris
+    # concatenate operation should preserve dtype, but this explicit check
+    # ensures we catch any regression here rather than propagating an
+    # unexpected dtype change to the caller.
+    if assembled_cube.dtype != common_dtype:
+        assembled_cube.data = assembled_cube.data.astype(common_dtype)
+
+    return assembled_cube
+
+
+def simple_split_and_process(
+    operation,
+    source,
+    target=None,
+    number_of_x_splits=0,
+    number_of_y_splits=0,
+    padding_cells=1,
+):
+    """
+    Apply *operation* to *source* (and optionally *target*), optionally
+    splitting the data into smaller horizontal pieces first.
+
+    This function is a simpler, more maintainable replacement for
+    :func:`decompose`.  Key differences:
+
+    * Split counts are passed directly as arguments rather than being read
+      from global configuration.
+    * No multiprocessing: all pieces are processed serially in a single
+      process.
+    * No temporary files or deferred data: results are kept in memory.
+    * Operates on single :class:`iris.cube.Cube` objects rather than
+      :class:`iris.cube.CubeList`.
+
+    **Unary mode** (``target=None``): the *source* is split into pieces, the
+    *operation* is applied to each piece independently, and the pieces are
+    reassembled.
+
+    **Binary mode** (``target`` provided): the *target* is split into pieces.
+    For each target piece the overlapping region of *source* is extracted
+    (plus ``padding_cells`` of context), the *operation* is applied to each
+    ``(source_piece, target_piece)`` pair, and the results are reassembled.
+    Splitting the *target* (rather than the source) ensures that the result
+    is identical to the no-split case: each target cell is interpolated from
+    exactly the same source cells regardless of how the decomposition is
+    configured.
+
+    When ``number_of_x_splits == 0`` and ``number_of_y_splits == 0``, the
+    *operation* is applied to the full datasets without any splitting.
+
+    Known correctness considerations (see private helpers for details):
+
+    * Coordinate bounds are guessed on the full cubes *before* splitting to
+      avoid inconsistencies at circular/global boundaries.
+    * Source extraction uses the target piece *bounds* (not centre points) to
+      define the extraction window.
+    * Source x-coordinates are normalised after extraction to be compatible
+      with the target's x-coordinate range (handles 0:360 vs -180:180).
+    * Wrapping of circular (global) sources across the 0/360 or ±180 boundary
+      is handled by :func:`_ssp_extract_source_region`.
+
+    Parameters
+    ----------
+    operation : callable
+        The function to apply.  Must have the signature
+        ``operation(source) -> result`` for unary mode or
+        ``operation(source, target) -> result`` for binary mode.
+    source : :class:`iris.cube.Cube`
+        The source dataset.
+    target : :class:`iris.cube.Cube`, optional
+        The target grid cube for binary operations.  When provided, the
+        *target* is split into pieces and the *source* is subsetted to match
+        each piece.
+    number_of_x_splits : int, optional
+        Number of pieces to divide the x (longitude) dimension into.
+        Default is 0 (no splitting).
+    number_of_y_splits : int, optional
+        Number of pieces to divide the y (latitude) dimension into.
+        Default is 0 (no splitting).
+    padding_cells : int, optional
+        Number of source cells to include beyond the boundary of each target
+        piece during extraction.  Provides the interpolation stencil context
+        needed at tile edges.  Default is 1.
+    Returns
+    -------
+    :class:`iris.cube.Cube`
+        The result of applying *operation* to the (optionally decomposed)
+        datasets.
+
+    """
+    # With zero splits in both dimensions, apply the operation directly to the
+    # full datasets without any decomposition overhead.
+    if number_of_x_splits == 0 and number_of_y_splits == 0:
+        if target is not None:
+            return operation(source, target)
+        else:
+            return operation(source)
+
+    # Guess coordinate bounds on the full cubes before splitting.  This must
+    # be done here (on the intact cubes) rather than inside the splitting
+    # loop: guessing bounds on a sub-region can produce slightly different
+    # spacing for circular grids, making the pieces inconsistent.
+    ants.utils.cube.guess_horizontal_bounds(source)
+    if target is not None:
+        ants.utils.cube.guess_horizontal_bounds(target)
+
+    result_pieces = []
+
+    if target is not None:
+        # Binary path: iterate over target pieces and pair each with the
+        # overlapping region of the source.
+        for target_piece in _ssp_generate_cube_pieces(
+            target, number_of_x_splits, number_of_y_splits
+        ):
+            source_piece = _ssp_extract_source_region(
+                source, target_piece, padding_cells
+            )
+            result_piece = operation(source_piece, target_piece)
+            result_pieces.append(result_piece)
+    else:
+        # Unary path: iterate over source pieces and apply operation to each.
+        for source_piece in _ssp_generate_cube_pieces(
+            source, number_of_x_splits, number_of_y_splits
+        ):
+            result_piece = operation(source_piece)
+            result_pieces.append(result_piece)
+
+    return _ssp_concatenate_result_pieces(result_pieces)
