@@ -180,6 +180,18 @@ def regrid_source_to_target(source, target):
     return source.regrid(target, iris.analysis.Linear())
 
 
+def regrid_source_to_target_areaweighted(source, target):
+    """
+    Binary operation: regrid the source cube onto the target grid using
+    iris area-weighted interpolation.
+
+    This operation is sensitive to small target tiles that can collapse a
+    singleton horizontal dimension in intermediate pieces, so it is used to
+    validate decomposition piece-shape conformity before concatenation.
+    """
+    return source.regrid(target, iris.analysis.AreaWeighted())
+
+
 # ---------------------------------------------------------------------------
 # Assertion helpers
 # ---------------------------------------------------------------------------
@@ -459,3 +471,107 @@ class TestConcatenateResultPiecesRegression:
             assembled.data,
             cube.data.astype(expected_dtype),
         )
+
+
+@pytest.mark.parametrize("number_of_x_splits,number_of_y_splits", SPLIT_CONFIGURATIONS)
+class TestBinaryOperationAreaWeighted:
+    """
+    Tests that area-weighted binary operations produce stable decomposed
+    results across supported domain/split combinations.
+    """
+
+    def _run_binary_test_areaweighted(
+        self, source, target, number_of_x_splits, number_of_y_splits
+    ):
+        reference_result = ants.decomposition.simple_split_and_process(
+            regrid_source_to_target_areaweighted,
+            source,
+            target=target,
+        )
+        decomposed_result = ants.decomposition.simple_split_and_process(
+            regrid_source_to_target_areaweighted,
+            source,
+            target=target,
+            number_of_x_splits=number_of_x_splits,
+            number_of_y_splits=number_of_y_splits,
+        )
+        return decomposed_result, reference_result
+
+    def test_global_source_global_fine_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source()
+        target = make_global_fine_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_source_uk_target(self, number_of_x_splits, number_of_y_splits):
+        source = make_global_coarse_source()
+        target = make_uk_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_source_australia_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source()
+        target = make_australia_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_source_new_zealand_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source()
+        target = make_new_zealand_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_source_singapore_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source()
+        target = make_singapore_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_source_northern_greenland_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source()
+        target = make_northern_greenland_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        assert_decomposed_result_matches_reference(decomposed, reference)
+
+    def test_global_0_to_360_source_regional_target(
+        self, number_of_x_splits, number_of_y_splits
+    ):
+        source = make_global_coarse_source_0_to_360()
+        target = make_uk_target()
+        decomposed, reference = self._run_binary_test_areaweighted(
+            source, target, number_of_x_splits, number_of_y_splits
+        )
+        numpy.testing.assert_allclose(
+            decomposed.data,
+            reference.data,
+            rtol=0.0,
+            atol=MIXED_CONVENTION_ABSOLUTE_TOLERANCE,
+            err_msg=(
+                "Mixed longitude convention area-weighted decomposition "
+                "exceeded expected machine-precision tolerance."
+            ),
+        )
+        assert decomposed.data.dtype == reference.data.dtype
+        assert decomposed.metadata == reference.metadata

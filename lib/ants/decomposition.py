@@ -1002,6 +1002,53 @@ def _ssp_concatenate_result_pieces(result_pieces):
     return assembled_cube
 
 
+def _ssp_conform_result_piece_to_target_grid(result_piece, target_piece):
+    """
+    Ensure a binary-operation result piece has the same grid shape as target.
+
+    Some operations (notably area-weighted regridding) may collapse singleton
+    horizontal dimensions for small tiles (for example, returning shape
+    ``(nx,)`` instead of ``(1, nx)``).  This prevents concatenation with
+    neighbouring tiles that retain both horizontal dimensions.
+
+    This helper reshapes such results onto the target piece grid while
+    preserving the result metadata.
+
+    Parameters
+    ----------
+    result_piece : :class:`iris.cube.Cube`
+        Result cube returned by the binary operation.
+    target_piece : :class:`iris.cube.Cube`
+        Target tile used for the operation.
+
+    Returns
+    -------
+    :class:`iris.cube.Cube`
+        Result cube guaranteed to have ``target_piece.shape``.
+
+    Raises
+    ------
+    RuntimeError
+        If the result data cannot be reshaped onto ``target_piece.shape``.
+
+    """
+    if result_piece.shape == target_piece.shape:
+        return result_piece
+
+    result_data = np.asarray(result_piece.data)
+    expected_size = int(np.prod(target_piece.shape))
+    if result_data.size != expected_size:
+        raise RuntimeError(
+            "Binary operation result shape is incompatible with target piece: "
+            f"result shape {result_piece.shape}, target shape {target_piece.shape}."
+        )
+
+    reshaped_result_data = result_data.reshape(target_piece.shape)
+    conformed_result_piece = target_piece.copy(reshaped_result_data)
+    conformed_result_piece.metadata = result_piece.metadata
+    return conformed_result_piece
+
+
 def simple_split_and_process(
     operation,
     source,
@@ -1109,6 +1156,9 @@ def simple_split_and_process(
                 source, target_piece, padding_cells
             )
             result_piece = operation(source_piece, target_piece)
+            result_piece = _ssp_conform_result_piece_to_target_grid(
+                result_piece, target_piece
+            )
             result_pieces.append(result_piece)
     else:
         # Unary path: iterate over source pieces and apply operation to each.
