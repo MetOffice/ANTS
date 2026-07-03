@@ -233,13 +233,6 @@ def _get_parser():
         help=invmask_help,
         required=False,
     )
-    parser.add_argument(
-        "--search-method",
-        type=str,
-        help="Select the search method used when filling.",
-        required=False,
-        default="kdtree",
-    )
     blending_help = (
         "Distance over which blending between the primary and alternate sources "
         "is applied. Note that this is in units of grid cells, not a physical distance."

@@ -53,6 +53,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             sources=["/path/to/source"],
             netcdf_only=False,
+            search_method="kdtree",
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -69,6 +70,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             ants_config=None,
             netcdf_only=False,
+            search_method="kdtree",
             new_arg="new_arg_value",
         )
         self.assertEqual(args, target_args)
@@ -176,6 +178,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=2016,
             end=2021,
             netcdf_only=False,
+            search_method="kdtree",
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -207,6 +210,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=1990,
             end=1996,
             netcdf_only=False,
+            search_method="kdtree",
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)

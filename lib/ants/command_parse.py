@@ -171,6 +171,13 @@ class AntsArgParser(argparse.ArgumentParser):
             help="Only write out a netCDF file.",
             required=False,
         )
+        self.add_argument(
+            "--search-method",
+            type=str,
+            help="Select the search method used when filling.",
+            required=False,
+            default="kdtree",
+        )
         if time_constraints:
             self.add_argument(
                 "--begin",
