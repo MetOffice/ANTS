@@ -12,7 +12,7 @@ points defining a single polygon in a specified polygon file.
 
 Rotated pole domains can be specified using the land sea mask argument,
 where the longitude, latitude pairs are rotated to the new pole
-It is assumed that the shapefile is on a standard unrotated lat-lon grid.
+It is assumed that the shapefile is on a standard unrotated lon-lat grid.
 """
 import argparse
 import json
@@ -32,17 +32,17 @@ _LOGGER = logging.getLogger(__name__)
 
 def _validate_coord_system(target_lsm):
     """
-    Check that target_lsm has a rotated pole co-ordinate system.
+    Check that target_lsm has a rotated pole coordinate system.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole co-ordinate system.
+        The lsm cube specifiying the rotated pole coordinate system.
 
     Raises
     ------
     ValueError :
-        If target_lsm does not have a rotated pole co-ordinate system.
+        If target_lsm does not have a rotated pole coordinate system.
     """
 
     is_pole_coords = isinstance(
@@ -52,27 +52,42 @@ def _validate_coord_system(target_lsm):
         raise ValueError(
             f"""target_lsm.coord_system() {target_lsm.coord_system()} is not
             an instance of {iris.coord_systems.RotatedGeogCS}. The landsea mask
-            should specify a valid rotated pole co-ordinate system."""
+            should specify a valid rotated pole coordinate system."""
         )
 
 
-def _check_pole_orientation(target_lsm):
+def _transform_coordinates(target_lsm, points):
     """
-    Check if target_lsm is already orientated with the true north pole.
+    Transforms the longitude, latitude points in the source coordinate
+    system to the rotated pole coordinate system defined by target_lsm.
+
+    he source coordinate system is assumed to be unrotated geodetic
+    defined on a sphere. Does nothing if the target coordinate system
+    is unrotated.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole co-ordinate system.
+        The lsm cube specifiying the rotated pole coordinate system.
+    points : :class:`np.ndarry`
+        An (m,2) sized numpy array of m longitude and m latitude points.
+
+    Returns
+    -------
+    rotated_points : :class:`np.ndarry`
+        An (m,2) sized numpy array of rotated longitude and latitude points.
 
     Raises
     ------
-    warning :
-        If target_lsm is already coincident with the true north pole.
+    Warns : UserWarning
+        If target_lsm is coincident with the true north pole and is
+        defined on a sphere.
     """
 
-    # TODO : I don't know what to specify here
     sphere = ccrs.Globe(semimajor_axis=6371000.0, semiminor_axis=6371000.0)
+
+    source_crs = ccrs.Geodetic(globe=sphere)
+    target_coord = target_lsm.coord_system()
 
     ref_crs = ccrs.RotatedGeodetic(
         pole_latitude=90.0,
@@ -84,51 +99,27 @@ def _check_pole_orientation(target_lsm):
     target_crs = target_lsm.coord_system().as_cartopy_crs()
     target_proj4 = target_crs.proj4_params
 
+    # Checks that the poles and also underlying ellipses are the same
     if ref_crs == target_crs:
         warnings.warn(
-            f"""target_lsm has a geodetic co-ordinate system with pole located at
+            f"""target_lsm has a geodetic coordinate system with pole located at
               grid_latitude={target_proj4['o_lat_p']},
               grid_longitude={target_proj4['o_lon_p']}.
-              No rotation will be carried out."""
+              No transformation will be carried out."""
         )
-
-
-def _transform_coordinates(target_lsm, lons, lats):
-    """
-    Transforms the longitude, latitude points in the source co-ordinate
-    system to the rotated pole co-ordinate system defined by target_lsm.
-    The source co-ordinate is assumed to be unrotated geodetic.
-
-    Parameters
-    ----------
-    target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole co-ordinate system.
-    lons : :class:`np.ndarry`
-        Longitude points to rotate of length m.
-    lats : :class:`np.ndarry`
-        Latitude points to rotate of length m.
-
-    Returns
-    -------
-    rotated_points : :class:`np.ndarry`
-        A (m,2) numpy array of rotated longitude and latitude pairs.
-
-    """
-
-    sphere = ccrs.Globe(semimajor_axis=6371000.0, semiminor_axis=6371000.0)
-
-    source_crs = ccrs.Geodetic(globe=sphere)
-    target_coord = target_lsm.coord_system()
+        rotated_points = np.copy(points)
+        return rotated_points
 
     rotated_points = target_coord.as_cartopy_crs().transform_points(
-        source_crs, lons, lats  # longitude  # latitude
+        source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
     _LOGGER.info(
-        "Input json file transformed to new pole rotated co-ordinate system at"
-        "grid_latitude=%s, grid_longitude=%s.",
-        target_coord.grid_north_pole_latitude,
+        "Input json file transformed to new pole rotated coordinate system at"
+        "pole longitude=%s, pole latitude=%s, central rotated longitude=%s.",
         target_coord.grid_north_pole_longitude,
+        target_coord.grid_north_pole_latitude,
+        target_coord.north_pole_grid_longitude,
     )
 
     return rotated_points
@@ -145,7 +136,7 @@ def _load_polygon_from_json(json_file, target_lsm_path):
         Path to json file
     target_lsm_path : str
         File path for a land sea mask that provides the new rotated pole
-        coordinates to which the longitude, latitude pairs will be mapped.
+        coordinates to which the longitude, latitude pairs will be transformed.
 
     Returns
     -------
@@ -158,10 +149,7 @@ def _load_polygon_from_json(json_file, target_lsm_path):
     if target_lsm_path is not None:
         target_lsm = load_landsea_mask(target_lsm_path)
         _validate_coord_system(target_lsm)
-        _check_pole_orientation(target_lsm)
-
-        lon, lat = points[:, 0], points[:, -1]
-        points = _transform_coordinates(target_lsm, lon, lat)
+        points = _transform_coordinates(target_lsm, points)
 
     polygon = Polygon(points)
 
@@ -174,9 +162,10 @@ def main(json_file, output, target_lsm_path):
     points to create a polygon from. That polygon is then used to create a
     shape file that is saved to the specified output location.
 
-    If a target_lsm_path is provided, the points will first be transformed
-    from a geodetic co-ordinate system to a rotated pole co-ordinate system
-    specified by the lsm file.
+    If target_lsm_path is provided, the points are first transformed from an
+    unrotated geodetic coordinate system to a rotated pole coordinate system
+    specified by the lsm. It is assumed that the points specified in the json
+    file are on an unrotated geodetic grid.
 
     Parameters
     ----------
@@ -226,7 +215,7 @@ def _get_parser():
         type=ants.config.filepath_readable,
         required=False,
         help="Path to the land sea mask containing the rotated pole"
-        " co-ordinate system.",
+        " coordinate system.",
     )
     parser.add_argument("output", help="File to save shape file to.")
     return parser
