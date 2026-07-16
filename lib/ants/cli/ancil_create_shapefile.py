@@ -22,7 +22,6 @@ import logging
 import warnings
 
 import ants
-import cartopy.crs as ccrs
 import iris.coord_systems
 import numpy as np
 from ants.io.load import load_cube, load_landsea_mask
@@ -60,21 +59,31 @@ def _validate_coord_system(target_lsm):
 
 
 def _validate_orientation(target_lsm):
+    """
+    Check if target_lsm is a non-rotated pole.
 
-    ref_crs = ccrs.RotatedGeodetic(pole_latitude=90.0, pole_longitude=0.0)
+    Parameters
+    ----------
+    target_lsm : :class:`iris.cube.Cube`
+        The lsm cube specifiying the rotated pole coordinate system.
 
-    # get the cube proj4 parameters
-    target_crs = target_lsm.coord_system().as_cartopy_crs()
-    target_proj4 = target_crs.proj4_params
+    Warns
+    ------
+    UserWarning :
+        If target_lsm is already at latitude=90.0, longitude=0.0.
+    """
 
-    # Checks that the poles and also underlying ellipses are the same
-    check_crs = ref_crs == target_crs
+    target_crs = target_lsm.coord_system()
+
+    grid_lon = target_crs.grid_north_pole_longitude
+    grid_lat = target_crs.grid_north_pole_latitude
+
+    check_crs = ants.utils.ndarray.allclose([grid_lon, grid_lat], [0.0, 90.0])
     if check_crs:
         warnings.warn(
-            f"""target_lsm has a geodetic coordinate system with pole located at
-              grid_latitude={target_proj4['o_lat_p']},
-              grid_longitude={target_proj4['o_lon_p']}.
-              No transformation will be carried out."""
+            "target_lsm has a geodetic coordinate system with pole located"
+            f"at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
+            "No transformation will be carried out."
         )
     return check_crs
 
@@ -102,12 +111,6 @@ def _transform_coordinates(target_lsm, source_cube, points):
     -------
     rotated_points : :class:`np.ndarry`
         An (m,2) sized numpy array of rotated longitude and latitude points.
-
-    Raises
-    ------
-    Warns : UserWarning
-        If target_lsm is coincident with the true north pole and is
-        defined on a sphere.
     """
 
     # sphere = ccrs.Globe(semimajor_axis=6371000.0, semiminor_axis=6371000.0)
@@ -161,10 +164,14 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
         points = json.load(polygon_json)
     points = np.array(points)
 
-    if target_lsm_path is not None and source_cube_path is not None:
-        target_lsm = load_landsea_mask(target_lsm_path)
+    if target_lsm_path is not None and source_cube_path is None:
+        crs = iris.coord_systems.GeogCS(6371229.0)
+        source_cube = ants.utils.cube.CubeBuilder(crs, (2, 2))._cube
+    elif target_lsm_path is not None and source_cube_path is not None:
         source_cube = load_cube(source_cube_path)
 
+    if target_lsm_path is not None:
+        target_lsm = load_landsea_mask(target_lsm_path)
         if not _validate_coord_system(target_lsm):
             points = _transform_coordinates(target_lsm, source_cube, points)
 
@@ -230,6 +237,7 @@ def _get_parser():
     parser.add_argument(
         "json_file", help="Path to json file defining polygon to generate."
     )
+    parser.add_argument("output", help="File to save shape file to.")
     parser.add_argument(
         "--target-lsm",
         type=ants.config.filepath_readable,
@@ -241,17 +249,25 @@ def _get_parser():
         "--source-cube",
         type=ants.config.filepath_readable,
         required=False,
-        help="Path to the source co-ordinate system",
+        help="Path to an iris cube which specifies the co-ordinate"
+        "system of the json file",
     )
-    parser.add_argument("output", help="File to save shape file to.")
     return parser
+
+
+def _validate_args(args):
+
+    if args.source_cube is not None and args.target_lsm is None:
+        raise ValueError(
+            "If --source-cube is passed then --target-lsm must" "also be given."
+        )
 
 
 def cli_interface():
     parser = _get_parser()
     args = parser.parse_args()
-    if args.search_method is not None and args.source_cube is None:
-        parser.error("--source-cube is required when --target-lsm is specified")
+
+    _validate_args(args)
     main(args.json_file, args.output, args.target_lsm, args.source_cube)
 
 
