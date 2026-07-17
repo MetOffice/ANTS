@@ -105,7 +105,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         # from passed longitude.
 
         true_lats = np.array([90, 45, 0, -45, -90])
-        true_lons = np.array([np.nan, 180.0, 180.0, 180.0, 180.0])
+        true_lons = np.array([np.nan, -180.0, -180.0, -180.0, -180.0])
         expected_rotation = np.array([true_lons, true_lats]).T
 
         # We cannot check the longitude at the pole (any longitude is valid).
@@ -124,7 +124,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
 
         points = np.array([[0.0, 45.0, 90.0, 135.0], [0.0, 0.0, 0.0, 0.0]]).T
         true_lats = np.array([0.0, 0.0, np.nan, 0.0])
-        true_lons = np.array([90.0, 135.0, 180.0, 225.0])
+        true_lons = np.array([90.0, 135.0, -180.0, -135.0])
         expected_rotation = np.array([true_lons, true_lats]).T
 
         check_mask = ~np.isnan(expected_rotation)
@@ -132,6 +132,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         rotated_coords = _transform_coordinates(
             self.sphere_rotate_lon, self.sphere_source, points
         )
+
         self.assertArrayAlmostEqual(
             expected_rotation[check_mask], rotated_coords[check_mask]
         )
@@ -141,7 +142,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         # Latitudes become longitudes and vice versa.
 
         true_lats = np.array([-45.0, 0.0, 45.0, 90.0, 45.0, 0.0, -45.0])
-        true_lons = np.array([90.0, 90.0, 90.0, np.nan, 270.0, 270.0, 270.0])
+        true_lons = np.array([90.0, 90.0, 90.0, np.nan, -90.0, -90.0, -90.0])
         expected_rotation = np.array([true_lons, true_lats]).T
         check_mask = ~np.isnan(expected_rotation)
         rotated_coords = _transform_coordinates(
@@ -150,27 +151,6 @@ class Test__transform_coordinates(ants.tests.TestCase):
         self.assertArrayAlmostEqual(
             expected_rotation[check_mask], rotated_coords[check_mask]
         )
-
-    def test_negative_longitudes_converted(self):
-        # Check that negative longitudes are converted to positive values.
-        # No transform performed here.
-
-        true_coords = np.array([[90.0, 160.0, 326.7], [0.0, 0.0, 0.0]]).T
-        neg_lons = np.array([[-270.0, -200.0, -33.3], [0.0, 0.0, 0.0]]).T
-
-        target_lsm, source_cube = Mock(), Mock()
-        source_crs, target_crs = Mock(), Mock()
-        target_coord = Mock()
-
-        source_cube.coord_system.return_value.as_cartopy_crs.return_value = source_crs
-        target_lsm.coord_system.return_value = target_coord
-
-        target_coord.as_cartopy_crs.return_value = target_crs
-
-        target_crs.transform_points.return_value = neg_lons
-
-        result = _transform_coordinates(target_lsm, source_cube, neg_lons)
-        self.assertArrayEqual(true_coords, result)
 
 
 class Test__load_polygon_from_json(ants.tests.TestCase):

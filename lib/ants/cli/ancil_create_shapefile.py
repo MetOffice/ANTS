@@ -131,10 +131,6 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
-    # Enforce that longitude is measured in the positive direction
-    negative_rotated_lons = np.where(rotated_points[:, 0] < 0)
-    rotated_points[negative_rotated_lons, 0] += 360.0
-
     _LOGGER.info(
         "Input json file transformed to new pole rotated coordinate system at"
         "pole longitude=%s, pole latitude=%s, central rotated longitude=%s.",
