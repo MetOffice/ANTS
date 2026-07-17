@@ -92,11 +92,6 @@ def _validate_orientation(target_lsm):
     return check_crs
 
 
-def _validate_ellipse(target_lsm, source_cube):
-    # what is the right thing to do here
-    pass
-
-
 def _validate_args(target_lsm_path, source_cube_path):
     if source_cube_path is not None and target_lsm_path is None:
         raise ValueError(

@@ -40,8 +40,12 @@ class Test__validate_coord_system(ants.tests.TestCase):
 class Test__validate_orientation(ants.tests.TestCase):
     def setUp(self):
         self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
-        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0)
-        self.sphere_rotated_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0, 180.0)
+        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
+            90.0, 0.0, ellipsoid=self.sphere_crs
+        )
+        self.sphere_rotated_crs = iris.coord_systems.RotatedGeogCS(
+            90.0, 0.0, 180.0, ellipsoid=self.sphere_crs
+        )
         self.sphere_identity_target_lsm = CubeBuilder(
             self.sphere_identity_crs, (2, 2)
         )._cube
@@ -64,15 +68,17 @@ class Test__validate_orientation(ants.tests.TestCase):
     def test_no_warning_raised(self):
         self.assertFalse(_validate_orientation(self.sphere_rotate_lon))
 
-    # an optional rotation can be applied afterward
-    def test_no_warning_rotated(self):
+    def test_no_warning_raised_rotated(self):
+        # The pole can be optionally rotated in longitude after relocation.
         self.assertFalse(_validate_orientation(self.sphere_rotated_target_lsm))
 
 
 class Test__transform_coordinates(ants.tests.TestCase):
     def setUp(self):
         self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
-        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0)
+        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
+            90.0, 0.0, ellipsoid=self.sphere_crs
+        )
         self.sphere_identity_target_lsm = CubeBuilder(
             self.sphere_identity_crs, (2, 2)
         )._cube
@@ -94,15 +100,15 @@ class Test__transform_coordinates(ants.tests.TestCase):
         ).T
 
     def test_identity_rotation_sphere(self):
+        # Rotation to pole at (0.0, 90.0).
+        # Rotated geodesic by convention defines the new pole 180 degrees.
+        # from passed longitude.
 
         true_lats = np.array([90, 45, 0, -45, -90])
-        # The rotated geodesic system flips the longitude
-        # Rotated geodesic has some odd properties, like the central
-        # longitude being set to 180.0
         true_lons = np.array([np.nan, 180.0, 180.0, 180.0, 180.0])
-
         expected_rotation = np.array([true_lons, true_lats]).T
-        # we cannot check the longitude at the pole (any longitude is valid)
+
+        # We cannot check the longitude at the pole (any longitude is valid).
         check_mask = ~np.isnan(expected_rotation)
 
         rotated_coords = _transform_coordinates(
@@ -113,14 +119,14 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
     def test_longitudinal_rotation(self):
-        # these tests can be counter-intuitive as the prime-meridian
-        # is by default at 180.0 so a rotation of 90.0 causes the prime meridian
-        # to be at 270.0 (it is always 180 further round from the longitude given)
-        points = np.array([[0.0, 45.0, 90.0, 135.0], [0.0, 0.0, 0.0, 0.0]]).T
+        # Rotation to pole (90.0, 90.0).
+        # The new pole is located at 270.0 after a 90.0 rotation.
 
+        points = np.array([[0.0, 45.0, 90.0, 135.0], [0.0, 0.0, 0.0, 0.0]]).T
         true_lats = np.array([0.0, 0.0, np.nan, 0.0])
         true_lons = np.array([90.0, 135.0, 180.0, 225.0])
         expected_rotation = np.array([true_lons, true_lats]).T
+
         check_mask = ~np.isnan(expected_rotation)
 
         rotated_coords = _transform_coordinates(
@@ -131,8 +137,10 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
     def test_rotation_to_equator_sphere(self):
+        # Rotation to pole at (0.0, 0.0).
+        # Latitudes become longitudes and vice versa.
+
         true_lats = np.array([-45.0, 0.0, 45.0, 90.0, 45.0, 0.0, -45.0])
-        # Again the results for lon depend on where the central lon is
         true_lons = np.array([90.0, 90.0, 90.0, np.nan, 270.0, 270.0, 270.0])
         expected_rotation = np.array([true_lons, true_lats]).T
         check_mask = ~np.isnan(expected_rotation)
@@ -144,6 +152,8 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
     def test_negative_longitudes_converted(self):
+        # Check that negative longitudes are converted to positive values.
+        # No transform performed here.
 
         true_coords = np.array([[90.0, 160.0, 326.7], [0.0, 0.0, 0.0]]).T
         neg_lons = np.array([[-270.0, -200.0, -33.3], [0.0, 0.0, 0.0]]).T
