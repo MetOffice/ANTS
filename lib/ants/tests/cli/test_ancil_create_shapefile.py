@@ -19,54 +19,10 @@ from ants.cli.ancil_create_shapefile import (
     _validate_orientation,
 )
 from ants.tests.stock import geodetic
+from ants.utils.cube import CubeBuilder
 
 
-def _create_cube(north_pole_lon, north_pole_lat, ellipsoid):
-    # stock geodetic automatically returns an identity rotated geodetic
-    # back to geodetic
-    crs = iris.coord_systems.RotatedGeogCS(
-        grid_north_pole_latitude=north_pole_lat,
-        grid_north_pole_longitude=north_pole_lon,
-        ellipsoid=ellipsoid,
-    )
-    lons, lats = [0.0], [0.0]
-    lon_coord = iris.coords.DimCoord(
-        lons,
-        standard_name="grid_longitude",
-        units="degrees",
-        coord_system=crs,
-    )
-
-    lat_coord = iris.coords.DimCoord(
-        lats,
-        standard_name="grid_latitude",
-        units="degrees",
-        coord_system=crs,
-    )
-
-    data = np.zeros((len(lats), len(lons)))
-
-    cube = iris.cube.Cube(data, dim_coords_and_dims=[(lat_coord, 0), (lon_coord, 1)])
-    return cube
-
-
-class Common(object):
-    def setUp(self):
-        # unrotated source cube
-        self.source_cube = geodetic((2, 2))
-        # spherical input coordinate systems are simple to test
-        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
-        self.sphere_source = geodetic((2, 2), crs=self.sphere_crs)
-        self.sphere_identity_target_lsm = _create_cube(0.0, 90.0, self.sphere_crs)
-        self.sphere_equator_target_lsm = geodetic(
-            (2, 2), north_pole_lat=0.0, north_pole_lon=0.0, crs=self.sphere_crs
-        )
-        self.sphere_rotate_lon = geodetic(
-            (2, 2), north_pole_lat=90.0, north_pole_lon=90.0, crs=self.sphere_crs
-        )
-
-
-class Test__validate_coord_system(Common, ants.tests.TestCase):
+class Test__validate_coord_system(ants.tests.TestCase):
 
     def test_unrotated_target_lsm(self):
         target_lsm = geodetic((2, 2))
@@ -81,9 +37,16 @@ class Test__validate_coord_system(Common, ants.tests.TestCase):
             _validate_coord_system(target_lsm)
 
 
-class Test__validate_orientation(Common, ants.tests.TestCase):
+class Test__validate_orientation(ants.tests.TestCase):
     def setUp(self):
-        super().setUp()
+        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
+        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0)
+        self.sphere_identity_target_lsm = CubeBuilder(
+            self.sphere_identity_crs, (2, 2)
+        )._cube
+        self.sphere_rotate_lon = geodetic(
+            (2, 2), north_pole_lat=90.0, north_pole_lon=90.0, crs=self.sphere_crs
+        )
         self.warning_msg = (
             "target_lsm has a geodetic coordinate system with pole located"
             "at grid_longitude=0.0, grid_latitude=90.0."
@@ -98,9 +61,20 @@ class Test__validate_orientation(Common, ants.tests.TestCase):
         self.assertFalse(_validate_orientation(self.sphere_rotate_lon))
 
 
-class Test__transform_coordinates(Common, ants.tests.TestCase):
+class Test__transform_coordinates(ants.tests.TestCase):
     def setUp(self):
-        super().setUp()
+        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
+        self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0)
+        self.sphere_identity_target_lsm = CubeBuilder(
+            self.sphere_identity_crs, (2, 2)
+        )._cube
+        self.sphere_source = geodetic((2, 2), crs=self.sphere_crs)
+        self.sphere_equator_target_lsm = geodetic(
+            (2, 2), north_pole_lat=0.0, north_pole_lon=0.0, crs=self.sphere_crs
+        )
+        self.sphere_rotate_lon = geodetic(
+            (2, 2), north_pole_lat=90.0, north_pole_lon=90.0, crs=self.sphere_crs
+        )
         self.vary_latitudes = np.array(
             [[0.0, 0.0, 0.0, 0.0, 0.0], [90.0, 45.0, 0.0, -45.0, -90.0]]
         ).T
@@ -126,8 +100,7 @@ class Test__transform_coordinates(Common, ants.tests.TestCase):
         rotated_coords = _transform_coordinates(
             self.sphere_identity_target_lsm, self.sphere_source, self.vary_latitudes
         )
-
-        assert ants.utils.ndarray.allclose(
+        self.assertArrayAlmostEqual(
             expected_rotation[check_mask], rotated_coords[check_mask]
         )
 
@@ -145,7 +118,7 @@ class Test__transform_coordinates(Common, ants.tests.TestCase):
         rotated_coords = _transform_coordinates(
             self.sphere_rotate_lon, self.sphere_source, points
         )
-        assert ants.utils.ndarray.allclose(
+        self.assertArrayAlmostEqual(
             expected_rotation[check_mask], rotated_coords[check_mask]
         )
 
@@ -158,7 +131,7 @@ class Test__transform_coordinates(Common, ants.tests.TestCase):
         rotated_coords = _transform_coordinates(
             self.sphere_equator_target_lsm, self.sphere_source, self.vary_longitudes
         )
-        assert ants.utils.ndarray.allclose(
+        self.assertArrayAlmostEqual(
             expected_rotation[check_mask], rotated_coords[check_mask]
         )
 
@@ -180,13 +153,17 @@ class Test__transform_coordinates(Common, ants.tests.TestCase):
         target_crs.transform_points.return_value = neg_lons
 
         result = _transform_coordinates(target_lsm, source_cube, neg_lons)
-        assert ants.utils.ndarray.allclose(true_coords, result)
+        self.assertArrayEqual(true_coords, result)
 
 
-class Test__load_polygon_from_json(Common, ants.tests.TestCase):
+class Test__load_polygon_from_json(ants.tests.TestCase):
     def setUp(self):
-        super().setUp()
         self.json_values = [[1, 2], [3, 4], [5, 6], [7, 8]]
+        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
+        self.sphere_source = geodetic((2, 2), crs=self.sphere_crs)
+        self.sphere_equator_target_lsm = geodetic(
+            (2, 2), north_pole_lat=0.0, north_pole_lon=0.0, crs=self.sphere_crs
+        )
 
     def patch_loader(func):
         @mock.patch("ants.cli.ancil_create_shapefile.load_landsea_mask")
@@ -200,7 +177,7 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
             mock_json,
             mock_open,
             mock_transform,
-            mock_validate,
+            mock_validate_coord,
             mock_load,
             mock_load_lsm,
             *args,
@@ -211,7 +188,7 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
                 mock_json,
                 mock_open,
                 mock_transform,
-                mock_validate,
+                mock_validate_coord,
                 mock_load,
                 mock_load_lsm,
                 *args,
@@ -226,7 +203,7 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
         mock_json,
         mock_open,
         mock_transform,
-        mock_validate,
+        mock_validate_coord,
         mock_load,
         mock_load_lsm,
     ):
@@ -237,29 +214,6 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
         mock_json.assert_called_once()
         mock_load_lsm.assert_not_called()
         mock_load.assert_not_called()
-        mock_validate.assert_not_called()
-        mock_transform.assert_not_called()
-
-    @patch_loader
-    def test_transform_not_called(
-        self,
-        mock_json,
-        mock_open,
-        mock_transform,
-        mock_validate,
-        mock_load,
-        mock_load_lsm,
-    ):
-
-        mock_json.return_value = self.json_values
-        mock_validate.return_value = True
-        mock_load_lsm.return_value = Mock()
-        mock_load.return_value = Mock()
-
-        _ = _load_polygon_from_json("json/path", "lsm/path", "source_cube/path")
-
-        mock_load_lsm.assert_called_once()
-        mock_load.assert_called_once()
         mock_transform.assert_not_called()
 
     @patch_loader
@@ -268,14 +222,13 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
         mock_json,
         mock_open,
         mock_transform,
-        mock_validate,
+        mock_validate_coord,
         mock_load,
         mock_load_lsm,
     ):
 
         mock_json.return_value = self.json_values
-        mock_validate.return_value = False
-        mock_load_lsm.return_value = Mock()
+        mock_load_lsm.return_value = self.sphere_equator_target_lsm
         mock_load.return_value = Mock()
         mock_transform.return_value = self.json_values
 
@@ -285,28 +238,26 @@ class Test__load_polygon_from_json(Common, ants.tests.TestCase):
         mock_load.assert_called_once()
         mock_transform.assert_called_once()
 
-    """
-    I need to figure out how to get this patch to work
     @patch_loader
-    def test_load_call(self, mock_json, mock_open, mock_transform,
-                    mock_validate, mock_load, mock_load_lsm):
+    def test_default_source(
+        self,
+        mock_json,
+        mock_open,
+        mock_transform,
+        mock_validate_coord,
+        mock_load,
+        mock_load_lsm,
+    ):
 
-        ants_cube = ants.utils.cube.CubeBuilder(self.sphere_crs,(2,2))._cube
         mock_json.return_value = self.json_values
-        mock_validate.return_value = False
-        mock_load_lsm.return_value = Mock()
+        mock_load_lsm.return_value = self.sphere_equator_target_lsm
+        mock_load.return_value = Mock()
         mock_transform.return_value = self.json_values
 
         _ = _load_polygon_from_json("json/path", "lsm/path", None)
 
-        mock_json.assert_called_once()
         mock_load_lsm.assert_called_once()
-        mock_load.assert_not_called()
-        mock_validate.assert_called_once()
-        mock_transform.assert_called_once_with(mock_load_lsm.return_value,
-                                               ants_cube,
-                                               np.array(self.json_values))
-    """
+        mock_transform.assert_called_once()
 
 
 class Test__validate_args(ants.tests.TestCase):

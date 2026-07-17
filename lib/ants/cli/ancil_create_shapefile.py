@@ -13,8 +13,6 @@ points defining a single polygon in a specified polygon file.
 Rotated pole domains can be specified using the land sea mask argument,
 where the longitude, latitude pairs are rotated to the new pole
 It is assumed that the shapefile is on a standard unrotated lon-lat grid.
-
-# TODO I need to decide if the central rotated longitude has to be set to 180
 """
 import argparse
 import json
@@ -25,6 +23,7 @@ import ants
 import iris.coord_systems
 import numpy as np
 from ants.io.load import load_cube, load_landsea_mask
+from ants.utils.cube import CubeBuilder
 from osgeo import ogr
 from shapely.geometry import Polygon
 
@@ -166,13 +165,14 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
 
     if target_lsm_path is not None and source_cube_path is None:
         crs = iris.coord_systems.GeogCS(6371229.0)
-        source_cube = ants.utils.cube.CubeBuilder(crs, (2, 2))._cube
+        source_cube = CubeBuilder(crs, (2, 2))._cube
     elif target_lsm_path is not None and source_cube_path is not None:
         source_cube = load_cube(source_cube_path)
 
     if target_lsm_path is not None:
         target_lsm = load_landsea_mask(target_lsm_path)
-        if not _validate_coord_system(target_lsm):
+        _validate_coord_system(target_lsm)
+        if not _validate_orientation(target_lsm):
             points = _transform_coordinates(target_lsm, source_cube, points)
 
     polygon = Polygon(points)
