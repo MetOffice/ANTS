@@ -41,8 +41,12 @@ class Test__validate_orientation(ants.tests.TestCase):
     def setUp(self):
         self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
         self.sphere_identity_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0)
+        self.sphere_rotated_crs = iris.coord_systems.RotatedGeogCS(90.0, 0.0, 180.0)
         self.sphere_identity_target_lsm = CubeBuilder(
             self.sphere_identity_crs, (2, 2)
+        )._cube
+        self.sphere_rotated_target_lsm = CubeBuilder(
+            self.sphere_rotated_crs, (2, 2)
         )._cube
         self.sphere_rotate_lon = geodetic(
             (2, 2), north_pole_lat=90.0, north_pole_lon=90.0, crs=self.sphere_crs
@@ -59,6 +63,10 @@ class Test__validate_orientation(ants.tests.TestCase):
 
     def test_no_warning_raised(self):
         self.assertFalse(_validate_orientation(self.sphere_rotate_lon))
+
+    # an optional rotation can be applied afterward
+    def test_no_warning_rotated(self):
+        self.assertFalse(_validate_orientation(self.sphere_rotated_target_lsm))
 
 
 class Test__transform_coordinates(ants.tests.TestCase):
@@ -138,7 +146,6 @@ class Test__transform_coordinates(ants.tests.TestCase):
     def test_negative_longitudes_converted(self):
 
         true_coords = np.array([[90.0, 160.0, 326.7], [0.0, 0.0, 0.0]]).T
-        # presumably I can't get a -400.0 for example
         neg_lons = np.array([[-270.0, -200.0, -33.3], [0.0, 0.0, 0.0]]).T
 
         target_lsm, source_cube = Mock(), Mock()
@@ -271,4 +278,4 @@ class Test__validate_args(ants.tests.TestCase):
         )
         error_msg = "If --source-cube is passed then --target-lsm must" "also be given."
         with self.assertRaisesRegex(ValueError, error_msg):
-            _validate_args(args)
+            _validate_args(args.target_lsm, args.source_cube)

@@ -12,7 +12,9 @@ points defining a single polygon in a specified polygon file.
 
 Rotated pole domains can be specified using the land sea mask argument,
 where the longitude, latitude pairs are rotated to the new pole
-It is assumed that the shapefile is on a standard unrotated lon-lat grid.
+Unless a source cube is provided with the source coordinate reference system,
+it assumed that the point defined in the json file are on a standard spherical
+unrotated geodetic coordinate reference system.
 """
 import argparse
 import json
@@ -76,8 +78,11 @@ def _validate_orientation(target_lsm):
 
     grid_lon = target_crs.grid_north_pole_longitude
     grid_lat = target_crs.grid_north_pole_latitude
+    pole_lon_rotation = target_crs.north_pole_grid_longitude
 
-    check_crs = ants.utils.ndarray.allclose([grid_lon, grid_lat], [0.0, 90.0])
+    check_crs = ants.utils.ndarray.allclose(
+        [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
+    )
     if check_crs:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
@@ -87,14 +92,25 @@ def _validate_orientation(target_lsm):
     return check_crs
 
 
+def _validate_ellipse(target_lsm, source_cube):
+    # what is the right thing to do here
+    pass
+
+
+def _validate_args(target_lsm_path, source_cube_path):
+    if source_cube_path is not None and target_lsm_path is None:
+        raise ValueError(
+            "If --source-cube is passed then --target-lsm must" "also be given."
+        )
+
+
 def _transform_coordinates(target_lsm, source_cube, points):
     """
     Transforms the longitude, latitude points in the source coordinate
     system to the rotated pole coordinate system defined by target_lsm.
 
     The source coordinate system is assumed to be unrotated geodetic
-    defined on a sphere. Does nothing if the target coordinate system
-    is unrotated.
+    defined on a sphere, unless otherwise specified.
 
     Parameters
     ----------
@@ -112,10 +128,6 @@ def _transform_coordinates(target_lsm, source_cube, points):
         An (m,2) sized numpy array of rotated longitude and latitude points.
     """
 
-    # sphere = ccrs.Globe(semimajor_axis=6371000.0, semiminor_axis=6371000.0)
-
-    # source_crs = ccrs.Geodetic(globe=sphere)
-
     source_crs = source_cube.coord_system().as_cartopy_crs()
     target_coord = target_lsm.coord_system()
     target_crs = target_coord.as_cartopy_crs()
@@ -124,7 +136,7 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
-    # Enforce that the points are all measured in the positive direction
+    # Enforce that longitude is measured in the positive direction
     negative_rotated_lons = np.where(rotated_points[:, 0] < 0)
     rotated_points[negative_rotated_lons, 0] += 360.0
 
@@ -143,6 +155,10 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
     """
     Load a json file containing a list of pairs of longitude, latitude points
     to create a polygon from.
+
+    If a valid rotated pole is specifed in the target lsm, first transforms
+    the points from the source coordinate system to the rotated pole before
+    creating a polygon.
 
     Parameters
     ----------
@@ -188,8 +204,8 @@ def main(json_file, output, target_lsm_path, source_cube_path):
 
     If target_lsm_path is provided, the points are first transformed from an
     unrotated geodetic coordinate system to a rotated pole coordinate system
-    specified by the lsm. It is assumed that the points specified in the json
-    file are on an unrotated geodetic grid.
+    specified by the lsm. It is assumed that the points in the json
+    file are on an unrotated geodetic grid, unless a crs is provided.
 
     Parameters
     ----------
@@ -255,19 +271,11 @@ def _get_parser():
     return parser
 
 
-def _validate_args(args):
-
-    if args.source_cube is not None and args.target_lsm is None:
-        raise ValueError(
-            "If --source-cube is passed then --target-lsm must" "also be given."
-        )
-
-
 def cli_interface():
     parser = _get_parser()
     args = parser.parse_args()
 
-    _validate_args(args)
+    _validate_args(args.target_lsm, args.source_cube)
     main(args.json_file, args.output, args.target_lsm, args.source_cube)
 
 
