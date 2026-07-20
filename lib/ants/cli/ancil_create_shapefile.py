@@ -32,7 +32,7 @@ from shapely.geometry import Polygon
 _LOGGER = logging.getLogger(__name__)
 
 
-def _validate_coord_system(target_lsm):
+def _check_coord_system_type(target_lsm):
     """
     Check that target_lsm has a rotated pole coordinate system.
 
@@ -61,17 +61,23 @@ def _validate_coord_system(target_lsm):
 
 def _validate_orientation(target_lsm):
     """
-    Check if target_lsm is a non-rotated pole.
+    Check if target_lsm has a valid rotated pole coordinate system.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole coordinate system.
+        The lsm cube specifying the rotated pole coordinate system.
+
+    Returns
+    -------
+    valid_crs : bool
+        True if target_lsm is a rotated pole,
+        False otherwise.
 
     Warns
     ------
-    UserWarning :
-        If target_lsm is already at latitude=90.0, longitude=0.0.
+    UserWarning
+        If target_lsm is already at latitude=90.0 and longitude=0.0.
     """
 
     target_crs = target_lsm.coord_system()
@@ -80,22 +86,24 @@ def _validate_orientation(target_lsm):
     grid_lat = target_crs.grid_north_pole_latitude
     pole_lon_rotation = target_crs.north_pole_grid_longitude
 
-    check_crs = ants.utils.ndarray.allclose(
-        [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
+    valid_crs = not (
+        ants.utils.ndarray.allclose(
+            [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
+        )
     )
-    if check_crs:
+    if not valid_crs:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
             f"at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
             "No transformation will be carried out."
         )
-    return check_crs
+    return valid_crs
 
 
 def _validate_args(target_lsm_path, source_cube_path):
     if source_cube_path is not None and target_lsm_path is None:
         raise ValueError(
-            "If --source-cube is passed then --target-lsm must" "also be given."
+            "If --source-cube is passed then --target-lsm must also be given."
         )
 
 
@@ -120,7 +128,7 @@ def _transform_coordinates(target_lsm, source_cube, points):
     Returns
     -------
     rotated_points : :class:`np.ndarry`
-        An (m,2) sized numpy array of rotated longitude and latitude points.
+        An (m,2) sized numpy array of transformed longitude and latitude points.
     """
 
     source_crs = source_cube.coord_system().as_cartopy_crs()
@@ -138,6 +146,47 @@ def _transform_coordinates(target_lsm, source_cube, points):
         target_coord.grid_north_pole_latitude,
         target_coord.north_pole_grid_longitude,
     )
+
+    return rotated_points
+
+
+def _transform_if_required(target_lsm_path, source_cube_path, points):
+    """
+    Load the target lsm and create a source cube if not provided. The points
+    are then transformed to the specified rotated pole coordinate system
+    if the provided coordinate system is a rotated pole and is not
+    coincident with the north pole.
+
+    Parameters
+    ----------
+    target_lsm_path : str
+        File path for a land sea mask that provides the new rotated pole
+        coordinates to which the longitude, latitude pairs will be transformed.
+    source_cube_path : str
+        File path to an iris cube specifying the co-ordinate system of the
+        input json file.
+    points : :class:`np.ndarry`
+        An (m,2) sized numpy array of longitude and latitude points.
+
+    Returns
+    -------
+    rotated_points : :class:`np.ndarry`
+        An (m,2) sized numpy array of transformed longitude and latitude points.
+    """
+
+    target_lsm = load_landsea_mask(target_lsm_path)
+    _check_coord_system_type(target_lsm)
+
+    if source_cube_path is None:
+        crs = iris.coord_systems.GeogCS(6371229.0)
+        source_cube = CubeBuilder(crs, (2, 2))._cube
+    else:
+        source_cube = load_cube(source_cube_path)
+
+    if _validate_orientation(target_lsm):
+        rotated_points = _transform_coordinates(target_lsm, source_cube, points)
+    else:
+        rotated_points = np.copy(points)
 
     return rotated_points
 
@@ -170,17 +219,8 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
         points = json.load(polygon_json)
     points = np.array(points)
 
-    if target_lsm_path is not None and source_cube_path is None:
-        crs = iris.coord_systems.GeogCS(6371229.0)
-        source_cube = CubeBuilder(crs, (2, 2))._cube
-    elif target_lsm_path is not None and source_cube_path is not None:
-        source_cube = load_cube(source_cube_path)
-
     if target_lsm_path is not None:
-        target_lsm = load_landsea_mask(target_lsm_path)
-        _validate_coord_system(target_lsm)
-        if not _validate_orientation(target_lsm):
-            points = _transform_coordinates(target_lsm, source_cube, points)
+        points = _transform_if_required(target_lsm_path, source_cube_path, points)
 
     polygon = Polygon(points)
 
