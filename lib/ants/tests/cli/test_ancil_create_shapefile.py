@@ -25,6 +25,9 @@ from ants.utils.cube import CubeBuilder
 class Test__check_coord_system_type(ants.tests.TestCase):
 
     def test_unrotated_target_lsm(self):
+        """Test that an error message is raised if the coordinate system in
+        target_lsm is not a rotated pole."""
+
         target_lsm = geodetic((2, 2))
         error_msg = re.escape(
             f"target_lsm.coord_system() {target_lsm.coord_system()} is not"
@@ -62,14 +65,22 @@ class Test__validate_orientation(ants.tests.TestCase):
         )
 
     def test_warning_raised(self):
-        with self.assertWarnsRegex(UserWarning, self.warning_msg):
-            _validate_orientation(self.sphere_identity_target_lsm)
+        """Test that a warning is raised with a coordinate system at latitude=90.0,
+        longitude=0.0 is passed. Check the function returns False."""
 
-    def test_no_warning_raised(self):
+        with self.assertWarnsRegex(UserWarning, self.warning_msg):
+            valid_crs = _validate_orientation(self.sphere_identity_target_lsm)
+        self.assertFalse(valid_crs)
+
+    def test_true_returned(self):
+        """Test that True is returned when target_lsm has a valid rotated pole."""
+
         self.assertTrue(_validate_orientation(self.sphere_rotate_lon))
 
     def test_no_warning_raised_rotated(self):
-        # The pole can be optionally rotated in longitude after relocation.
+        """Test that passing a non-zero central rotated longitude is still
+        accounted for when checking if the coordinate system is rotated."""
+
         self.assertTrue(_validate_orientation(self.sphere_rotated_target_lsm))
 
 
@@ -100,9 +111,10 @@ class Test__transform_coordinates(ants.tests.TestCase):
         ).T
 
     def test_identity_rotation_sphere(self):
-        # Rotation to pole at (0.0, 90.0).
-        # Rotated geodesic by convention defines the new pole 180 degrees.
-        # from passed longitude.
+        """Test that a rotation to a pole at latitude=90.0, longitude=0.0
+        returns the same points, except a 180.0 degree rotation in longitude. By
+        convention the new pole is defined 180.0 rotated from the provided
+        longitude."""
 
         true_lats = np.array([90, 45, 0, -45, -90])
         true_lons = np.array([np.nan, -180.0, -180.0, -180.0, -180.0])
@@ -119,8 +131,9 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
     def test_longitudinal_rotation(self):
-        # Rotation to pole (90.0, 90.0).
-        # The new pole is located at 270.0 after a 90.0 rotation.
+        """Test rotation to a new pole at latitude=90.0, longitude=90.0.
+        The new pole is located at latitude=90.0, longitude 270.0 in the rotated
+        pole coordinate system."""
 
         points = np.array([[0.0, 45.0, 90.0, 135.0], [0.0, 0.0, 0.0, 0.0]]).T
         true_lats = np.array([0.0, 0.0, np.nan, 0.0])
@@ -138,8 +151,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
     def test_rotation_to_equator_sphere(self):
-        # Rotation to pole at (0.0, 0.0).
-        # Latitudes become longitudes and vice versa.
+        """Test rotation to a new pole at latitude=0.0, longitude=0.0."""
 
         true_lats = np.array([-45.0, 0.0, 45.0, 90.0, 45.0, 0.0, -45.0])
         true_lons = np.array([90.0, 90.0, 90.0, np.nan, -90.0, -90.0, -90.0])
@@ -156,6 +168,8 @@ class Test__transform_coordinates(ants.tests.TestCase):
 class Test__validate_args(ants.tests.TestCase):
 
     def test_error_raised(self):
+        """Test that an error is raised if only --source-cube is passed."""
+
         args = argparse.Namespace(
             json_file="json/path",
             output="output/path",
@@ -189,6 +203,10 @@ class Test__transform_if_required(ants.tests.TestCase):
     def test_transform_coords_not_called(
         self, mock_lsm, mock_source, mock_transform_coord, mock_validate
     ):
+        """Test that when _transform_coordinates is not called when an unrotated pole
+        is given and only target_lsm is given. The assert statements check that only
+        appropriate functions are called in this case. Also checks that the unrotated
+        points are correctly returned."""
 
         mock_lsm.return_value = self.sphere_identity_target_lsm
         mock_validate.return_value = False
@@ -204,6 +222,8 @@ class Test__transform_if_required(ants.tests.TestCase):
     @mock.patch("ants.cli.ancil_create_shapefile.CubeBuilder")
     @mock.patch("ants.cli.ancil_create_shapefile.load_landsea_mask")
     def test_transform_called(self, mock_lsm, mock_source, mock_transform_coord):
+        """Test that _transform_coordinates is called when a valid target_lsm is given
+        and no source_cube is given."""
 
         mock_lsm.return_value = self.sphere_equator_target_lsm
 
@@ -220,6 +240,9 @@ class Test__transform_if_required(ants.tests.TestCase):
     def test_source_cube_loaded(
         self, mock_lsm, mock_source, mock_transform_coord, mock_load_cube
     ):
+        """Test that _transform_coordinates is called when both target_lsm and
+        source_cube are given. Check that the source comes from loading from
+        the cube path."""
 
         mock_lsm.return_value = self.sphere_equator_target_lsm
 
@@ -239,6 +262,8 @@ class Test__load_polygon_from_json(ants.tests.TestCase):
     @mock.patch("builtins.open", new_callable=mock.mock_open)
     @mock.patch("ants.cli.ancil_create_shapefile.json.load")
     def test_json_load(self, mock_json, mock_open, mock_transform):
+        """Test that the default arguments load a json file,
+        but do not try to call _transform_if_required."""
 
         mock_json.return_value = self.json_values
 
@@ -251,6 +276,8 @@ class Test__load_polygon_from_json(ants.tests.TestCase):
     @mock.patch("builtins.open", new_callable=mock.mock_open)
     @mock.patch("ants.cli.ancil_create_shapefile.json.load")
     def test_transform_called(self, mock_json, mock_open, mock_transform):
+        """Test that when target_lsm is given but not source_cube,
+        _transform_if_required is called once with the correct arguments."""
 
         mock_json.return_value = self.json_values
 
@@ -267,6 +294,8 @@ class Test__load_polygon_from_json(ants.tests.TestCase):
     @mock.patch("builtins.open", new_callable=mock.mock_open)
     @mock.patch("ants.cli.ancil_create_shapefile.json.load")
     def test_transform_called_with_source(self, mock_json, mock_open, mock_transform):
+        """Test that when both target_lsm and source_cube are given,
+        _transform_if_required is called once with the correct arguments."""
 
         mock_json.return_value = self.json_values
 
