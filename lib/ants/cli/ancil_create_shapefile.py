@@ -11,9 +11,9 @@ Creates and saves a shapefile from a list of pairs of longitude, latitude
 points defining a single polygon in a specified polygon file.
 
 Rotated pole domains can be specified using the land sea mask argument,
-where the longitude, latitude pairs are rotated to the new pole
+where the longitude, latitude pairs are rotated to the new pole.
 Unless a source cube is provided with the source coordinate reference system,
-it assumed that the point defined in the json file are on a standard spherical
+it assumed that the points defined in the json file are on a standard spherical
 unrotated geodetic coordinate reference system.
 """
 import argparse
@@ -61,12 +61,13 @@ def _check_coord_system_type(target_lsm):
 
 def _validate_orientation(target_lsm):
     """
-    Check if target_lsm has a valid rotated pole coordinate system.
+    Check if the rotated pole coordinate system specified by the target lsm
+    is coincident with the north pole.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifying the rotated pole coordinate system.
+        The target lsm cube specifying the rotated pole coordinate system.
 
     Returns
     -------
@@ -120,15 +121,15 @@ def _transform_coordinates(target_lsm, source_cube, points):
     target_lsm : :class:`iris.cube.Cube`
         The lsm cube specifiying the rotated pole coordinate system.
     source_cube : :class:`iris.cube.Cube`
-        An iris cube specifying the co-ordinate system of the
+        An iris cube specifying the coordinate system of the
         input json file.
     points : :class:`np.ndarry`
-        An (m,2) sized numpy array of m longitude and m latitude points.
+        An (m,2) shaped numpy array of m longitude and m latitude points.
 
     Returns
     -------
     rotated_points : :class:`np.ndarry`
-        An (m,2) sized numpy array of transformed longitude and latitude points.
+        An (m,2) shaped numpy array of transformed longitude and latitude points.
     """
 
     source_crs = source_cube.coord_system().as_cartopy_crs()
@@ -163,15 +164,15 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
         File path for a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
-        File path to an iris cube specifying the co-ordinate system of the
+        File path to an iris cube specifying the coordinate system of the
         input json file.
     points : :class:`np.ndarry`
-        An (m,2) sized numpy array of longitude and latitude points.
+        An (m,2) shaped numpy array of longitude and latitude points.
 
     Returns
     -------
     rotated_points : :class:`np.ndarry`
-        An (m,2) sized numpy array of transformed longitude and latitude points.
+        An (m,2) shaped numpy array of transformed longitude and latitude points.
     """
 
     target_lsm = load_landsea_mask(target_lsm_path)
@@ -208,7 +209,7 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
         File path for a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
-        File path to an iris cube specifying the co-ordinate system of the
+        File path to an iris cube specifying the coordinate system of the
         input json file.
 
     Returns
@@ -236,7 +237,7 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     If target_lsm_path is provided, the points are first transformed from an
     unrotated geodetic coordinate system to a rotated pole coordinate system
     specified by the lsm. It is assumed that the points in the json
-    file are on an unrotated geodetic grid, unless a crs is provided.
+    file are on an unrotated geodetic grid, unless otherwise specified.
 
     Parameters
     ----------
@@ -248,7 +249,7 @@ def main(json_file, output, target_lsm_path, source_cube_path):
         File path for a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
-        File path to an iris cube specifying the co-ordinate system of the
+        File path to an iris cube specifying the cosordinate system of the
         input json file.
     """
 
@@ -297,7 +298,7 @@ def _get_parser():
         type=ants.config.filepath_readable,
         required=False,
         help="Path to an iris cube which specifies the co-ordinate"
-        "system of the json file",
+        " system of the json file.",
     )
     return parser
 

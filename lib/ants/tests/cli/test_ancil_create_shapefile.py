@@ -6,7 +6,6 @@
 import argparse
 import re
 from unittest import mock
-from unittest.mock import Mock
 
 import ants.tests
 import iris
@@ -223,7 +222,6 @@ class Test__transform_if_required(ants.tests.TestCase):
     ):
 
         mock_lsm.return_value = self.sphere_equator_target_lsm
-        mock_load_cube.return_value = Mock()
 
         _ = _transform_if_required("lsm/path", "source/path", self.points)
 
