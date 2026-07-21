@@ -161,7 +161,7 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
     Parameters
     ----------
     target_lsm_path : str
-        File path for a land sea mask that provides the new rotated pole
+        File path to a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
         File path to an iris cube specifying the coordinate system of the
@@ -206,7 +206,7 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
     json_file : str
         Path to json file
     target_lsm_path : str
-        File path for a land sea mask that provides the new rotated pole
+        File path to a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
         File path to an iris cube specifying the coordinate system of the
@@ -246,10 +246,10 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     output : str
         Location to store generated shape file
     target_lsm_path : str
-        File path for a land sea mask that provides the new rotated pole
+        File path to a land sea mask that provides the new rotated pole
         coordinates to which the longitude, latitude pairs will be transformed.
     source_cube_path : str
-        File path to an iris cube specifying the cosordinate system of the
+        File path to an iris cube specifying the coordinate system of the
         input json file.
     """
 
