@@ -61,8 +61,8 @@ def _check_coord_system_type(target_lsm):
 
 def _validate_orientation(target_lsm):
     """
-    Check if the rotated pole coordinate system specified by the target lsm
-    is coincident with the north pole.
+    Validate that the rotated pole coordinate system is not coincident with the
+    geographic north pole.
 
     Parameters
     ----------
@@ -71,14 +71,13 @@ def _validate_orientation(target_lsm):
 
     Returns
     -------
-    valid_crs : bool
-        True if target_lsm is a rotated pole,
-        False otherwise.
+    bool
+        True if target_lsm is a valid rotated pole, False otherwise.
 
     Warns
-    ------
+    -----
     UserWarning
-        If target_lsm is already at latitude=90.0 and longitude=0.0.
+        If the rotated pole is coincident with the geographic north pole.
     """
 
     target_crs = target_lsm.coord_system()
@@ -110,26 +109,25 @@ def _validate_args(target_lsm_path, source_cube_path):
 
 def _transform_coordinates(target_lsm, source_cube, points):
     """
-    Transforms the longitude, latitude points in the source coordinate
-    system to the rotated pole coordinate system defined by target_lsm.
+    Transform the longitude-latitude points to the rotated pole.
 
-    The source coordinate system is assumed to be unrotated geodetic
-    defined on a sphere, unless otherwise specified.
+    The source coordinate system is assumed to be unrotated geodetic defined
+    on a sphere, unless otherwise specified.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole coordinate system.
+        The lsm cube specifying the rotated pole coordinate system.
     source_cube : :class:`iris.cube.Cube`
-        An iris cube specifying the coordinate system of the
-        input json file.
-    points : :class:`np.ndarry`
-        An (m,2) shaped numpy array of m longitude and m latitude points.
+        An iris cube specifying the coordinate system of the input json
+        file.
+    points : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of m longitude-latitude pairs.
 
     Returns
     -------
-    rotated_points : :class:`np.ndarry`
-        An (m,2) shaped numpy array of transformed longitude and latitude points.
+    : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
     """
 
     source_crs = source_cube.coord_system().as_cartopy_crs()
@@ -151,38 +149,63 @@ def _transform_coordinates(target_lsm, source_cube, points):
     return rotated_points
 
 
-def _transform_if_required(target_lsm_path, source_cube_path, points):
+def _load_cubes(target_lsm_path, source_cube_path):
     """
-    Load the target lsm and create a source cube if not provided. The points
-    are then transformed to the specified rotated pole coordinate system
-    if the provided coordinate system is a rotated pole and is not
-    coincident with the north pole.
+    Load the target lsm and create a source cube if not provided.
 
     Parameters
     ----------
     target_lsm_path : str
-        File path to a land sea mask that provides the new rotated pole
-        coordinates to which the longitude, latitude pairs will be transformed.
+        File path to a land sea mask that provides the new rotated pole.
     source_cube_path : str
         File path to an iris cube specifying the coordinate system of the
         input json file.
-    points : :class:`np.ndarry`
-        An (m,2) shaped numpy array of longitude and latitude points.
 
     Returns
     -------
-    rotated_points : :class:`np.ndarry`
-        An (m,2) shaped numpy array of transformed longitude and latitude points.
+    : tuple(:class:`iris.cube.Cube`, :class:`iris.cube.Cube`)
+        A tuple containing the target lsm and the source cube respectively.
     """
 
     target_lsm = load_landsea_mask(target_lsm_path)
-    _check_coord_system_type(target_lsm)
 
     if source_cube_path is None:
         crs = iris.coord_systems.GeogCS(6371229.0)
         source_cube = CubeBuilder(crs, (2, 2))._cube
     else:
         source_cube = load_cube(source_cube_path)
+
+    return target_lsm, source_cube
+
+
+def _transform_if_required(target_lsm_path, source_cube_path, points):
+    """
+    Perform the transformation to a rotated pole if the coordinate system
+    is valid.
+
+    The points are transformed to the specified rotated pole coordinate system
+    if the provided coordinate system is a rotated pole and is not coincident
+    with the geographic north pole.
+
+    Parameters
+    ----------
+    target_lsm_path : str
+        File path to a land sea mask that provides the new rotated pole.
+    source_cube_path : str
+        File path to an iris cube specifying the coordinate system of the
+        input json file.
+    points : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of m longitude-latitude pairs.
+
+    Returns
+    -------
+    : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
+    """
+
+    target_lsm, source_cube = _load_cubes(target_lsm_path, source_cube_path)
+
+    _check_coord_system_type(target_lsm)
 
     if _validate_orientation(target_lsm):
         rotated_points = _transform_coordinates(target_lsm, source_cube, points)
@@ -194,7 +217,7 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
 
 def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
     """
-    Load a json file containing a list of pairs of longitude, latitude points
+    Load a json file containing a list of pairs of longitude-latitude points
     to create a polygon from.
 
     If a valid rotated pole is specifed in the target lsm, first transforms
@@ -206,8 +229,7 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
     json_file : str
         Path to json file
     target_lsm_path : str
-        File path to a land sea mask that provides the new rotated pole
-        coordinates to which the longitude, latitude pairs will be transformed.
+        File path to a land sea mask that provides the new rotated pole.
     source_cube_path : str
         File path to an iris cube specifying the coordinate system of the
         input json file.
@@ -216,6 +238,7 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
     -------
     : :class:`~shapely.geometry.Polygon`
     """
+
     with open(json_file, "r") as polygon_json:
         points = json.load(polygon_json)
     points = np.array(points)
@@ -230,12 +253,14 @@ def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
 
 def main(json_file, output, target_lsm_path, source_cube_path):
     """
+    Create a shape file from pairs of longitude, latitude points.
+
     Loads in a provided json file that defines pairs of longitude, latitude
     points to create a polygon from. That polygon is then used to create a
     shape file that is saved to the specified output location.
 
     If target_lsm_path is provided, the points are first transformed from an
-    unrotated geodetic coordinate system to a rotated pole coordinate system
+    source geodetic coordinate system to a rotated pole coordinate system
     specified by the lsm. It is assumed that the points in the json
     file are on an unrotated geodetic grid, unless otherwise specified.
 
@@ -246,8 +271,7 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     output : str
         Location to store generated shape file
     target_lsm_path : str
-        File path to a land sea mask that provides the new rotated pole
-        coordinates to which the longitude, latitude pairs will be transformed.
+        File path to a land sea mask that provides the new rotated pole.
     source_cube_path : str
         File path to an iris cube specifying the coordinate system of the
         input json file.
