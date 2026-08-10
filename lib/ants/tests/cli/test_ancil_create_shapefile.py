@@ -13,7 +13,7 @@ import numpy as np
 from ants.cli.ancil_create_shapefile import (
     _check_coord_system_type,
     _load_cubes,
-    _load_polygon_from_json,
+    _load_points_from_json,
     _transform_coordinates,
     _transform_if_required,
     _validate_args,
@@ -214,7 +214,6 @@ class Test__load_cubes(ants.tests.TestCase):
         mock_load_cube.assert_called_once()
 
 
-@mock.patch("ants.cli.ancil_create_shapefile._load_cubes")
 class Test__transform_if_required(ants.tests.TestCase):
     def setUp(self):
         self.points = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
@@ -230,27 +229,27 @@ class Test__transform_if_required(ants.tests.TestCase):
             self.sphere_identity_crs, (2, 2)
         )._cube
 
-    def test_non_rotated_returned(self, mock_load):
+    def test_non_rotated_returned(self):
         """Test that the input points are returned if a non-rotated pole is
         provided as the target_lsm."""
 
-        mock_load.return_value = self.sphere_identity_target_lsm, self.sphere_source
-
         with self.assertWarns(UserWarning):
-            rotated_points = _transform_if_required("target/lsm", None, self.points)
+            rotated_points = _transform_if_required(
+                self.sphere_identity_target_lsm, self.sphere_source, self.points
+            )
 
         self.assertArrayEqual(rotated_points, self.points)
 
-    def test_transform_called(self, mock_load):
+    def test_transform_called(self):
         """Test that transform coordinates is called with the correct arguments
         when a valid target_lsm is given."""
-
-        mock_load.return_value = self.sphere_equator_target_lsm, self.sphere_source
 
         with mock.patch(
             "ants.cli.ancil_create_shapefile._transform_coordinates"
         ) as mock_transform:
-            _ = _transform_if_required("target/lsm", None, self.points)
+            _ = _transform_if_required(
+                self.sphere_equator_target_lsm, self.sphere_source, self.points
+            )
 
         target_lsm, source_cube, points = mock_transform.call_args.args
         mock_transform.assert_called_once()
@@ -260,55 +259,14 @@ class Test__transform_if_required(ants.tests.TestCase):
 
 
 @mock.patch("builtins.open", new_callable=mock.mock_open)
-class Test__load_polygon_from_json(ants.tests.TestCase):
+class Test__load_points_from_json(ants.tests.TestCase):
     def setUp(self):
         self.json_values = [[1, 2], [3, 4], [5, 6], [7, 8]]
 
     def test_json_load(self, *args):
-        """Test that the default arguments load a json file."""
+        """Test that a json file is loaded."""
 
         with mock.patch("ants.cli.ancil_create_shapefile.json.load") as mock_json:
-            _ = _load_polygon_from_json("json/path", None, None)
+            _ = _load_points_from_json("json/path")
 
         mock_json.assert_called_once()
-
-    @mock.patch("ants.cli.ancil_create_shapefile.json.load")
-    def test_transform_not_called(self, mock_json, *args):
-        """Test that transformation is not performed if target_lsm
-        is not passed."""
-
-        mock_json.return_value = self.json_values
-
-        with mock.patch(
-            "ants.cli.ancil_create_shapefile._transform_if_required"
-        ) as mock_transform_if:
-            _ = _load_polygon_from_json("json/path", None, None)
-
-        mock_transform_if.assert_not_called()
-
-    @mock.patch("ants.cli.ancil_create_shapefile.json.load")
-    def test_transform_called(self, mock_json, *args):
-        """Test that transformation is called if target_lsm_path is passed."""
-
-        mock_json.return_value = self.json_values
-
-        with mock.patch(
-            "ants.cli.ancil_create_shapefile._transform_if_required"
-        ) as mock_transform_if:
-            _ = _load_polygon_from_json("json/path", "lsm/path", None)
-
-        mock_transform_if.assert_called_once()
-
-    @mock.patch("ants.cli.ancil_create_shapefile.json.load")
-    def test_transform_called_with_source(self, mock_json, *args):
-        """Test that transformation is called if target_lsm_path and source_cube_path
-        are passed."""
-
-        mock_json.return_value = self.json_values
-
-        with mock.patch(
-            "ants.cli.ancil_create_shapefile._transform_if_required"
-        ) as mock_transform_if:
-            _ = _load_polygon_from_json("json/path", "lsm/path", "source/path")
-
-        mock_transform_if.assert_called_once()

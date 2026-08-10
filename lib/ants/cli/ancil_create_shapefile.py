@@ -178,7 +178,7 @@ def _load_cubes(target_lsm_path, source_cube_path):
     return target_lsm, source_cube
 
 
-def _transform_if_required(target_lsm_path, source_cube_path, points):
+def _transform_if_required(target_lsm, source_cube, points):
     """
     Perform the transformation to a rotated pole if the coordinate system
     is valid.
@@ -189,11 +189,11 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
 
     Parameters
     ----------
-    target_lsm_path : str
-        File path to a land sea mask that provides the new rotated pole.
-    source_cube_path : str
-        File path to an iris cube specifying the coordinate system of the
-        input json file.
+    target_lsm : :class:`iris.cube.Cube`
+        The lsm cube specifying the rotated pole coordinate system.
+    source_cube : :class:`iris.cube.Cube`
+        An iris cube specifying the coordinate system of the input json
+        file.
     points : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of m longitude-latitude pairs.
 
@@ -202,8 +202,6 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
     : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
     """
-
-    target_lsm, source_cube = _load_cubes(target_lsm_path, source_cube_path)
 
     _check_coord_system_type(target_lsm)
 
@@ -215,40 +213,25 @@ def _transform_if_required(target_lsm_path, source_cube_path, points):
     return rotated_points
 
 
-def _load_polygon_from_json(json_file, target_lsm_path, source_cube_path):
+def _load_points_from_json(json_file):
     """
-    Load a json file containing a list of pairs of longitude-latitude points
-    to create a polygon from.
-
-    If a valid rotated pole is specifed in the target lsm, first transforms
-    the points from the source coordinate system to the rotated pole before
-    creating a polygon.
+    Load a json file containing a list of pairs of longitude-latitude points.
 
     Parameters
     ----------
     json_file : str
-        Path to json file
-    target_lsm_path : str
-        File path to a land sea mask that provides the new rotated pole.
-    source_cube_path : str
-        File path to an iris cube specifying the coordinate system of the
-        input json file.
+        Path to json file.
 
     Returns
     -------
-    : :class:`~shapely.geometry.Polygon`
+    : :class:`numpy.ndarray`
     """
 
     with open(json_file, "r") as polygon_json:
         points = json.load(polygon_json)
     points = np.array(points)
 
-    if target_lsm_path is not None:
-        points = _transform_if_required(target_lsm_path, source_cube_path, points)
-
-    polygon = Polygon(points)
-
-    return polygon
+    return points
 
 
 def main(json_file, output, target_lsm_path, source_cube_path):
@@ -259,7 +242,7 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     points to create a polygon from. That polygon is then used to create a
     shape file that is saved to the specified output location.
 
-    If target_lsm_path is provided, the points are first transformed from an
+    If target_lsm_path is provided, the points are first transformed from a
     source geodetic coordinate system to a rotated pole coordinate system
     specified by the lsm. It is assumed that the points in the json
     file are on an unrotated geodetic grid, unless otherwise specified.
@@ -278,8 +261,13 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     """
 
     # Load a json and make a polygon
-    polygon = _load_polygon_from_json(json_file, target_lsm_path, source_cube_path)
+    points = _load_points_from_json(json_file)
 
+    if target_lsm_path is not None:
+        target_lsm, source_cube = _load_cubes(target_lsm_path, source_cube_path)
+        points = _transform_if_required(target_lsm, source_cube, points)
+
+    polygon = Polygon(points)
     # Now convert it to a shapefile with OGR
     driver = ogr.GetDriverByName("Esri Shapefile")
     datasource = driver.CreateDataSource(output)
