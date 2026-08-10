@@ -111,8 +111,9 @@ def _transform_coordinates(target_lsm, source_cube, points):
     """
     Transform the longitude-latitude points to the rotated pole.
 
-    The source coordinate system is assumed to be unrotated geodetic defined
-    on a sphere, unless otherwise specified.
+    If the distance between transformed longitude points exceeds 180.0,
+    it is assumed these points cross the antimeridian. The points are
+    changed so they are instead defined in the interval [0.0, 360.0].
 
     Parameters
     ----------
@@ -138,8 +139,15 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
+    closed_longitudes = np.vstack([points, points[0, :]])
+    long_diff = np.abs(closed_longitudes[:-1, 0] - closed_longitudes[1:, 0])
+
+    if np.any(long_diff > 180.0):
+        neg_indices = np.where(points[:, 0] < 0)
+        points[neg_indices, 0] += 360.0
+
     _LOGGER.info(
-        "Input json file transformed to new pole rotated coordinate system at"
+        "Input json file transformed to new pole rotated coordinate system at "
         "pole longitude=%s, pole latitude=%s, central rotated longitude=%s.",
         target_coord.grid_north_pole_longitude,
         target_coord.grid_north_pole_latitude,
