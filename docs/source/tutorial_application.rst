@@ -94,7 +94,7 @@ it contains the following:
     import ants
     import ants.regrid
     import iris
-    from ants import load_cube
+    from ants.io.load import load_cube
     from ants.io.save import ancil, netcdf
 
 
@@ -233,9 +233,9 @@ we are only loading specific fields (as opposed to whatever is in there). To do
 this we make use of Iris constraints. Here we want to specifically load the
 surface altitude fields.
 
-Run your application as: ``python ancil_tutorial.py /path/to/sample_source.nc --target-grid /path/to/sample_target.nc -o output.nc``
+Run your application as: ``python ancil_tutorial.py /path/to/sample_source.nc --target-grid /path/to/sample_target.nc -o output``
 and you should see details of the loaded iris cubes printed to screen. N.B. we
-have had to supply the ``-o output.nc`` option as the interface requires it,
+have had to supply the ``-o output`` option as the interface requires it,
 even though we have not yet implemented code to save the file itself.
 
 Add Regridding
