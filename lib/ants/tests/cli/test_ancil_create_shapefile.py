@@ -138,7 +138,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
 
         points = np.array([[0.0, 45.0, 90.0, 135.0], [0.0, 0.0, 0.0, 0.0]]).T
         true_lats = np.array([0.0, 0.0, np.nan, 0.0])
-        true_lons = np.array([90.0, 135.0, -180.0, -135.0])
+        true_lons = np.array([90.0, 135.0, 180.0, 225.0])
         expected_rotation = np.array([true_lons, true_lats]).T
 
         check_mask = ~np.isnan(expected_rotation)

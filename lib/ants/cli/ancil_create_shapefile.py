@@ -86,18 +86,17 @@ def _validate_orientation(target_lsm):
     grid_lat = target_crs.grid_north_pole_latitude
     pole_lon_rotation = target_crs.north_pole_grid_longitude
 
-    valid_crs = not (
-        ants.utils.ndarray.allclose(
-            [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
-        )
+    invalid_crs = ants.utils.ndarray.allclose(
+        [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
     )
-    if not valid_crs:
+
+    if invalid_crs:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
             f"at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
             "No transformation will be carried out."
         )
-    return valid_crs
+    return not invalid_crs
 
 
 def _validate_args(target_lsm_path, source_cube_path):
