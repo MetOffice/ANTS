@@ -139,12 +139,12 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
-    closed_longitudes = np.vstack([points, points[0, :]])
+    closed_longitudes = np.vstack([rotated_points, rotated_points[0, :]])
     long_diff = np.abs(closed_longitudes[:-1, 0] - closed_longitudes[1:, 0])
 
     if np.any(long_diff > 180.0):
-        neg_indices = np.where(points[:, 0] < 0)
-        points[neg_indices, 0] += 360.0
+        neg_indices = np.where(rotated_points[:, 0] < 0)
+        rotated_points[neg_indices, 0] += 360.0
 
     _LOGGER.info(
         "Input json file transformed to new pole rotated coordinate system at "
