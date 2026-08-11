@@ -139,10 +139,10 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
-    closed_longitudes = np.vstack([rotated_points, rotated_points[0, :]])
-    long_diff = np.abs(closed_longitudes[:-1, 0] - closed_longitudes[1:, 0])
+    closed_lon = np.vstack([rotated_points, rotated_points[0, :]])
+    lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
 
-    if np.any(long_diff > 180.0):
+    if np.any(lon_diff > 180.0):
         neg_indices = np.where(rotated_points[:, 0] < 0)
         rotated_points[neg_indices, 0] += 360.0
 
