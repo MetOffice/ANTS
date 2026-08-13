@@ -12,6 +12,7 @@ import iris
 import numpy as np
 from ants.cli.ancil_create_shapefile import (
     _check_coord_system_type,
+    _check_polygon_validity,
     _load_cubes,
     _load_points_from_json,
     _transform_coordinates,
@@ -21,6 +22,7 @@ from ants.cli.ancil_create_shapefile import (
 )
 from ants.tests.stock import geodetic
 from ants.utils.cube import CubeBuilder
+from shapely.geometry import Polygon
 
 
 class Test__check_coord_system_type(ants.tests.TestCase):
@@ -39,6 +41,36 @@ class Test__check_coord_system_type(ants.tests.TestCase):
 
         with self.assertRaisesRegex(ValueError, error_msg):
             _check_coord_system_type(target_lsm)
+
+
+class Test__check_polygon_validity(ants.tests.TestCase):
+    def test_invalid_polygon(self):
+        """Test that an invalid polygon with intersecting boundaries
+        raises an error."""
+
+        self.invalid_points = np.array([[1, 1], [-1, -1], [1, -1], [-1, 1]])
+        self.invalid_poly = Polygon(self.invalid_points)
+        self.is_ccw = False
+
+        error_msg = "Polygon is invalid: "
+
+        with self.assertRaisesRegex(ValueError, error_msg):
+            _check_polygon_validity(self.invalid_poly, self.is_ccw)
+
+    def test_changed_orientation(self):
+        """Test that a change in polygon orientation raises an error."""
+
+        self.ccw_points = np.array([[1, 1], [-1, 1], [-1, -1], [1, -1]])
+        self.cw_poly = Polygon(self.ccw_points)
+        self.is_ccw = False
+
+        error_msg = (
+            "Polygon orientation has changed. Expected is_ccw=False, "
+            "current polygon has is_ccw=True."
+        )
+
+        with self.assertRaisesRegex(ValueError, error_msg):
+            _check_polygon_validity(self.cw_poly, self.is_ccw)
 
 
 class Test__validate_orientation(ants.tests.TestCase):
@@ -61,8 +93,8 @@ class Test__validate_orientation(ants.tests.TestCase):
         )
         self.warning_msg = (
             "target_lsm has a geodetic coordinate system with pole located"
-            "at grid_longitude=0.0, grid_latitude=90.0."
-            "No transformation will be carried out."
+            " at grid_longitude=0.0, grid_latitude=90.0."
+            " No transformation will be carried out."
         )
 
     def test_warning_raised(self):

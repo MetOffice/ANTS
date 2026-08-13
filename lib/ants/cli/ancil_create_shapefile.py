@@ -28,6 +28,7 @@ from ants.io.load import load_cube, load_landsea_mask
 from ants.utils.cube import CubeBuilder
 from osgeo import ogr
 from shapely.geometry import Polygon
+from shapely.validation import explain_validity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,6 +57,34 @@ def _check_coord_system_type(target_lsm):
             f" an instance of {iris.coord_systems.RotatedGeogCS}."
             f" The landsea mask should specify a valid rotated pole coordinate"
             f" system."
+        )
+
+
+def _check_polygon_validity(polygon, ccw_expected):
+    """
+    Check if polygon is valid and has the expected orientation.
+
+    Parameters
+    ----------
+    polygon : :class:`~shapely.geometry.Polygon`
+        The polygon made from the input json file.
+    ccw_expected : bool
+        Expected polygon orientation before rotation.
+
+    Raises
+    ------
+    ValueError :
+        If the polygon is invalid (for example intersecting edges).
+    ValueError :
+        If the polygon has a different orientation after rotation.
+    """
+
+    if not polygon.is_valid:
+        raise ValueError(f"Polygon is invalid: {explain_validity(polygon)}")
+    if polygon.exterior.is_ccw != ccw_expected:
+        raise ValueError(
+            f"Polygon orientation has changed. Expected is_ccw={ccw_expected}, "
+            f"current polygon has is_ccw={polygon.exterior.is_ccw}."
         )
 
 
@@ -93,8 +122,8 @@ def _validate_orientation(target_lsm):
     if invalid_crs:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
-            f"at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
-            "No transformation will be carried out."
+            f" at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
+            " No transformation will be carried out."
         )
     return not invalid_crs
 
@@ -269,12 +298,16 @@ def main(json_file, output, target_lsm_path, source_cube_path):
 
     # Load a json and make a polygon
     points = _load_points_from_json(json_file)
+    ccw_expected = Polygon(points).exterior.is_ccw
 
     if target_lsm_path is not None:
         target_lsm, source_cube = _load_cubes(target_lsm_path, source_cube_path)
         points = _transform_if_required(target_lsm, source_cube, points)
 
     polygon = Polygon(points)
+
+    _check_polygon_validity(polygon, ccw_expected)
+
     # Now convert it to a shapefile with OGR
     driver = ogr.GetDriverByName("Esri Shapefile")
     datasource = driver.CreateDataSource(output)
@@ -316,7 +349,7 @@ def _get_parser():
         "--source-cube",
         type=ants.config.filepath_readable,
         required=False,
-        help="Path to an iris cube which specifies the co-ordinate"
+        help="Path to an iris cube which specifies the coordinate"
         " system of the json file.",
     )
     return parser
