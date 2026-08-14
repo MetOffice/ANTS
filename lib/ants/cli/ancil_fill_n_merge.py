@@ -189,7 +189,7 @@ def main(
 
 
 def _get_parser():
-    parser = ants.AntsArgParser(time_constraints=True)
+    parser = ants.AntsArgParser(time_constraints=True, search_method=True)
     lsm_help = (
         "Path to the land sea mask.  If not supplied, the missing "
         "neighbour search considers all points valid to choose "

@@ -158,7 +158,10 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(
-        target_lsm=True, target_grid=True, time_constraints=True
+        target_lsm=True,
+        target_grid=True,
+        time_constraints=True,
+        search_method=True,
     )
     invmask_help = (
         "Invert the provided target_mask or not.\n"
