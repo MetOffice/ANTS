@@ -61,7 +61,7 @@ class Test__check_polygon_validity(ants.tests.TestCase):
         """Test that a change in polygon orientation raises an error."""
 
         self.ccw_points = np.array([[1, 1], [-1, 1], [-1, -1], [1, -1]])
-        self.cw_poly = Polygon(self.ccw_points)
+        self.ccw_poly = Polygon(self.ccw_points)
         self.is_ccw = False
 
         error_msg = (
@@ -70,7 +70,7 @@ class Test__check_polygon_validity(ants.tests.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, error_msg):
-            _check_polygon_validity(self.cw_poly, self.is_ccw)
+            _check_polygon_validity(self.ccw_poly, self.is_ccw)
 
 
 class Test__validate_orientation(ants.tests.TestCase):
