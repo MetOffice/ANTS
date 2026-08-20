@@ -16,7 +16,7 @@ class TestAll(ants.tests.TestCase):
         target.units = mock.sentinel.units
         target.attributes["grid_staggering"] = mock.sentinel.grid_staggering
         inherit_metadata(source, target)
-        # source.rename.assert_called_once_with(mock.sentinel.name)
+        source.rename.assert_called_once_with(mock.sentinel.name)
         self.assertIs(source.units, target.units)
         self.assertIs(
             source.attributes["grid_staggering"], target.attributes["grid_staggering"]

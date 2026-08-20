@@ -311,7 +311,6 @@ def load_cubes(filenames, callback=None):
         dataset = gdal.Open(fname, GA_ReadOnly)
         if dataset is None:
             raise IOError("gdal failed to open raster image")
-        print("boop")
 
         # Get metadata applies to all raster bands
         transform = dataset.GetGeoTransform()
@@ -356,8 +355,6 @@ def load_cubes(filenames, callback=None):
             proxy = _GdalDataProxy(
                 num_xy, dtype, fname, iraster, iband.GetNoDataValue()
             )
-            print("bop")
-            print(proxy)
             data = as_lazy_data(proxy)
             cube = iris.cube.Cube(data)
             cube.add_dim_coord(x, 1)

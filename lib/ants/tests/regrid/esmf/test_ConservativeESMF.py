@@ -33,7 +33,6 @@ class Common1D(object):
                           -
 
         """
-        print("setup start")
         # We patch the cache filename to ensure there is no collision when
         # running these tests with multiprocessing (these tests use common
         # source-target pairs).
@@ -71,23 +70,19 @@ class Common1D(object):
         self.tgt = tgt_cube
 
         self.scheme = ConservativeESMF()
-        print("setup end")
 
 
 @ants.tests.skip_esmpy
 class Test_regridder_1D(Common1D, ants.tests.TestCase):
     def test_nochange(self):
         """Ensure no expensive calculation if it's not needed."""
-        print("one start")
         with mock.patch("esmpy.api.regrid.Regrid") as patch_esmpy_regrid:
             regridder = self.scheme.regridder(self.src, self.src)
             regridder(self.src)
         self.assertFalse(patch_esmpy_regrid.called)
-        print("one end")
 
     def test_grid_latitude_coordinate(self):
         """Check expected grid latitude."""
-        print("two start")
         expected = self.tgt.coord("grid_latitude")
 
         regridder = self.scheme.regridder(self.src, self.tgt)
@@ -95,11 +90,9 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         actual = result.coord("grid_latitude")
 
         self.assertEqual(actual, expected)
-        print("two end")
 
     def test_grid_longitude_coordinate(self):
         """Check expected grid longitude."""
-        print("three")
         expected = self.tgt.coord("grid_longitude")
 
         regridder = self.scheme.regridder(self.src, self.tgt)
@@ -110,7 +103,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
 
     def test_data(self):
         """Check data payload."""
-        print("four")
         source_areas = iris.analysis.cartography.area_weights(self.src)
         expected = self.src.collapsed(
             ["latitude", "longitude"], iris.analysis.MEAN, weights=source_areas
@@ -130,7 +122,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
     def test_alt_mapping(self):
         # Ensure that the ordering of the coordinates has no impact on the
         # results.
-        print("five")
         input_cube = self.src.copy()
         input_cube.rename("input_cube")
 
@@ -142,7 +133,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
             regridder(input_cube)
 
     def test_attributes_persisting(self):
-        print("six")
         # Certain atttributes from the source should persist to the target
         # cube.
         self.src.attributes = {"grid_staggering": 3, "valid_min": 0}
@@ -157,17 +147,11 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         # fixed where possible and also ANTS crs equivalence is utilised.
         #
         # src, tgt and input cube should call this.
-        print("seven")
         new_src = self.src.copy()
-        print("seven1")
         new_src.rename("new_source")
-        print("seven2")
         with mock.patch("ants.utils.cube.set_crs") as patch_set_crs:
-            print("seven2.1")
             regridder = self.scheme.regridder(self.src, self.tgt)
-            print("seven2.2")
             regridder(new_src)
-        print("seven3")
         mock.call(self.src) in patch_set_crs.call_args_list
         mock.call(self.tgt) in patch_set_crs.call_args_list
         mock.call(new_src) in patch_set_crs.call_args_list
@@ -181,7 +165,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         # values).  Instead this captures the behaviour that is coded
         # right now.  This current behaviour is that 'extrapolated points'
         # result in values of ~0.
-        print("eight")
         src_cube = ants.tests.stock.geodetic((4, 5), xlim=[0, 180])
         src_cube.data = src_cube.data + 10
         src_cube.data = src_cube.data.astype("float64")
@@ -192,7 +175,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         self.assertTrue((result.data == 0).sum() > 0)
 
     def test_masked_data(self):
-        print("nine")
         self.src.data = np.ma.array(self.src.data)
         self.src.data[0] = np.ma.masked
         tgt_cube = ants.tests.stock.geodetic((32, 32))
@@ -208,7 +190,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
     def test_result_dtype_always_64bit(self):
         # Ensure that the resulting dtype is independent of properties of
         # either source or target.
-        print("ten")
         self.src.data = self.src.data.astype("int32")
         coords = [
             self.src.coord(axis="x"),
@@ -230,7 +211,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         self.assertEqual(result.coord(axis="y").bounds.dtype, np.dtype("int32"))
 
     def broadcasting_check(self, coords, dims):
-        print("eleven")
         data = np.arange(20).reshape((4, 5))[None]
         data = np.repeat(data, 6, 0).reshape((2, 3, 4, 5))
         src_cube = ants.tests.stock.geodetic((2, 3, 4, 5), data=data)
@@ -258,7 +238,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         self.assertArrayAlmostEqual(result.data, target)
 
     def test_broadcasting_nd_aux_coords(self):
-        print("twelve")
         bing_coord = iris.coords.AuxCoord(
             np.arange(6).reshape((2, 3)), long_name="bing"
         )
@@ -268,14 +247,12 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         self.broadcasting_check([bing_coord, flop_coord], [(0, 1), (0, 1)])
 
     def test_broadcasting_nd_aux_coord(self):
-        print("thirteen")
         bing_coord = iris.coords.AuxCoord(
             np.arange(6).reshape((2, 3)), long_name="bing"
         )
         self.broadcasting_check([bing_coord], [(0, 1)])
 
     def test_broadcasting_1d_aux_coords(self):
-        print("fourteen")
         bing_coord = iris.coords.AuxCoord(np.arange(2), long_name="bing")
         flop_coord = iris.coords.AuxCoord(np.arange(3), long_name="flop")
         self.broadcasting_check([bing_coord, flop_coord], [(0,), (1,)])
@@ -283,7 +260,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
     def test_input_cube_different_to_source_cube(self):
         # Ensure that an exception is raised where the grid used to derive the
         # weights is not identical to the input provided for regridding.
-        print("fifteen")
         new_src = self.src.copy()
         new_src.rename("new_source")
         coord = new_src.coord(axis="x")
@@ -297,7 +273,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
             regridder(new_src)
 
     def test_src_cube_additional_coords(self):
-        print("sixteen")
         # Ensure we raise an exception in the case where the source cube has
         # additional coordinates mapped to the same dimensions as the
         # horizontal grid.
@@ -311,7 +286,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         # Ensure we raise an exception in the case where the input cube has
         # additional coordinates mapped to the same dimensions as the
         # horizontal grid.
-        print("seventeen")
         new_src = self.src.copy()
         msg = r"Additional coordinate\(s\) vary along the horizontal mapping."
         bing_coord = iris.coords.AuxCoord(np.arange(4), long_name="bing")
@@ -324,7 +298,6 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
 @ants.tests.skip_esmpy
 class Test_cache(Common1D, ants.tests.TestCase):
     def test_values(self):
-        print("eighteen")
         src = self.src
         tgt = self.tgt
         regridder = self.scheme.regridder(src, tgt)
@@ -348,7 +321,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
 
     def test_values_using_sparse_arrays(self):
         # Check usage with sparse arrays.
-        print("nineteen")
         src = self.src
         tgt = self.tgt
         regridder = self.scheme.regridder(src, tgt)
@@ -366,7 +338,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
         self.assertArrayAlmostEqual(result.data, target.data)
 
     def test_cache_cleanup(self):
-        print("twenty")
         regridder = self.scheme.regridder(self.src, self.tgt)
         cache_file = regridder._cache_fnme
         self.assertTrue(os.path.isfile(cache_file))
@@ -375,7 +346,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
 
     def test_cache_persistence(self):
         # Ensure that the file remains after getting rid of the regridder.
-        print("twenty one")
         regridder = self.scheme.regridder(self.src, self.tgt, persistent_cache=True)
         cache_file = regridder._cache_fnme
         self.assertTrue(os.path.isfile(cache_file))
@@ -386,7 +356,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
     def test_cache_persistence_regridder_usage(self):
         # Ensure that ESMF can successfully generate the same results when
         # utilising this cache to instantiate a regridder.
-        print("twenty two")
         regridder = self.scheme.regridder(self.src, self.tgt, persistent_cache=True)
         res1 = regridder(self.src)
         del regridder
@@ -397,7 +366,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
     def test_cache_persistance_regridder_readfromfile(self):
         # Ensure that we are requesting that ESMF read the cache from disk for
         # instantiating its regridder in the case of persistent cache usage.
-        print("twenty three")
         regridder = self.scheme.regridder(self.src, self.tgt, persistent_cache=True)
         with mock.patch("esmpy.api.regrid.RegridFromFile") as cache_regrid:
             del regridder
@@ -407,7 +375,6 @@ class Test_cache(Common1D, ants.tests.TestCase):
 
 class CommonND(object):
     def test_alt_mapping(self):
-        print("twenty four")
         input_cube = self.src.copy()
         input_cube.rename("input_cube")
 
@@ -422,7 +389,6 @@ class CommonND(object):
 @ants.tests.skip_esmpy
 class Test_regridder_1D_source_2D_target(CommonND, ants.tests.TestCase):
     def setUp(self):
-        print("twenty five - setup")
         self.src = ants.tests.stock.geodetic((2, 3))
 
         crs = iris.coord_systems.RotatedGeogCS(20, 10)
@@ -432,7 +398,6 @@ class Test_regridder_1D_source_2D_target(CommonND, ants.tests.TestCase):
 
     def test_latitude_coordinate(self):
         """Check expected latitude."""
-        print("twenty six")
         expected = self.tgt.coord("latitude")
 
         regridder = self.scheme.regridder(self.src, self.tgt)
@@ -443,7 +408,6 @@ class Test_regridder_1D_source_2D_target(CommonND, ants.tests.TestCase):
 
     def test_longitude_coordinate(self):
         """Check expected longitude."""
-        print("twenty seven")
         expected = self.tgt.coord("longitude")
 
         regridder = self.scheme.regridder(self.src, self.tgt)
@@ -454,7 +418,6 @@ class Test_regridder_1D_source_2D_target(CommonND, ants.tests.TestCase):
 
     def test_data(self):
         """Check data payload."""
-        print("twenty eight")
         expected = np.array(
             [
                 [1.43261933, 2.35197492, 1.07919774, 0.0],

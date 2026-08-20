@@ -66,9 +66,6 @@ def as_lazy_data(data, chunks=None, asarray=False):
     This is for ants core library usage ONLY!
 
     """
-    print("data:", data)
-    print("chunks: ", chunks)
-    print("asarray: ", asarray)
     meta = np.empty(data.shape, data.dtype)
     return iris._lazy_data.as_lazy_data(data, chunks=chunks, asarray=asarray, meta=meta)
 
