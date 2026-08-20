@@ -297,3 +297,70 @@ class Test__transform_if_required(ants.tests.TestCase):
         self.assertEqual(target_lsm, self.sphere_equator_target_lsm)
         self.assertEqual(source, self.sphere_source)
         self.assertArrayEqual(points, self.points)
+
+
+class Test_ite_transform(ants.tests.TestCase):
+
+    def test_uk_pole_rotation(self):
+        """
+        Test the unrotated polygon enclosing regions of valid data from ITE
+        expressed in true longitude and latitude is rotated correctly. The target
+        pole is lon=177.5, lat=37.5.
+
+        The points have been obtained by unrotating the coordinates in
+        $UMDIR/ancil/data/shapefiles/ite_ukv_polygon/runme.py
+        """
+        self.ite_points = np.array(
+            [
+                [1.63160953, 51.09703216],
+                [-0.29556461, 50.36332573],
+                [-5.37076475, 49.91322904],
+                [-6.01981579, 50.15822986],
+                [-5.16157337, 53.5014088],
+                [-3.80608343, 53.99550534],
+                [-4.04624456, 54.56480733],
+                [-5.10119435, 54.47567927],
+                [-5.95760936, 55.29939785],
+                [-6.998891, 55.85406809],
+                [-7.98467448, 56.73347598],
+                [-7.65168129, 58.36692001],
+                [-3.71924355, 61.09496898],
+                [0.11346329, 61.0768747],
+                [2.0703864, 52.72809453],
+                [1.7594481, 51.23560201],
+            ]
+        )
+
+        self.expected_rotated_points = np.array(
+            [
+                [362.594, -1.32876],
+                [361.407, -2.1152],
+                [358.15, -2.55],
+                [357.744, -2.28679],
+                [358.417, 1.03058],
+                [359.232, 1.50245],
+                [359.103, 2.07441],
+                [358.488, 2.00291],
+                [358.03, 2.84656],
+                [357.472, 3.43282],
+                [356.986, 4.34795],
+                [357.286, 5.96374],
+                [359.404, 8.6],
+                [361.278, 8.6],
+                [362.766, 0.315629],
+                [362.666, -1.18577],
+            ]
+        )
+        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
+        self.sphere_source = CubeBuilder(self.sphere_crs, (2, 2))._cube
+
+        target_lsm = geodetic(
+            (2, 2), north_pole_lat=37.5, north_pole_lon=177.5, crs=self.sphere_crs
+        )
+
+        points = _transform_if_required(target_lsm, self.sphere_source, self.ite_points)
+
+        # Adding 360.0 to compare to the expected points
+        points[:, 0] += 360.0
+
+        self.assertArrayAlmostEqual(points, self.expected_rotated_points)

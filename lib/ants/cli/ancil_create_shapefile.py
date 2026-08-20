@@ -11,7 +11,7 @@ Creates and saves a shapefile from a list of pairs of longitude, latitude
 points defining a single polygon in a specified polygon file.
 
 Rotated pole domains can be specified using the land sea mask argument,
-where the longitude, latitude pairs are rotated to the new pole.
+where the longitude, latitude pairs are transformed to the new pole.
 Unless a source cube is provided with the source coordinate reference system,
 it assumed that the points defined in the json file are on a standard spherical
 unrotated geodetic coordinate reference system.
