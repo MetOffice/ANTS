@@ -69,14 +69,14 @@ def _check_polygon_validity(polygon, ccw_expected):
     polygon : :class:`~shapely.geometry.Polygon`
         The polygon made from the input json file.
     ccw_expected : bool
-        Expected polygon orientation before rotation.
+        Expected polygon orientation before transformation.
 
     Raises
     ------
     ValueError :
         If the polygon is invalid (for example intersecting edges).
     ValueError :
-        If the polygon has a different orientation after rotation.
+        If the polygon has a different orientation after transformation.
     """
 
     if not polygon.is_valid:
@@ -128,26 +128,29 @@ def _validate_orientation(target_lsm):
     return not invalid_crs
 
 
-def _validate_args(target_lsm_path, source_cube_path):
-    if source_cube_path is not None and target_lsm_path is None:
-        raise ValueError(
-            "If --source-cube is passed then --target-lsm must also be given."
-        )
+def _validate_args(target_lsm_path, source_path):
+    if source_path is not None and target_lsm_path is None:
+        raise ValueError("If --source is passed then --target-lsm must also be given.")
 
 
-def _transform_coordinates(target_lsm, source_cube, points):
+def _transform_coordinates(target_lsm, source, points):
     """
     Transform the longitude-latitude points to the rotated pole.
 
-    If the distance between transformed longitude points exceeds 180.0,
-    it is assumed these points cross the antimeridian. The points are
-    changed so they are instead defined in the interval [0.0, 360.0].
+    If the transformation results in the points spanning the antimeridian, this
+    can cause incorrect polygons to be created because shapely does not wrap
+    between 180.0 and -180.0 degrees.
+
+    If the distance between sequential transformed longitude points exceeds
+    180.0 degrees, it is assumed these points cross the antimeridian. The points
+    are instead defined in the interval [0.0, 360.0] by adding 360.0 degrees
+    to the negative longitudes.
 
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
         The lsm cube specifying the rotated pole coordinate system.
-    source_cube : :class:`iris.cube.Cube`
+    source : :class:`iris.cube.Cube`
         An iris cube specifying the coordinate system of the input json
         file.
     points : :class:`numpy.ndarray`
@@ -159,7 +162,7 @@ def _transform_coordinates(target_lsm, source_cube, points):
         An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
     """
 
-    source_crs = source_cube.coord_system().as_cartopy_crs()
+    source_crs = source.coord_system().as_cartopy_crs()
     target_coord = target_lsm.coord_system()
     target_crs = target_coord.as_cartopy_crs()
 
@@ -167,10 +170,17 @@ def _transform_coordinates(target_lsm, source_cube, points):
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
 
+    # Create a wrapped array of longitudes and find the point-wise difference.
     closed_lon = np.vstack([rotated_points, rotated_points[0, :]])
     lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
 
+    # Add 360.0 degrees to negative longitudes if the points cross the antimeridian.
     if np.any(lon_diff > 180.0):
+        warnings.warn(
+            "The transformed points are assumed to cross the antimeridian. "
+            "The longitudinal points will instead be defined in the interval"
+            " [0, 360.0] degrees."
+        )
         neg_indices = np.where(rotated_points[:, 0] < 0)
         rotated_points[neg_indices, 0] += 360.0
 
@@ -185,7 +195,7 @@ def _transform_coordinates(target_lsm, source_cube, points):
     return rotated_points
 
 
-def _load_cubes(target_lsm_path, source_cube_path):
+def _load_cubes(target_lsm_path, source_path):
     """
     Load the target lsm and create a source cube if not provided.
 
@@ -193,8 +203,8 @@ def _load_cubes(target_lsm_path, source_cube_path):
     ----------
     target_lsm_path : str
         File path to a land sea mask that provides the new rotated pole.
-    source_cube_path : str
-        File path to an iris cube specifying the coordinate system of the
+    source_path : str
+        File path to a source file specifying the coordinate system of the
         input json file.
 
     Returns
@@ -205,16 +215,16 @@ def _load_cubes(target_lsm_path, source_cube_path):
 
     target_lsm = load_landsea_mask(target_lsm_path)
 
-    if source_cube_path is None:
+    if source_path is None:
         crs = iris.coord_systems.GeogCS(6371229.0)
-        source_cube = CubeBuilder(crs, (2, 2))._cube
+        source = CubeBuilder(crs, (2, 2))._cube
     else:
-        source_cube = load_cube(source_cube_path)
+        source = load_cube(source_path)
 
-    return target_lsm, source_cube
+    return target_lsm, source
 
 
-def _transform_if_required(target_lsm, source_cube, points):
+def _transform_if_required(target_lsm, source, points):
     """
     Perform the transformation to a rotated pole if the coordinate system
     is valid.
@@ -227,7 +237,7 @@ def _transform_if_required(target_lsm, source_cube, points):
     ----------
     target_lsm : :class:`iris.cube.Cube`
         The lsm cube specifying the rotated pole coordinate system.
-    source_cube : :class:`iris.cube.Cube`
+    source : :class:`iris.cube.Cube`
         An iris cube specifying the coordinate system of the input json
         file.
     points : :class:`numpy.ndarray`
@@ -242,7 +252,7 @@ def _transform_if_required(target_lsm, source_cube, points):
     _check_coord_system_type(target_lsm)
 
     if _validate_orientation(target_lsm):
-        rotated_points = _transform_coordinates(target_lsm, source_cube, points)
+        rotated_points = _transform_coordinates(target_lsm, source, points)
     else:
         rotated_points = np.copy(points)
 
@@ -270,7 +280,7 @@ def _load_points_from_json(json_file):
     return points
 
 
-def main(json_file, output, target_lsm_path, source_cube_path):
+def main(json_file, output, target_lsm_path, source_path):
     """
     Create a shape file from pairs of longitude, latitude points.
 
@@ -280,8 +290,8 @@ def main(json_file, output, target_lsm_path, source_cube_path):
 
     If target_lsm_path is provided, the points are first transformed from a
     source geodetic coordinate system to a rotated pole coordinate system
-    specified by the lsm. It is assumed that the points in the json
-    file are on an unrotated geodetic grid, unless otherwise specified.
+    specified by the lsm. It is assumed that the points in the json file
+    are on an unrotated spherical geodetic grid, unless otherwise specified.
 
     Parameters
     ----------
@@ -291,8 +301,8 @@ def main(json_file, output, target_lsm_path, source_cube_path):
         Location to store generated shape file
     target_lsm_path : str
         File path to a land sea mask that provides the new rotated pole.
-    source_cube_path : str
-        File path to an iris cube specifying the coordinate system of the
+    source_path : str
+        File path to a source file specifying the coordinate system of the
         input json file.
     """
 
@@ -301,8 +311,8 @@ def main(json_file, output, target_lsm_path, source_cube_path):
     ccw_expected = Polygon(points).exterior.is_ccw
 
     if target_lsm_path is not None:
-        target_lsm, source_cube = _load_cubes(target_lsm_path, source_cube_path)
-        points = _transform_if_required(target_lsm, source_cube, points)
+        target_lsm, source = _load_cubes(target_lsm_path, source_path)
+        points = _transform_if_required(target_lsm, source, points)
 
     polygon = Polygon(points)
 
@@ -346,11 +356,10 @@ def _get_parser():
         " coordinate system.",
     )
     parser.add_argument(
-        "--source-cube",
+        "--source",
         type=ants.config.filepath_readable,
         required=False,
-        help="Path to an iris cube which specifies the coordinate"
-        " system of the json file.",
+        help="Path to a source containing the coordinate system of the json file.",
     )
     return parser
 
@@ -359,8 +368,8 @@ def cli_interface():
     parser = _get_parser()
     args = parser.parse_args()
 
-    _validate_args(args.target_lsm, args.source_cube)
-    main(args.json_file, args.output, args.target_lsm, args.source_cube)
+    _validate_args(args.target_lsm, args.source)
+    main(args.json_file, args.output, args.target_lsm, args.source)
 
 
 if __name__ == "__main__":
