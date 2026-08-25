@@ -160,12 +160,20 @@ def _transform_coordinates(target_lsm, source, points):
     -------
     : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
+    Warns
+    -----
+    UserWarning
+        If the transformed points are assumed to cross the antimeridian.
+    UserWarning
+        If the transformed polygon lies at least partially outside of the
+        domain specified in the target lsm.
     """
 
     source_crs = source.coord_system().as_cartopy_crs()
     target_coord = target_lsm.coord_system()
     target_crs = target_coord.as_cartopy_crs()
 
+    # We only return longitude and latitude and discard the z coordinate.
     rotated_points = target_crs.transform_points(
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
@@ -183,6 +191,22 @@ def _transform_coordinates(target_lsm, source, points):
         )
         neg_indices = np.where(rotated_points[:, 0] < 0)
         rotated_points[neg_indices, 0] += 360.0
+
+    # Find the bounds of the target lsm.
+    bounds_lon = target_lsm.coord(axis="X").bounds
+    bounds_lat = target_lsm.coord(axis="Y").bounds
+    min_lon, max_lon = bounds_lon.min(), bounds_lon.max()
+    min_lat, max_lat = bounds_lat.min(), bounds_lat.max()
+    lons, lats = rotated_points[:, 0], rotated_points[:, 1]
+
+    # Check if the polygon lies in the domain specified by the target lsm.
+    if (
+        lons.min() < min_lon
+        or lons.max() > max_lon
+        or lats.min() < min_lat
+        or lats.max() > max_lat
+    ):
+        warnings.warn("The transformed points lie outside the target lsm domain.")
 
     _LOGGER.info(
         "Input json file transformed to new pole rotated coordinate system at "
