@@ -19,12 +19,13 @@ unrotated geodetic coordinate reference system.
 import argparse
 import json
 import logging
+import os
 import warnings
 
 import ants
 import iris.coord_systems
 import numpy as np
-from ants.io.load import load_cube, load_landsea_mask
+from ants.io.load import load_cube
 from ants.utils.cube import CubeBuilder
 from osgeo import ogr
 from shapely.geometry import Polygon
@@ -237,7 +238,7 @@ def _load_cubes(target_lsm_path, source_path):
         A tuple containing the target lsm and the source cube respectively.
     """
 
-    target_lsm = load_landsea_mask(target_lsm_path)
+    target_lsm = load_cube(target_lsm_path)
 
     if source_path is None:
         crs = iris.coord_systems.GeogCS(6371229.0)
@@ -281,6 +282,32 @@ def _transform_if_required(target_lsm, source, points):
         rotated_points = np.copy(points)
 
     return rotated_points
+
+
+def _save_json(output, target_lsm_path, source_path, target_lsm, source):
+    """
+    Save a json file containing metadata about the target lsm and source.
+    """
+
+    parent_path = os.path.dirname(output)
+    target_coord = target_lsm.coord_system()
+    target_proj_params = target_coord.as_cartopy_crs().proj4_params
+    source_proj_params = source.coord_system().as_cartopy_crs().proj4_params
+
+    prj_metadata = {
+        "target_lsm": {
+            "target_lsm_path": target_lsm_path,
+            "proj4_params": target_proj_params,
+            "grid_north_pole_longitude": target_coord.grid_north_pole_longitude,
+            "grid_north_pole_latitude": target_coord.grid_north_pole_latitude,
+            "north_pole_grid_longitude": target_coord.north_pole_grid_longitude,
+        },
+        "source": {"source_path": source_path, "proj4_params": source_proj_params},
+    }
+    json_name = "prj_metadata"
+
+    with open(os.path.join(parent_path, json_name + ".json"), "w") as json_file:
+        json.dump(prj_metadata, json_file, indent=4)
 
 
 def _load_points_from_json(json_file):
@@ -337,6 +364,7 @@ def main(json_file, output, target_lsm_path, source_path):
     if target_lsm_path is not None:
         target_lsm, source = _load_cubes(target_lsm_path, source_path)
         points = _transform_if_required(target_lsm, source, points)
+        _save_json(output, target_lsm_path, source_path, target_lsm, source)
 
     polygon = Polygon(points)
 

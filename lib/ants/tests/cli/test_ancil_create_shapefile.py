@@ -244,14 +244,12 @@ class Test__load_cubes(ants.tests.TestCase):
     def test_load_lsm_called(self):
         """Test that loading the landsea mask is successfully called."""
 
-        with mock.patch(
-            "ants.cli.ancil_create_shapefile.load_landsea_mask"
-        ) as mock_lsm:
+        with mock.patch("ants.cli.ancil_create_shapefile.load_cube") as mock_load:
             _ = _load_cubes("target/path", None)
 
-        mock_lsm.assert_called_once_with("target/path")
+        mock_load.assert_called_once_with("target/path")
 
-    @mock.patch("ants.cli.ancil_create_shapefile.load_landsea_mask")
+    @mock.patch("ants.cli.ancil_create_shapefile.load_cube")
     def test_cubebuilder_called(self, *args):
         """Test source cube created if no path given."""
 
@@ -262,14 +260,13 @@ class Test__load_cubes(ants.tests.TestCase):
 
         mock_build_cube.assert_called_once()
 
-    @mock.patch("ants.cli.ancil_create_shapefile.load_landsea_mask")
     def test_load_cube_called(self, *args):
         """Test load cube called if source path given."""
 
-        with mock.patch("ants.cli.ancil_create_shapefile.load_cube") as mock_load_cube:
+        with mock.patch("ants.cli.ancil_create_shapefile.load_cube") as mock_load:
             _ = _load_cubes("target/path", "source/cube")
 
-        mock_load_cube.assert_called_once()
+        self.assertEqual(2, mock_load.call_count)
 
 
 class Test__transform_if_required(ants.tests.TestCase):
