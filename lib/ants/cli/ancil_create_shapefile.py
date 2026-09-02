@@ -290,21 +290,29 @@ def _save_json(output, target_lsm_path, source_path, target_lsm, source):
     """
 
     parent_path = os.path.dirname(output)
-    target_coord = target_lsm.coord_system()
-    target_proj_params = target_coord.as_cartopy_crs().proj4_params
-    source_proj_params = source.coord_system().as_cartopy_crs().proj4_params
+    filename = os.path.splitext(os.path.basename(output))[0]
+
+    target_crs = target_lsm.coord_system()
+    target_proj_params = target_crs.as_cartopy_crs().proj4_params
+    source_crs = source.coord_system()
+    source_proj_params = source_crs.as_cartopy_crs().proj4_params
 
     prj_metadata = {
         "target_lsm": {
             "target_lsm_path": target_lsm_path,
+            "coord_system": type(target_crs).__name__,
+            "grid_north_pole_longitude": target_crs.grid_north_pole_longitude,
+            "grid_north_pole_latitude": target_crs.grid_north_pole_latitude,
+            "north_pole_grid_longitude": target_crs.north_pole_grid_longitude,
             "proj4_params": target_proj_params,
-            "grid_north_pole_longitude": target_coord.grid_north_pole_longitude,
-            "grid_north_pole_latitude": target_coord.grid_north_pole_latitude,
-            "north_pole_grid_longitude": target_coord.north_pole_grid_longitude,
         },
-        "source": {"source_path": source_path, "proj4_params": source_proj_params},
+        "source": {
+            "source_path": source_path,
+            "coord_system": type(source_crs).__name__,
+            "proj4_params": source_proj_params,
+        },
     }
-    json_name = "prj_metadata"
+    json_name = filename + "_prj"
 
     with open(os.path.join(parent_path, json_name + ".json"), "w") as json_file:
         json.dump(prj_metadata, json_file, indent=4)
@@ -361,13 +369,13 @@ def main(json_file, output, target_lsm_path, source_path):
     points = _load_points_from_json(json_file)
     ccw_expected = Polygon(points).exterior.is_ccw
 
+    # Transform points to a rotated pole if required
     if target_lsm_path is not None:
         target_lsm, source = _load_cubes(target_lsm_path, source_path)
         points = _transform_if_required(target_lsm, source, points)
         _save_json(output, target_lsm_path, source_path, target_lsm, source)
 
     polygon = Polygon(points)
-
     _check_polygon_validity(polygon, ccw_expected)
 
     # Now convert it to a shapefile with OGR
@@ -411,7 +419,7 @@ def _get_parser():
         "--source",
         type=ants.config.filepath_readable,
         required=False,
-        help="Path to a source containing the coordinate system of the json file.",
+        help="Path to a source specifying the coordinate system of the json file.",
     )
     return parser
 

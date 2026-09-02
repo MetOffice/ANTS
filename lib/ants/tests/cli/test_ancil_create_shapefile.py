@@ -191,7 +191,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         lies inside the target domain."""
 
         crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 0.0, 170.0, ellipsoid=self.sphere_crs
+            90.0, 10.0, 180.0, ellipsoid=self.sphere_crs
         )
         target_lsm = CubeBuilder(crs, (2, 2), xlim=(-25.0, 5.0), ylim=(-12, 12))._cube
         expected_points = np.array([[0, 10], [0, -10], [-20, -10.0], [-20, 10]])
@@ -207,7 +207,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         lies at least partially outside of the valid target domain."""
 
         crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 0.0, 170.0, ellipsoid=self.sphere_crs
+            90.0, 10.0, 180.0, ellipsoid=self.sphere_crs
         )
         target_lsm = CubeBuilder(crs, (2, 2), xlim=(-10.0, 5.0), ylim=(-12, 12))._cube
         expected_points = np.array([[0, 10], [0, -10], [-20, -10.0], [-20, 10]])
@@ -271,7 +271,7 @@ class Test__load_cubes(ants.tests.TestCase):
 
 class Test__transform_if_required(ants.tests.TestCase):
     def setUp(self):
-        self.points = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+        self.points = np.array([[10, 10], [10, -10], [-10, -10], [-10, 10]])
         self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
         self.sphere_source = CubeBuilder(self.sphere_crs, (2, 2))._cube
 
@@ -313,15 +313,24 @@ class Test_ite_transform(ants.tests.TestCase):
 
     def test_uk_pole_rotation(self):
         """
-        The following test uses points which create a validity polygon
-        over the UK. The input points describe the points in an unrotated
-        geodetic coordinate system as an array of (lon, lat) pairs. The
-        points are then rotated to the target pole at lon=177.5, lat=37.5
+        The following test uses points that define a validity polygon over the UK.
 
-        The points have been obtained by unrotating the coordinates in
+        The input points are specified in an unrotated geodetic coordinate system
+        as (lon, lat) pairs. They are then rotated to a pole at lon=177.5,
+        lat=37.5. Note that PROJ applies an additional 180.0 degree rotation
+        to the specified pole location.
+
+        The points have been obtained by unrotating the coordinates under
         $UMDIR/ancil/data/shapefiles/ite_ukv_polygon/runme.py, which can
-        also be found as part of the ANTS rose-stem test suite in
+        also be found as part of the ANTS rose-stem test suite under
         /data/users/ants/sources/ANTS/developer/core/ancil_create_shapefile/
+
+        Notes
+        -----
+        The transformed points differ from the expected points by 360 degrees in
+        longitude. Cartopy treats these longitudes as equivalent, but operations
+        that perform Cartesian comparisons may not consider the resulting polygons
+        equivalent.
         """
 
         points = np.array(
@@ -372,6 +381,6 @@ class Test_ite_transform(ants.tests.TestCase):
 
         rotated_points = _transform_if_required(target_lsm, source, points)
 
-        # Adding 360.0 to longitude to compare to the expected points
+        # Adding 360.0 to longitude to compare to the expected points.
         rotated_points[:, 0] += 360.0
         self.assertArrayAlmostEqual(rotated_points, expected_points)
