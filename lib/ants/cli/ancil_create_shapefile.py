@@ -65,6 +65,9 @@ def _check_polygon_validity(polygon, ccw_expected):
     """
     Check if polygon is valid and has the expected orientation.
 
+    A rotation should not change the orientation of the points. If the orientation
+    does change, it is a sign that the transformation has not behaved as expected.
+
     Parameters
     ----------
     polygon : :class:`~shapely.geometry.Polygon`
