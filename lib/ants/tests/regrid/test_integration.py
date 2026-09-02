@@ -18,11 +18,8 @@ class TestErrorMessages(ants.tests.TestCase):
         with self.assertRaises(AttributeError) as context:
             source.regrid(target, scheme)
 
-            self.assertTrue(
-                "At least one of horizontal \
-            or vertical re-grid schemes must be provided."
-                in context.exception
-            )
+            self.assertTrue("At least one of horizontal \
+            or vertical re-grid schemes must be provided." in context.exception)
 
 
 class TestInterpolation(ants.tests.TestCase):

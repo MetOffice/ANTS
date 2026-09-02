@@ -18,6 +18,7 @@ All tests that make use of the optional dependencies should be configured to be
 skipped if the import fails via the appropriate decorator @ants.tests.skip_<dependency>,
 e.g. @ants.tests.skip_mule.
 """  # noqa: E501
+
 import ants  # noqa: F401
 
 

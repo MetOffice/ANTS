@@ -9,6 +9,7 @@ All operations must be defined in global scope for them to be pickleable (i.e.
 suitable for multiprocessing or any parallelism framework).
 
 """
+
 import os
 import unittest.mock as mock
 

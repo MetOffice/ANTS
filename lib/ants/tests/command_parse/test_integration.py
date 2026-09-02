@@ -5,6 +5,7 @@
 """
 Stub doc for testing.
 """
+
 import argparse
 import unittest.mock as mock
 
