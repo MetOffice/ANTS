@@ -71,9 +71,10 @@ class _GdalDataProxy(object):
                 dtype = np.dtype("int32")
             elif (dtype.name) == "uint32":
                 dtype = np.dtype("int64")
-            else:
+            elif (dtype.name) == "uint64":
                 dtype = np.dtype("int128")
-
+            else:
+                raise TypeError(f"Cannot cast {dtype.name} from unsigned to signed int")
         self.dtype = dtype
         self.path = path
         self.raster_band_index = raster_band_index
