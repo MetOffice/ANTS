@@ -96,13 +96,27 @@ def transform_bbox(points, src_crs, tgt_crs):
     src_geom = sgeom.Polygon(points)
     tgt_geom = cartopy_tgt_crs.project_geometry(src_geom, cartopy_src_crs)
 
-    for item in tgt_geom.bounds:
+    bounds = tgt_geom.bounds
+    for item in bounds:
         if np.isnan(item):
             msg = (
                 "Attempting to project bounding box ({}) beyond the extent of "
                 "the target coordinate system limits ({})."
             )
             raise ValueError(msg.format(src_crs, tgt_crs))
+
+    # Check the bounds are invertible.
+    inversion = cartopy_src_crs.transform_points(
+        cartopy_tgt_crs,
+        np.array([bounds[0], bounds[2]]),
+        np.array([bounds[1], bounds[3]]),
+    )
+    if np.isnan(inversion).any():
+        msg = (
+            "The bounding box in the crs ({}) is not invertible"
+            " to the source crs ({})."
+        )
+        raise ValueError(msg.format(type(tgt_crs).__name__, type(src_crs).__name__))
 
     return tgt_geom
 
