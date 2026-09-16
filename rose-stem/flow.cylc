@@ -27,8 +27,8 @@
         install_cold => ancil_general_regrid_invert_mask_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
     "general_regrid_time_constrained": "install_cold => ancil_general_regrid_with_time_constraint<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_with_time_constraint_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
-    "vertical_regrid_zonal_mean": "install_cold => ancil_vertical_regrid_ozone_zonal_mean => rose_ana_vertical_regrid:fail? => plot_comparisons_general_regrid",
-    "vertical_regrid_3d": "install_cold => ancil_vertical_regrid_aerosol_3d => rose_ana_vertical_regrid:fail? => plot_comparisons_general_regrid",
+    "vertical_regrid_zonal_mean": "install_cold => ancil_vertical_regrid_ozone_zonal_mean => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
+    "vertical_regrid_3d": "install_cold => ancil_vertical_regrid_aerosol_3d => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
     "build_documentation_graph": "install_cold => build_docs => linkcheck",
     "unittests_graph": "install_cold => unittests",
     "black_graph": "install_cold => black",
@@ -362,3 +362,8 @@ fi
         inherit = PLOT_COMPARISONS
         [[[environment]]]
             TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_general_regrid_${CYLC_TASK_PARAM_fill}
+
+    [[plot_comparisons_vertical_regrid]]
+        inherit = PLOT_COMPARISONS
+        [[[environment]]]
+            TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_vertical_regrid
