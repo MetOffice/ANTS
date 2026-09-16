@@ -96,13 +96,12 @@ class TestAntsArgParser(ants.tests.TestCase):
         self.assertIs(args.ants_config, None)
 
     def test_missing_lbm(self):
+        """Tests that the system will exit if not given an lbm."""
         new = ["program", "/path/to/source", "-o", "/path/to/output"]
         with mock.patch("sys.argv", new=new):
-            with mock.patch("sys.exit") as sys_exit:
-                with mock.patch("sys.stderr"):
-                    parser = AntsArgParser(target_lsm=True)
-                    parser.parse_args()
-        sys_exit.assert_called_once_with(2)
+            with self.assertRaises(SystemExit):
+                parser = AntsArgParser(target_lsm=True)
+                parser.parse_args()
 
     def test_configuration_parse(self):
         config_path = "/path/to/config/file"
