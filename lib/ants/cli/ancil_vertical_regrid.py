@@ -136,7 +136,6 @@ def main(
             save.ancil(regridded_cubes, output_path)
         save.netcdf(regridded_cubes, output_path)
 
-    print(regridded_cubes)
     return regridded_cubes
 
 
