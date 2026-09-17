@@ -5,6 +5,8 @@
 
 .. include:: common.txt
 
+.. Created with assitance of MetOffice Enterprise Copilot
+
 Merging datasets and filling missing data
 ==========================================
 

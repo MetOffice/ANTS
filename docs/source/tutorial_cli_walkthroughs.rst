@@ -5,6 +5,8 @@
 
 .. include:: common.txt
 
+.. Created with assitance of MetOffice Enterprise Copilot
+
 Worked examples: the ANTS command line tools
 ================================================
 
