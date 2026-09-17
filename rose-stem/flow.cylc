@@ -290,7 +290,6 @@ fi
         [[[environment]]]
             ROSE_TASK_APP = rose_ana
             ROSE_APP_OPT_CONF_KEYS = vertical_regrid
-            ANTS_KGO_DIRECTORY_OVERRIDE = /data/users/jennifer.hickson/ants_vertical_cli/kgo
 
 
     {% endfor %}
