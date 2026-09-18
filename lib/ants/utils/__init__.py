@@ -108,8 +108,8 @@ def transform_bbox(points, src_crs, tgt_crs):
     # Check the bounds are invertible.
     inversion = cartopy_src_crs.transform_points(
         cartopy_tgt_crs,
-        np.array([bounds[0], bounds[2]]),
-        np.array([bounds[1], bounds[3]]),
+        np.array([bounds[0], bounds[2], bounds[2], bounds[0]]),
+        np.array([bounds[1], bounds[1], bounds[3], bounds[3]]),
     )
     if np.isnan(inversion).any():
         msg = (
