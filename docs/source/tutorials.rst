@@ -14,3 +14,4 @@ Tutorials
    tutorial_KGO.rst
    tutorial_sources.rst
    tutorial_rose_stem.rst
+   tutorial_metadata.rst
