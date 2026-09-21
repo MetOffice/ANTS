@@ -1,6 +1,6 @@
 .. meta::
    :description lang=en: Worked examples for the ANTS command line tools
-   :keywords: ancil_2anc, ancil_create_shapefile, ancil_fill_n_merge, ancil_general_regrid, tutorial
+   :keywords: ancil_2anc, ancil_create_shapefile, ancil_fill_n_merge, ancil_general_regrid, ancil_vertical_regrid, tutorial
    :property=og:locale: en_GB
 
 .. include:: common.txt
@@ -10,14 +10,14 @@
 Worked examples: the ANTS command line tools
 ================================================
 
-:doc:`core_capabilities` introduces the four general purpose command line
+:doc:`core_capabilities` introduces the five general purpose command line
 tools that ship with ANTS, and their individual pages (:doc:`ancil_2anc`,
 :doc:`ancil_create_shapefile`, :doc:`ancil_fill_n_merge`,
-:doc:`ancil_general_regrid`) document their full set of arguments. This
-tutorial instead walks through a realistic invocation of each tool, so you
-can see how they fit together in practice.
+:doc:`ancil_general_regrid`, :doc:`ancil_vertical_regrid`) document their full
+set of arguments. This tutorial instead walks through a realistic invocation
+of each tool, so you can see how they fit together in practice.
 
-All four tools share a common command line interface, provided by
+All five tools share a common command line interface, provided by
 :class:`ants.command_parse.AntsArgParser`:
 
 .. code-block::
@@ -100,10 +100,61 @@ To regrid directly onto a target land sea mask instead of a plain grid, use
 consistent with that mask using the same fill algorithms discussed in
 :doc:`tutorial_merge_fill`.
 
+ancil_vertical_regrid: regridding onto a new vertical level set
+------------------------------------------------------------------
+
+:doc:`ancil_vertical_regrid` is the vertical-only counterpart to
+``ancil_general_regrid``. Rather than moving data onto a new horizontal grid,
+it interpolates onto a new set of vertical levels (for example a target
+vertical namelist), and requires that the source and target already share
+the same horizontal (latitude/longitude) coordinates:
+
+.. code-block:: bash
+
+    ants-launch ancil_vertical_regrid.py aerosol_3d.nc \
+        --output aerosol_3d_L70 \
+        --target-grid vertlevs_L70_50t_20s_80km \
+        --ants-config rose-app-run.conf
+
+The vertical interpolation scheme is chosen via ``--ants-config`` rather than
+a command line flag, using the ``[ants_regridding_vertical]`` section, for
+example:
+
+.. code-block::
+
+    [ants_regridding_vertical]
+    scheme = Linear
+
+Where a source spans many years, ``--begin``/``--end`` can be used to
+restrict processing to a subset of that time range before regridding, for
+example when producing a zonal mean ozone ancillary from a multi-decade
+source:
+
+.. code-block:: bash
+
+    ants-launch ancil_vertical_regrid.py ozone_multi_decade.nc \
+        --output ozone_L85_1994-2005 \
+        --target-grid vertlevs_L70_50t_20s_80km \
+        --begin 1994 \
+        --end 2005 \
+        --ants-config rose-app-run.conf
+
+A ``--save-ukca`` flag is also available, which saves the result using
+:func:`ants.io.save.ukca_netcdf` instead of the usual ancillary/NetCDF pair.
+
+.. note::
+   ``ancil_vertical_regrid`` checks its target before regridding: if the
+   target is a UGrid mesh, it raises an error directing you to the
+   regrid-to-mesh application in UG-ANTS instead; if the target's
+   latitude/longitude coordinates do not match the source's, it raises an
+   error rather than silently regridding horizontally too. Use
+   :doc:`ancil_general_regrid` (see :doc:`tutorial_regridding`) when a
+   horizontal regrid is also needed.
+
 Decomposition configuration
 ------------------------------
 
-All four tools accept ``--ants-config`` to point at an ANTS configuration
+All five tools accept ``--ants-config`` to point at an ANTS configuration
 file. This is most commonly used to enable :doc:`decomposition` for large
 datasets, for example:
 
@@ -119,15 +170,20 @@ datasets, for example:
 Key Points
 ----------
 
- * All four command line tools share the same ``<sources> --output <output>
+ * All five command line tools share the same ``<sources> --output <output>
    [--ants-config <config>]`` interface via
    :class:`ants.command_parse.AntsArgParser`.
  * ``ancil_2anc`` is for fileformat translation, ``ancil_create_shapefile``
    produces validity polygons, ``ancil_fill_n_merge`` combines and fills
-   data, and ``ancil_general_regrid`` moves data onto a target grid.
+   data, ``ancil_general_regrid`` moves data onto a target horizontal grid,
+   and ``ancil_vertical_regrid`` moves data onto a target set of vertical
+   levels.
  * Prefer ``--search-method kdtree`` on ``ancil_fill_n_merge`` and
    ``ancil_general_regrid`` for consistency across UM and LFRic pipelines
    (see :doc:`tutorial_merge_fill`).
+ * ``ancil_vertical_regrid`` chooses its interpolation scheme via the
+   ``[ants_regridding_vertical]`` section of ``--ants-config``, not a command
+   line flag.
  * See the ``rose-stem/app/`` directory in the ANTS repository for complete,
    runnable configurations of each of these tools.
 
@@ -138,3 +194,4 @@ See Also
  * :doc:`tutorial_regridding`
  * :doc:`tutorial_merge_fill`
  * :doc:`core_capabilities`
+ * :doc:`ancil_vertical_regrid`

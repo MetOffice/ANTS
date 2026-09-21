@@ -121,6 +121,10 @@ Key Points
    inconsistencies.
  * For large datasets, combine regridding with
    :func:`ants.decomposition.decompose` (see :doc:`decomposition`).
+ * If you only need to regrid vertically (source and target already share
+   the same horizontal grid), the dedicated ``ancil_vertical_regrid`` command
+   line tool may be simpler than ``ancil_general_regrid`` - see
+   :doc:`tutorial_cli_walkthroughs`.
 
 See Also
 --------
