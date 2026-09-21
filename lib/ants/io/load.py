@@ -57,6 +57,7 @@ See Also
 """
 import copy
 import glob
+import inspect
 import warnings
 from contextlib import contextmanager
 from functools import wraps
@@ -211,7 +212,7 @@ def ants_format_agent():
         iris.fileformats.FORMAT_AGENT = original_format_agent
 
 
-def load_landsea_mask(filename, land_threshold=None):
+def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True):
     """
     Load a landsea mask from either a landsea mask file or a landfraction file.
 
@@ -223,6 +224,8 @@ def load_landsea_mask(filename, land_threshold=None):
         Threshold for converting the land fraction field into a landsea mask
         field.  0.5 would mean that any fraction greater than this will be
         masked.  This argument is used when loading a land fraction field.
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to True (off) by default.
 
     Returns
     -------
@@ -233,21 +236,23 @@ def load_landsea_mask(filename, land_threshold=None):
     try:
         # Is it a landsea mask field?
         lbm = ants.io.load.load_cube(
-            filename, "land_binary_mask", ignore_metadata_files=True
+            filename, "land_binary_mask", ignore_metadata_files
         )
         lbm = lbm.copy(lbm.data.astype("bool", copy=False))
     except iris.exceptions.ConstraintMismatchError:
         try:
             # Is it a land fraction field?
             land_fraction = ants.io.load.load_cube(
-                filename, "vegetation_area_fraction", ignore_metadata_files=True
+                filename, "vegetation_area_fraction", ignore_metadata_files
             )
             lbm = land_fraction.copy(land_fraction.data > land_threshold)
             lbm.rename("land_binary_mask")
         except iris.exceptions.ConstraintMismatchError:
             # It looks like we are wanting to extract a landsea mask from some
             # other field.
-            cube = ants.io.load.load(filename, ignore_metadata_files=True)[0]
+            cube = ants.io.load.load(
+                filename, ignore_metadata_files=ignore_metadata_files
+            )[0]
             y = cube.coord(axis="y")
             x = cube.coord(axis="x")
             cube = cube.slices((y, x)).next()
@@ -255,7 +260,7 @@ def load_landsea_mask(filename, land_threshold=None):
     return lbm
 
 
-def load_grid(filenames, *args, **kwargs):
+def load_grid(filenames, *args, ignore_metadata_files=False, **kwargs):
     """
     Load a grid definition and return an iris cube.
 
@@ -276,6 +281,8 @@ def load_grid(filenames, *args, **kwargs):
         definition.
     *args :
         See :func:`iris.load`
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load`
 
@@ -303,7 +310,9 @@ def load_grid(filenames, *args, **kwargs):
     # for variable resolution namelists - need both parts (regular and
     # variable namelists) in the namelist loader at the same time.
     if filenames:
-        cubes = load(filenames, *args, **kwargs)
+        cubes = load(
+            filenames, *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+        )
         if cubes:
             results.extend(cubes)
 
@@ -360,24 +369,39 @@ def _customised_load(func):
                 "iris.FUTURE.datum_support flag.",
                 FutureWarning,
             )
+            # Check if metadata functionality has been turned off.
             ignore_metadata_files = False
+            print(kwargs)
+            print(args)
             if "ignore_metadata_files" in kwargs:
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
+                print("ignore metadata files: ", ignore_metadata_files)
+            print(ignore_metadata_files)
             if not ignore_metadata_files:
-                # Do the handling for each way a user callback can be passed in through
-                # iris
-                user_callback = None
-                if len(args) == 3:
-                    user_callback = args[2]
+                # Get the inputs of the function.
+                sig = inspect.signature(func)
+                inputs = sig.bind(*args, **kwargs)
+                # Check if a constraint has been passed in so it can be preserved
+                if "constraints" in inputs.arguments.keys():
+                    constraints = inputs.arguments["constraints"]
                 else:
-                    if "callback" in kwargs:
-                        user_callback = kwargs.pop("callback")
-                args, kwargs = _add_callback(
-                    _CallbackMetadata(user_callback), *args, **kwargs
+                    constraints = None
+                # Add a user callback to the metadata callback if supplied.
+                if "callback" in inputs.arguments.keys():
+                    callback = _CallbackMetadata(inputs.arguments["callback"])
+                else:
+                    callback = _CallbackMetadata(None)
+                # Always pass in as positional to avoid constrint naming mismatch
+                updated_binding = sig.bind(
+                    inputs.arguments["uris"], constraints, callback
                 )
-            # Use context manager to avoid permanently modifying iris behaviour.
-            with ants_format_agent():
-                cubes = func(*args, **kwargs)
+                # Use context manager to avoid permanently modifying iris behaviour.
+                with ants_format_agent():
+                    cubes = func(*updated_binding.args, **updated_binding.kwargs)
+            else:
+                # Use context manager to avoid permanently modifying iris behaviour.
+                with ants_format_agent():
+                    cubes = func(*args, **kwargs)
         if cubes is not None:
             try:
                 ants.utils.cube.derive_circular_status(cubes)
@@ -388,28 +412,6 @@ def _customised_load(func):
         return cubes
 
     return load_function
-
-
-def _add_callback(callback, *args, **kwargs):
-    """
-    Adds both the ants callback and the user provided callback (if any) to the
-    load.
-
-    Parameters
-        ----------
-        callback: :class:`_CallbackMetadata`
-            An object that will contain the ants call back and an attribute
-            with the user callback if applicable.
-    """
-    args = list(args)
-    if len(args) == 1:
-        kwargs["callback"] = callback
-    elif len(args) == 2:
-        args.append(callback)
-    elif len(args) == 3:
-        args[2] = callback
-    args = tuple(args)
-    return args, kwargs
 
 
 class _CallbackMetadata(object):
@@ -489,7 +491,7 @@ class _CallbackMetadata(object):
                 cube.attributes[attribute_name] = metadata
 
 
-def load_cube(*args, **kwargs):
+def load_cube(*args, ignore_metadata_files=False, **kwargs):
     """
     Loads a single cube.
 
@@ -501,6 +503,8 @@ def load_cube(*args, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cube`
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_cube`
 
@@ -509,10 +513,12 @@ def load_cube(*args, **kwargs):
         A :class:`~iris.cube.Cube`.
     """
     loading_function = _customised_load(iris.load_cube)
-    return loading_function(*args, **kwargs)
+    return loading_function(
+        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+    )
 
 
-def load(*args, **kwargs):
+def load(*args, ignore_metadata_files=False, **kwargs):
     """
     Loads any number of Cubes for each constraint.
 
@@ -525,6 +531,8 @@ def load(*args, **kwargs):
     ----------
     *args :
         See :func:`iris.load`
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load`
 
@@ -533,10 +541,12 @@ def load(*args, **kwargs):
         A :class:`~iris.cube.CubeList`.
     """
     loading_function = _customised_load(iris.load)
-    return loading_function(*args, **kwargs)
+    return loading_function(
+        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+    )
 
 
-def load_cubes(*args, **kwargs):
+def load_cubes(*args, ignore_metadata_files=False, **kwargs):
     """
     Loads exactly one Cube for each constraint.
 
@@ -549,6 +559,8 @@ def load_cubes(*args, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cubes`
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_cubes`
 
@@ -558,10 +570,12 @@ def load_cubes(*args, **kwargs):
 
     """
     loading_function = _customised_load(iris.load_cubes)
-    return loading_function(*args, **kwargs)
+    return loading_function(
+        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+    )
 
 
-def load_raw(*args, **kwargs):
+def load_raw(*args, ignore_metadata_files=False, **kwargs):
     """
     Loads non-merged cubes.
 
@@ -574,6 +588,8 @@ def load_raw(*args, **kwargs):
     ----------
     *args :
         See :func:`iris.load_raw`
+    ignore_metadata_files : The option to turn off the ability to load external metadata
+        files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_raw`
 
@@ -582,4 +598,6 @@ def load_raw(*args, **kwargs):
         A :class:`~iris.cube.CubeList`.
     """
     loading_function = _customised_load(iris.load_raw)
-    return loading_function(*args, **kwargs)
+    return loading_function(
+        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+    )
