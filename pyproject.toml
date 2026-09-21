@@ -88,3 +88,4 @@ classifiers = [
 "ancil_create_shapefile.py" = "ants.cli.ancil_create_shapefile:cli_interface"
 "ancil_fill_n_merge.py" = "ants.cli.ancil_fill_n_merge:cli_interface"
 "ancil_general_regrid.py" = "ants.cli.ancil_general_regrid:cli_interface"
+"ancil_vertical_regrid.py" = "ants.cli.ancil_vertical_regrid:cli_interface"
