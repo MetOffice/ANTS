@@ -13,9 +13,9 @@ Metadata in this tutorial refers to information about the data in a file, that d
 directly affect that data. For example, licensing information or attributions.
 
 Some ancillary file formats cannot include metadata. Metadata can be very important to
-keep alongside the data as often data will have rome form of requirement or restriction
+keep alongside the data as often data will have some form of requirement or restriction
 on it. Because of this, ANTS can handle in external metadata files, provided they match
-the naming convention of `filename.attribute.accepted-metadata`. The current accepted
+the naming convention of `filename.extension.accepted-metadata`. The current accepted
 metadata attributes are "license", "attribution", "restrictions", "institution",
 "acknowledgement", and "references".
 
@@ -49,8 +49,8 @@ attribute. This is to prevent unintentional loss or overwriting of metadata info
 Saving Metadata
 ---------------
 
-Metadata will only be saved to a sidecar file, if the ancil loader is used. This is
+Metadata will only be saved to a sidecar file, if the ancil saver is used. This is
 because NetCDF files will include the attributes within the file.
 
-The sidecar files produced by ANTS follow the same naming covenstions at those loaded in
+The sidecar files produced by ANTS follow the same naming coventions at those loaded in
 `filename.attribute.accepted-metadata`. Only accepted metadata will be written out.

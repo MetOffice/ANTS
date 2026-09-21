@@ -414,7 +414,7 @@ def _customised_load(func):
     return load_function
 
 
-class _CallbackMetadata(object):
+class _CallbackMetadata:
     """Callback for collecting metadata from sidecar files.
 
     This callback will load additional metadata files with the naming convention:
@@ -432,7 +432,7 @@ class _CallbackMetadata(object):
         """
         if type(filename) is list:
             filename = filename[0]
-        metadata_filenames = "".join([filename, ".*"])
+        metadata_filenames = f"{filename}.*"
         metadata_files = glob.glob(metadata_filenames)
         if metadata_files != []:
             self._retrieve_metadata(metadata_files, cube)
@@ -485,9 +485,8 @@ class _CallbackMetadata(object):
                     category=UserWarning,
                 )
             else:
-                open_file = open(metadata_file, "r")
-                metadata = open_file.read()
-                open_file.close()
+                with open(metadata_file, "r") as open_file:
+                    metadata = open_file.read()
                 cube.attributes[attribute_name] = metadata
 
 
