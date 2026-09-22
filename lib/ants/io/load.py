@@ -236,14 +236,16 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
     try:
         # Is it a landsea mask field?
         lbm = ants.io.load.load_cube(
-            filename, "land_binary_mask", ignore_metadata_files
+            filename, "land_binary_mask", ignore_metadata_files=ignore_metadata_files
         )
         lbm = lbm.copy(lbm.data.astype("bool", copy=False))
     except iris.exceptions.ConstraintMismatchError:
         try:
             # Is it a land fraction field?
             land_fraction = ants.io.load.load_cube(
-                filename, "vegetation_area_fraction", ignore_metadata_files
+                filename,
+                "vegetation_area_fraction",
+                ignore_metadata_files=ignore_metadata_files,
             )
             lbm = land_fraction.copy(land_fraction.data > land_threshold)
             lbm.rename("land_binary_mask")
@@ -371,12 +373,8 @@ def _customised_load(func):
             )
             # Check if metadata functionality has been turned off.
             ignore_metadata_files = False
-            print(kwargs)
-            print(args)
             if "ignore_metadata_files" in kwargs:
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
-                print("ignore metadata files: ", ignore_metadata_files)
-            print(ignore_metadata_files)
             if not ignore_metadata_files:
                 # Get the inputs of the function.
                 sig = inspect.signature(func)
@@ -384,6 +382,8 @@ def _customised_load(func):
                 # Check if a constraint has been passed in so it can be preserved
                 if "constraints" in inputs.arguments.keys():
                     constraints = inputs.arguments["constraints"]
+                elif "constraint" in inputs.arguments.keys():
+                    constraints = inputs.arguments["constraint"]
                 else:
                     constraints = None
                 # Add a user callback to the metadata callback if supplied.
@@ -430,8 +430,6 @@ class _CallbackMetadata:
         The method that runs when Iris runs the callback. Collects the filenames and
         will run the user callback
         """
-        if type(filename) is list:
-            filename = filename[0]
         metadata_filenames = f"{filename}.*"
         metadata_files = glob.glob(metadata_filenames)
         if metadata_files != []:

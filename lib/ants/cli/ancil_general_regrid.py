@@ -42,7 +42,7 @@ def load_data(
     land_fraction_threshold=None,
     begin=None,
     end=None,
-    ignore_metadata_files=None,
+    ignore_metadata_files=False,
 ):
     source_cubes = ants.io.load.load(
         source, ignore_metadata_files=ignore_metadata_files
@@ -55,7 +55,9 @@ def load_data(
         )
     else:
         target_cube = ants.io.load.load_landsea_mask(
-            target_landseamask, land_fraction_threshold
+            target_landseamask,
+            land_fraction_threshold,
+            ignore_metadata_files=ignore_metadata_files,
         )
     return source_cubes, target_cube
 
