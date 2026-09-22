@@ -84,10 +84,12 @@ should:
 
 1. Add newly generated KGO changes to a local directory.  This only needs to
    be the KGO files needed for any rose stem tests affected by the change,
-   rather than the full set of KGOs.
-2. Add an ``ANTS_KGO_DIRECTORY_OVERRIDE`` or ``CONTRIB_KGO_DIRECTORY_OVERRIDE``
+   rather than the full set of KGOs or directory structure.
+2. KGO filenames should match the expected task output name and be listed in the
+   rose-ana optional configs.
+3. Add an ``ANTS_KGO_DIRECTORY_OVERRIDE`` or ``CONTRIB_KGO_DIRECTORY_OVERRIDE``
    variable (that points to the local directory) to the ``[[[environment]]]``
    section of each affected task's runtime entry within the ``flow.cylc``.
-3. Seek science owner approval for KGO changes.
-4. When the ticket is complete, please include a summary of the KGO changes on
+4. Seek science owner approval for KGO changes.
+5. When the ticket is complete, please include a summary of the KGO changes on
    the ticket template.
