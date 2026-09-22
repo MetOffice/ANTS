@@ -12,6 +12,8 @@ capability provided by iris.  ANTS provides:
   regridding/interpolation approaches.
 * :mod:`ants.regrid.interpolation` a set of vertical points-based approaches.
 * :mod:`ants.regrid.esmf` regridding schemes for ESMF framework using emspy.
+* :mod:`ants.regrid.iris_esmf` experimental regridding schemes for the ESMF
+  framework using ``esmf_regrid`` (``iris-esmf-regrid``).
 
 The reader is referred to the module documentation for further details.
 For further details see the user guide.
@@ -23,7 +25,7 @@ import sys
 
 from ants.config import CONFIG
 
-from . import esmf, interpolation, rectilinear
+from . import esmf, interpolation, iris_esmf, rectilinear
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -187,12 +189,13 @@ def _create_horizontal_regrid_scheme_instance(
 ):
     """Create a horizontal regrid scheme instance from a named regrid scheme.
 
-    The regrid scheme is sourced from one of three places. They are, in decreasing order
+    The regrid scheme is sourced from one of four places. They are, in decreasing order
     of precedence:
 
     1. :mod:`ants.regrid.rectilinear`
     2. :mod:`iris.analysis`
     3. :mod:`ants.regrid.esmf`
+    4. :mod:`ants.regrid.iris_esmf`
 
     Parameters
     ----------
@@ -208,6 +211,7 @@ def _create_horizontal_regrid_scheme_instance(
         getattr(rectilinear, scheme_name, None)
         or getattr(sys.modules["iris.analysis"], scheme_name, None)
         or getattr(esmf, scheme_name, None)
+        or getattr(iris_esmf, scheme_name, None)
     )
     if extrapolation_mode is None:
         regrid_scheme_instance = regrid_scheme_class()

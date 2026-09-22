@@ -2,6 +2,9 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+
+# Some of the content of this file has been created with the assistance of
+# Met Office Github Copilot
 import unittest.mock as mock
 
 import ants.tests
@@ -61,6 +64,25 @@ class TestESMF(ants.tests.TestCase):
     def test_expected_scheme(self):
         with mock.patch("ants.regrid.esmf.ConservativeESMF") as patched_scheme:
             scheme = GeneralRegridScheme(horizontal_scheme="ConservativeESMF")
+            source = ants.tests.stock.geodetic((2, 2))
+            target = source.copy()
+            source.regrid(target, scheme)
+        self.assertTrue(patched_scheme.called)
+
+
+class TestIrisESMF(ants.tests.TestCase):
+    @ants.tests.skip_esmf_regrid
+    def test_conservative(self):
+        with self.assertWarnsRegex(UserWarning, "Experimental"):
+            scheme = GeneralRegridScheme(horizontal_scheme="IrisESMFAreaWeighted")
+        source = ants.tests.stock.geodetic((2, 2))
+        target = source.copy()
+        res = source.regrid(target, scheme)
+        self.assertArrayAlmostEqual(res.data, target.data)
+
+    def test_expected_scheme(self):
+        with mock.patch("ants.regrid.iris_esmf.IrisESMFAreaWeighted") as patched_scheme:
+            scheme = GeneralRegridScheme(horizontal_scheme="IrisESMFAreaWeighted")
             source = ants.tests.stock.geodetic((2, 2))
             target = source.copy()
             source.regrid(target, scheme)

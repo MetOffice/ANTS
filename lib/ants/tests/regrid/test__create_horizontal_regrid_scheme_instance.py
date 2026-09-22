@@ -2,9 +2,13 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+
+# Some of the content of this file has been created with the assistance of
+# Met Office Github Copilot
 import ants.tests
 from ants.regrid import _create_horizontal_regrid_scheme_instance
 from ants.regrid.esmf import ConservativeESMF
+from ants.regrid.iris_esmf import IrisESMFAreaWeighted
 from ants.regrid.rectilinear import AreaWeighted, Linear, TwoStage
 from iris.analysis import Nearest
 
@@ -95,3 +99,22 @@ class TestConservativeESMF(ants.tests.TestCase):
             TypeError, "got an unexpected keyword argument 'extrapolation_mode'"
         ):
             _create_horizontal_regrid_scheme_instance("ConservativeESMF", "nan")
+
+
+class TestIrisESMFAreaWeighted(ants.tests.TestCase):
+    def test_no_extrapolation(self):
+        """Test that the IrisESMFAreaWeighted regrid scheme is instantiated.
+        No extrapolation mode is required for IrisESMFAreaWeighted."""
+        with self.assertWarnsRegex(UserWarning, "Experimental"):
+            scheme = _create_horizontal_regrid_scheme_instance(
+                "IrisESMFAreaWeighted", None
+            )
+        self.assertIsInstance(scheme, IrisESMFAreaWeighted)
+
+    def test_non_permitted_extrapolation(self):
+        """Test that an error is raised when attempting to pass an extrapolation mode
+        to the IrisESMFAreaWeighted regrid scheme."""
+        with self.assertRaisesRegex(
+            TypeError, "got an unexpected keyword argument 'extrapolation_mode'"
+        ):
+            _create_horizontal_regrid_scheme_instance("IrisESMFAreaWeighted", "nan")
