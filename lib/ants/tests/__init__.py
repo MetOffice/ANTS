@@ -106,6 +106,30 @@ https://earthsystemmodeling.org/esmpy_doc/release/latest/html/install.html
     return _skip_importable(ants.regrid.esmf.esmpy, "esmpy")(fn)
 
 
+def skip_esmf_regrid(fn):
+    """
+    Decorator to choose whether to run tests, based on the availability of the
+    esmf_regrid (iris-esmf-regrid) library.
+
+    Example usage:
+        @skip_esmf_regrid
+        class MyEsmfRegridTests(ants.tests.TestCase):
+            ...
+
+    """
+    ESMF_REGRID_IMPORT_MESSAGE = """To use esmf_regrid, set the ESMFMKFILE environment
+variable.
+https://earthsystemmodeling.org/esmpy_doc/release/latest/html/install.html
+#importing-esmpy"""
+    if "ESMFMKFILE" not in os.environ:
+        warnings.warn(ESMF_REGRID_IMPORT_MESSAGE)
+        return _skip_importable(ants.regrid.iris_esmf.esmf_regrid, "esmf_regrid")(fn)
+    if os.environ.get("ESMFMKFILE") == "":
+        warnings.warn(ESMF_REGRID_IMPORT_MESSAGE)
+        return _skip_importable(ants.regrid.iris_esmf.esmf_regrid, "esmf_regrid")(fn)
+    return _skip_importable(ants.regrid.iris_esmf.esmf_regrid, "esmf_regrid")(fn)
+
+
 def skip_spiral(fn):
     """
     Decorator to choose whether to run tests, based on the availability of the

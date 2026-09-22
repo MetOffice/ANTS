@@ -67,6 +67,25 @@ class TestESMF(ants.tests.TestCase):
         self.assertTrue(patched_scheme.called)
 
 
+class TestIrisESMF(ants.tests.TestCase):
+    @ants.tests.skip_esmf_regrid
+    def test_conservative(self):
+        with self.assertWarnsRegex(UserWarning, "Experimental"):
+            scheme = GeneralRegridScheme(horizontal_scheme="IrisESMFAreaWeighted")
+        source = ants.tests.stock.geodetic((2, 2))
+        target = source.copy()
+        res = source.regrid(target, scheme)
+        self.assertArrayAlmostEqual(res.data, target.data)
+
+    def test_expected_scheme(self):
+        with mock.patch("ants.regrid.iris_esmf.IrisESMFAreaWeighted") as patched_scheme:
+            scheme = GeneralRegridScheme(horizontal_scheme="IrisESMFAreaWeighted")
+            source = ants.tests.stock.geodetic((2, 2))
+            target = source.copy()
+            source.regrid(target, scheme)
+        self.assertTrue(patched_scheme.called)
+
+
 class TestRectilinear(ants.tests.TestCase):
     def test_twostage(self):
         with mock.patch("ants.regrid.rectilinear.TwoStage") as patched_scheme:

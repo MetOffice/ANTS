@@ -273,6 +273,9 @@ class GlobalConfiguration(object, metaclass=_Singleton):
         #  * ConservativeESMF,
         #  * AreaWeighted,
         #  * Nearest
+        #  * IrisESMFAreaWeighted (Experimental, for evaluation purposes
+        #    only, may change or be removed without notice at a future
+        #    release).
         # Default is None.
         scheme
 
