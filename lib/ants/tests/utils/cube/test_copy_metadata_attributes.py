@@ -3,7 +3,6 @@
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
 
-import pytest
 from ants.tests import stock
 from ants.utils.cube import copy_metadata_attributes
 
@@ -63,10 +62,7 @@ def test_non_standard_attribute():
     reference.rename("test cube")
     # Copy the metadata
     copy_metadata_attributes(source, reference)
-    expected_msg = "a value not in the allowed list"
-    with pytest.raises(KeyError, match=expected_msg):
-        # Check the attribute hasn't been copied over
-        source.attributes["a value not in the allowed list"]
+    assert "a value not in the allowed list" not in source.attributes
 
 
 def test_different_attribute_list():
