@@ -178,7 +178,11 @@ def scalar_coord(cube, coord_name):
 
 
 def _guess_axis_interpolation(cube):
-    dims = cube.coord_dims("model_level_number")
+    try:
+        dims = cube.coord_dims("model_level_number")
+    except iris.exceptions.CoordinateNotFoundError:
+        dims = cube.coord_dims("altitude")
+
     if len(dims) != 1:
         raise ValueError(
             "Expecting only a single axis of interpolation, " "got {}".format(len(dims))

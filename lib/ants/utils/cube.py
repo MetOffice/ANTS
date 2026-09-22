@@ -1560,3 +1560,24 @@ def fetch_seed_index(cube, seed):
     xd = abs(x.points - seed[1]).argmin()
     yd = abs(y.points - seed[0]).argmin()
     return xd, yd
+
+
+def is_single_level(cube: iris.cube.Cube) -> bool:
+    """Determine if a cube is defined on a single horizontal level.
+
+    A cube is identified as single level if it is 2-dimensional, and those
+    dimensions correspond to the x and y axes (in any order).
+
+    Parameters
+    ----------
+    cube: iris.cube.Cube
+        The cube to check
+
+    Returns
+    -------
+    bool
+        Whether the cube is defined on a single horizontal level
+    """
+    axes = {iris.util.guess_coord_axis(coord).lower() for coord in cube.dim_coords}
+    condition = cube.ndim == 2 and axes == {"x", "y"}
+    return condition

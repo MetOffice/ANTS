@@ -37,6 +37,12 @@ ancil_general_regrid.py
 The :doc:`ancil_general_regrid` application regrids a source file onto a
 specified target grid.
 
+ancil_vertical_regrid.py
+------------------------
+
+The :doc:`ancil_vertical_regrid` application vertically interpolates a source
+file onto a specified target grid.
+
 .. toctree::
    :maxdepth: 2
 
@@ -44,3 +50,4 @@ specified target grid.
    ancil_create_shapefile.rst
    ancil_fill_n_merge.rst
    ancil_general_regrid.rst
+   ancil_vertical_regrid.rst

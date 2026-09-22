@@ -5,6 +5,7 @@
 {% set fill_n_merge_source = ['land_cover', 'invert_mask'] %}
 {% set grid_source = ['grid_to_grid', 'grid_to_variable_resolution_grid', 'grid_to_n48e_namelist', 'grid_to_n48_namelist', '3d_to_3d', '3d_to_3d_with_extrapolation', 'invert_mask'] %}
 {% set target_lsm_grid_sources = ['grid_to_grid', 'invert_mask'] %}
+{% set vertical_regrid_source = ['ozone_zonal_mean', 'aerosol_3d'] %}
 
 
 # This links a name specified on the command in rose-stem with a
@@ -26,6 +27,8 @@
         install_cold => ancil_general_regrid_invert_mask_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
     "general_regrid_time_constrained": "install_cold => ancil_general_regrid_with_time_constraint<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_with_time_constraint_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
+    "vertical_regrid_zonal_mean": "install_cold => ancil_vertical_regrid_ozone_zonal_mean => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
+    "vertical_regrid_3d": "install_cold => ancil_vertical_regrid_aerosol_3d => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
     "build_documentation_graph": "install_cold => build_docs => linkcheck",
     "unittests_graph": "install_cold => unittests",
     "black_graph": "install_cold => black",
@@ -55,6 +58,7 @@
     "core" : ["ancil_2anc_graph", "fill_n_merge", "general_regrid"],
     "fill_n_merge": ["fill_n_merge_land_cover_graph", "fill_n_merge_invert_mask_graph"],
     "general_regrid": ["general_regrid_grid_to_grid_graph", "general_regrid_grid_to_variable_graph", "general_regrid_grid_to_n48e_namelist_graph", "general_regrid_grid_to_n48_namelist_graph", "general_regrid_3d_to_3d_graph", "general_regrid_3d_to_3d_with_extrapolation", "general_regrid_time_constrained", "general_regrid_invert_mask_graph"],
+    "vertical_regrid": ["vertical_regrid_zonal_mean", "vertical_regrid_3d"],
     "documentation": ["build_documentation_graph"],
     "unittests": ["unittests_graph", "black_graph", "flake8_graph", "isort_graph"],
 }
@@ -272,6 +276,25 @@ fi
             ROSE_TASK_APP = rose_ana
             ROSE_APP_OPT_CONF_KEYS = general_regrid_latitude_weighted_kdtree
 
+
+    {% for source in vertical_regrid_source %}
+    [[ANCIL_VERTICAL_REGRID_{{ source }}]]
+        inherit=ANTS_CORE, LARGE
+
+    [[ancil_vertical_regrid_{{ source }}]]
+        inherit = ANCIL_VERTICAL_REGRID_{{ source }}
+        script = rose task-run --app-key=ancil_vertical_regrid -O {{ source }}
+
+    [[rose_ana_vertical_regrid]]
+        inherit = ROSE_ANA
+        [[[environment]]]
+            ROSE_TASK_APP = rose_ana
+            ROSE_APP_OPT_CONF_KEYS = vertical_regrid
+
+
+    {% endfor %}
+
+
     # ##################################
     # Build Documentation
     # ##################################
@@ -338,3 +361,8 @@ fi
         inherit = PLOT_COMPARISONS
         [[[environment]]]
             TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_general_regrid_${CYLC_TASK_PARAM_fill}
+
+    [[plot_comparisons_vertical_regrid]]
+        inherit = PLOT_COMPARISONS
+        [[[environment]]]
+            TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_vertical_regrid

@@ -96,6 +96,7 @@ def main(
     end,
     netcdf_only,
     search_method,
+    blending_distance,
 ):
     """
     Perform merge and fill operation on the provided sources.
@@ -104,8 +105,13 @@ def main(
     to be provided, and may optionally have a ``polygon`` shapefile.  The
     resulting data takes values from the ``primary_source`` within the ``polygon``
     (or everywhere where valid data is present, if the ``polygon`` is not
-    provided), and values from the ``alternate_source`` everywhere else.  See
-    :func:`ants.analysis.merge` for further details.
+    provided), and values from the ``alternate_source`` everywhere else.
+    A blending between the sources can be applied by specifying the
+    ``blending_distance`` (for no blending, pass ``None``). A linear blending
+    between the primary and alternate sources will be applied in the region
+    immediately outside the polygon over the blending distance.
+    Beyond the blending distance, the alternate source is used.
+    See :func:`ants.analysis.merge` for further details.
 
     The fill stage replaces missing data values with valid data, where missing
     is defined as data that is either masked or NaN.  If a landseamask is
@@ -141,6 +147,12 @@ def main(
     search_method : :obj:`str`
         Select the search method to be used when filling missing points. The methods
         currently supported are "spiral" and "kdtree".
+    blending_distance : float
+        Distance over which blending between the primary and alternate sources
+        is applied. Note that this is in units of grid cells, not a physical distance.
+        If ``None``, no blending is applied, and there will be a hard edge between
+        the two sources.
+
     Returns
     -------
     : :class:`~iris.cube.CubeList`
@@ -163,7 +175,9 @@ def main(
 
     result = primary_cubes
     if alternate_cubes is not None:
-        result = ants.analysis.merge(primary_cubes, alternate_cubes, validity_polygon)
+        result = ants.analysis.merge(
+            primary_cubes, alternate_cubes, validity_polygon, blending_distance
+        )
     if target_mask_filepath:
         ants.analysis.make_consistent_with_lsm(result, lbm, invert_mask, search_method)
 
@@ -226,6 +240,11 @@ def _get_parser():
         required=False,
         default="spiral",
     )
+    blending_help = (
+        "Distance over which blending between the primary and alternate sources "
+        "is applied. Note that this is in units of grid cells, not a physical distance."
+    )
+    parser.add_argument("--blending-distance", type=float, help=blending_help)
     return parser
 
 
@@ -251,6 +270,7 @@ def cli_interface():
         end=args.end,
         netcdf_only=args.netcdf_only,
         search_method=args.search_method,
+        blending_distance=args.blending_distance,
     )
 
 
