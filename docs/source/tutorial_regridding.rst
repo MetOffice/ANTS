@@ -70,10 +70,10 @@ source onto the target:
     target = stock.geodetic((8, 8))
 
     scheme = ants.regrid.GeneralRegridScheme(horizontal_scheme="TwoStage")
-    result = source.regrid(target, scheme)
+    regridding_result = source.regrid(target, scheme)
 
-``result`` is a cube on the target grid. In an application dealing with
-larger, real datasets you would typically pass ``result`` through
+``regridding_result`` is a cube on the target grid. In an application dealing with
+larger, real datasets you would typically pass ``regridding_result`` through
 :func:`ants.decomposition.decompose` rather than calling ``regrid`` directly,
 so that the regrid can be split into pieces that fit into memory - see
 :doc:`decomposition` for details.
