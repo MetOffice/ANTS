@@ -13,7 +13,7 @@ capability provided by iris.  ANTS provides:
 * :mod:`ants.regrid.interpolation` a set of vertical points-based approaches.
 * :mod:`ants.regrid.esmf` regridding schemes for ESMF framework using emspy.
 * :mod:`ants.regrid.iris_esmf` experimental regridding schemes for the ESMF
-  framework using :mod:`esmf_regrid` (``iris-esmf-regrid``).
+  framework using ``esmf_regrid`` (``iris-esmf-regrid``).
 
 The reader is referred to the module documentation for further details.
 For further details see the user guide.

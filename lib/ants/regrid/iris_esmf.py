@@ -7,7 +7,7 @@
 # Met Office Github Copilot
 """
 Experimental regridding schemes which wrap the ESMF-backed regridders
-provided by :mod:`esmf_regrid` (the ``iris-esmf-regrid`` package), as
+provided by ``esmf_regrid`` (the ``iris-esmf-regrid`` package), as
 opposed to :mod:`ants.regrid.esmf` which uses ``esmpy`` directly.
 
 These schemes are exposed under an ``Iris``-prefixed name (e.g.
@@ -58,7 +58,7 @@ EXPERIMENTAL_MESSAGE = (
 
 class _IrisESMFAreaWeightedRegridder(object):
     """
-    Area weighted regridder using :mod:`esmf_regrid` (``iris-esmf-regrid``).
+    Area weighted regridder using ``esmf_regrid`` (``iris-esmf-regrid``).
 
     Wraps :class:`esmf_regrid.schemes.ESMFAreaWeighted` applying the same
     ANTS specific data preparation and post-processing as
@@ -136,7 +136,7 @@ class _IrisESMFAreaWeightedRegridder(object):
 
 class IrisESMFAreaWeighted(object):
     """
-    Area weighted regridding scheme using ESMF via :mod:`esmf_regrid`.
+    Area weighted regridding scheme using ESMF via ``esmf_regrid``.
 
     .. warning::
         Experimental, for evaluation purposes only, may change or be removed
@@ -154,7 +154,7 @@ class IrisESMFAreaWeighted(object):
         """
         Parameters
         ----------
-        mdtol : float, optional
+        mdtol : :obj:`float`, optional
             Tolerance of missing data.  The value returned in each element
             of the returned array will be masked if the fraction of masked
             data exceeds mdtol.  mdtol=0 means no missing data is tolerated
