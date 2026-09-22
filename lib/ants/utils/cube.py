@@ -1139,18 +1139,7 @@ def inherit_metadata(source, reference):
         source.attributes["grid_staggering"] = reference.attributes["grid_staggering"]
 
 
-def copy_metadata_attributes(
-    source,
-    reference,
-    metadata_to_copy=[
-        "license",
-        "attribution",
-        "restrictions",
-        "institution",
-        "acknowledgement",
-        "references",
-    ],
-):
+def copy_metadata_attributes(source, reference, metadata_to_copy=None):
     """
     Inherit cube metadata attributes from a provided reference.
 
@@ -1169,6 +1158,15 @@ def copy_metadata_attributes(
     metadata_to_copy : list
         A list of metadata attribute keys to copy to the source cube.
     """
+    if metadata_to_copy is None:
+        metadata_to_copy = [
+            "license",
+            "attribution",
+            "restrictions",
+            "institution",
+            "acknowledgement",
+            "references",
+        ]
 
     for attribute in metadata_to_copy:
         # Only copy an attribute if it exists in the reference cube.
