@@ -4,6 +4,9 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 # Parsing the rose app configuration files using Python's built-in config
 # parser.
+
+# Some of the content of this file has been created with the assistance of
+# Met Office Github Copilot
 """
 This module handles the run-time configuration of the ANTS library.
 

@@ -2,6 +2,9 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+
+# Some of the content of this file has been created with the assistance of
+# Met Office Github Copilot
 import ants.tests
 from ants.regrid import _create_horizontal_regrid_scheme_instance
 from ants.regrid.esmf import ConservativeESMF
