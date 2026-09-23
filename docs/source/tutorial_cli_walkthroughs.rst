@@ -15,7 +15,8 @@ tools that ship with ANTS, and their individual pages (:doc:`ancil_2anc`,
 :doc:`ancil_create_shapefile`, :doc:`ancil_fill_n_merge`,
 :doc:`ancil_general_regrid`, :doc:`ancil_vertical_regrid`) document their full
 set of arguments. This tutorial instead walks through a realistic invocation
-of each tool, so you can see how they fit together in practice.
+of each tool as run in a cylc workflow, so you can see how they fit together
+in practice.
 
 All five tools share a common command line interface, provided by
 :class:`ants.command_parse.AntsArgParser`:
@@ -100,6 +101,27 @@ To regrid directly onto a target land sea mask instead of a plain grid, use
 consistent with that mask using the same fill algorithms discussed in
 :doc:`tutorial_merge_fill`.
 
+Like ``ancil_vertical_regrid``, discussed later, this application has no
+built-in default regridding scheme - ``rose-app-run.conf`` above must include a
+``[ants_regridding_horizontal]`` section (and a ``[ants_regridding_vertical]``
+section too, if the target also varies vertically), for example:
+
+.. code-block::
+
+    [ants_regridding_horizontal]
+    scheme = Linear
+
+See :class:`ants.config.GlobalConfiguration` for the full list of valid
+``scheme`` values. Omitting this section raises an error rather than
+silently falling back to a default (the same is true of the
+``[ants_regridding_vertical]`` scheme required by ``ancil_vertical_regrid``
+- neither tool has a built-in default).
+
+.. note:: `ancil_vertical_regrid` is available for vertical only regrid operations
+   or cases where you want to ensure a vertical regrid is carried out before any
+   other processing.
+
+
 ancil_vertical_regrid: regridding onto a new vertical level set
 ------------------------------------------------------------------
 
@@ -116,31 +138,20 @@ the same horizontal (latitude/longitude) coordinates:
         --target-grid vertlevs_L70_50t_20s_80km \
         --ants-config rose-app-run.conf
 
-The vertical interpolation scheme is chosen via ``--ants-config`` rather than
-a command line flag, using the ``[ants_regridding_vertical]`` section, for
-example:
+This application has no default vertical scheme - the ``--ants-config`` file
+passed above (``rose-app-run.conf``) must include a
+``[ants_regridding_vertical]`` section naming one, for example:
 
 .. code-block::
 
     [ants_regridding_vertical]
     scheme = Linear
 
-Where a source spans many years, ``--begin``/``--end`` can be used to
-restrict processing to a subset of that time range before regridding, for
-example when producing a zonal mean ozone ancillary from a multi-decade
-source:
-
-.. code-block:: bash
-
-    ants-launch ancil_vertical_regrid.py ozone_multi_decade.nc \
-        --output ozone_L85_1994-2005 \
-        --target-grid vertlevs_L70_50t_20s_80km \
-        --begin 1994 \
-        --end 2005 \
-        --ants-config rose-app-run.conf
-
-A ``--save-ukca`` flag is also available, which saves the result using
-:func:`ants.io.save.ukca_netcdf` instead of the usual ancillary/NetCDF pair.
+See :class:`ants.config.GlobalConfiguration` for the full list of valid
+``scheme`` values. Omitting this section raises an error rather than
+silently falling back to a default (the same is true of the
+``[ants_regridding_horizontal]`` scheme required by ``ancil_general_regrid``
+- neither tool has a built-in default).
 
 .. note::
    ``ancil_vertical_regrid`` checks its target before regridding: if the
@@ -181,9 +192,8 @@ Key Points
  * Prefer ``--search-method kdtree`` on ``ancil_fill_n_merge`` and
    ``ancil_general_regrid`` for consistency across UM and LFRic pipelines
    (see :doc:`tutorial_merge_fill`).
- * ``ancil_vertical_regrid`` chooses its interpolation scheme via the
-   ``[ants_regridding_vertical]`` section of ``--ants-config``, not a command
-   line flag.
+ * If you want to do a vertical regrid for UGrid target domains use the
+   UG-ANTS tooling instead.
  * See the ``rose-stem/app/`` directory in the ANTS repository for complete,
    runnable configurations of each of these tools.
 
