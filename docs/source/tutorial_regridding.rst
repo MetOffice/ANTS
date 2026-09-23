@@ -78,6 +78,11 @@ larger, real datasets you would typically pass the regridding operation through
 so that the regrid can be split into pieces that fit into memory - see
 :doc:`decomposition` for details.
 
+.. note::
+   For the example above using the ``TwoStage`` scheme is redundant as the source
+   and target are on the same grid - it achieves the same result as directly
+   calling the ``AreaWeighted`` scheme.
+
 Regridding onto a land sea mask
 --------------------------------
 
