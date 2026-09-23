@@ -15,8 +15,7 @@ tools that ship with ANTS, and their individual pages (:doc:`ancil_2anc`,
 :doc:`ancil_create_shapefile`, :doc:`ancil_fill_n_merge`,
 :doc:`ancil_general_regrid`, :doc:`ancil_vertical_regrid`) document their full
 set of arguments. This tutorial instead walks through a realistic invocation
-of each tool as run in a cylc workflow, so you can see how they fit together
-in practice.
+of each tool, so you can see how they fit together in practice. 
 
 All five tools share a common command line interface, provided by
 :class:`ants.command_parse.AntsArgParser`:
@@ -37,7 +36,7 @@ the underlying load/save mechanics.
 
 .. code-block:: bash
 
-    ants-launch ancil_2anc.py land_cover_fraction.nc \
+    ancil_2anc.py land_cover_fraction.nc \
         --output land_cover_fraction_ancil \
         --grid-staggering 6 \
         --ants-config rose-app-run.conf
@@ -61,7 +60,7 @@ A minimal input JSON, defining a simple box:
 
 .. code-block:: bash
 
-    ants-launch ancil_create_shapefile.py validity_region.json validity_region.shp
+    ancil_create_shapefile.py validity_region.json validity_region.shp
 
 ancil_fill_n_merge: merging and filling
 ------------------------------------------
@@ -73,7 +72,7 @@ and LFRic pipelines:
 
 .. code-block:: bash
 
-    ants-launch ancil_fill_n_merge.py primary_source.nc alternate_source.nc \
+    ancil_fill_n_merge.py primary_source.nc alternate_source.nc \
         --output merged_filled \
         --target-lsm target_lsm.nc \
         --polygon validity_region.shp \
@@ -91,7 +90,7 @@ sea mask - see :doc:`tutorial_regridding` for the underlying mechanics:
 
 .. code-block:: bash
 
-    ants-launch ancil_general_regrid.py source_field.nc \
+    ancil_general_regrid.py source_field.nc \
         --output regridded_field \
         --target-grid target_grid_namelist \
         --ants-config rose-app-run.conf
@@ -101,10 +100,10 @@ To regrid directly onto a target land sea mask instead of a plain grid, use
 consistent with that mask using the same fill algorithms discussed in
 :doc:`tutorial_merge_fill`.
 
-Like ``ancil_vertical_regrid``, discussed later, this application has no
-built-in default regridding scheme - ``rose-app-run.conf`` above must include a
-``[ants_regridding_horizontal]`` section (and a ``[ants_regridding_vertical]``
-section too, if the target also varies vertically), for example:
+This application has no default regridding scheme the ``--ants-config`` file
+passed above (``rose-app-run.conf``) must include a ``[ants_regridding_horizontal]`` 
+section (and a ``[ants_regridding_vertical]`` section too, if the target also
+varies vertically), for example:
 
 .. code-block::
 
@@ -112,12 +111,9 @@ section too, if the target also varies vertically), for example:
     scheme = Linear
 
 See :class:`ants.config.GlobalConfiguration` for the full list of valid
-``scheme`` values. Omitting this section raises an error rather than
-silently falling back to a default (the same is true of the
-``[ants_regridding_vertical]`` scheme required by ``ancil_vertical_regrid``
-- neither tool has a built-in default).
+``scheme`` values. Omitting this section raises an error.
 
-.. note:: `ancil_vertical_regrid` is available for vertical only regrid operations
+.. note:: ``ancil_vertical_regrid`` is available for vertical only regrid operations
    or cases where you want to ensure a vertical regrid is carried out before any
    other processing.
 
@@ -133,14 +129,14 @@ the same horizontal (latitude/longitude) coordinates:
 
 .. code-block:: bash
 
-    ants-launch ancil_vertical_regrid.py aerosol_3d.nc \
+    ancil_vertical_regrid.py aerosol_3d.nc \
         --output aerosol_3d_L70 \
         --target-grid vertlevs_L70_50t_20s_80km \
         --ants-config rose-app-run.conf
 
 This application has no default vertical scheme - the ``--ants-config`` file
 passed above (``rose-app-run.conf``) must include a
-``[ants_regridding_vertical]`` section naming one, for example:
+``[ants_regridding_vertical]`` section specifying one, for example:
 
 .. code-block::
 
@@ -148,10 +144,7 @@ passed above (``rose-app-run.conf``) must include a
     scheme = Linear
 
 See :class:`ants.config.GlobalConfiguration` for the full list of valid
-``scheme`` values. Omitting this section raises an error rather than
-silently falling back to a default (the same is true of the
-``[ants_regridding_horizontal]`` scheme required by ``ancil_general_regrid``
-- neither tool has a built-in default).
+``scheme`` values. Omitting this section raises an error.
 
 .. note::
    ``ancil_vertical_regrid`` checks its target before regridding: if the
@@ -204,4 +197,3 @@ See Also
  * :doc:`tutorial_regridding`
  * :doc:`tutorial_merge_fill`
  * :doc:`core_capabilities`
- * :doc:`ancil_vertical_regrid`
