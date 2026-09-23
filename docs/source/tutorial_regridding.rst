@@ -73,7 +73,7 @@ source onto the target:
     regridding_result = source.regrid(target, scheme)
 
 ``regridding_result`` is a cube on the target grid. In an application dealing with
-larger, real datasets you would typically pass ``regridding_result`` through
+larger, real datasets you would typically pass the regridding operation through
 :func:`ants.decomposition.decompose` rather than calling ``regrid`` directly,
 so that the regrid can be split into pieces that fit into memory - see
 :doc:`decomposition` for details.
