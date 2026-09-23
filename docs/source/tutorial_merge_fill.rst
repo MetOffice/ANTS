@@ -39,8 +39,13 @@ region where the primary source should be trusted:
 
     # data must already be shaped to match the cube's shape, so reshape
     # the flat arrays of values first
-    primary = stock.geodetic((4, 4), data=np.arange(16).reshape(4, 4))
-    alternate = stock.geodetic((4, 4), data=np.zeros((4, 4)))
+    primary = stock.geodetic((4, 4), data=np.arange(16,dtype=float).reshape(4, 4))
+    # Fill the first two rows with nans so there's something to merge into
+    primary.data[:2,:] = np.nan
+
+    alternate = stock.geodetic((4, 4), data=np.arange(16,dtype=float).reshape(4, 4))
+    # Fill the last two rows with nans so we know data hasn't come in from the alternate
+    alternate.data[2:,:] = np.nan
 
     # everywhere valid data is present in the primary, it takes priority;
     # elsewhere, the alternate is used.
