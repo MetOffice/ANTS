@@ -179,9 +179,9 @@ Key Points
    :class:`ants.command_parse.AntsArgParser`.
  * ``ancil_2anc`` is for fileformat translation, ``ancil_create_shapefile``
    produces validity polygons, ``ancil_fill_n_merge`` combines and fills
-   data, ``ancil_general_regrid`` moves data onto a target horizontal grid,
-   and ``ancil_vertical_regrid`` moves data onto a target set of vertical
-   levels.
+   data, ``ancil_general_regrid`` moves data onto a target horizontal grid
+   (and can carry out vertical regridding too), and ``ancil_vertical_regrid``
+   moves data onto a target set of vertical levels.
  * Prefer ``--search-method kdtree`` on ``ancil_fill_n_merge`` and
    ``ancil_general_regrid`` for consistency across UM and LFRic pipelines
    (see :doc:`tutorial_merge_fill`).
