@@ -138,7 +138,7 @@ def load_vertical(filenames, callback=None, remove_level_zero=True):
     ----------
     filenames : str
         Pathname of a Fortran namelist file, or a list of such paths.
-    callback : function
+    callback : :class:`~collections.abc.Callable`, optional
         Iris callback function with the signature (cube, field, filename)
     remove_level_zero : bool
         Apply a correction to the loaded namelist to remove the zeroth level,
@@ -146,7 +146,7 @@ def load_vertical(filenames, callback=None, remove_level_zero=True):
 
     Returns
     -------
-    : :class:`iris.cube.Cube`
+    :class:`iris.cube.Cube`
         Cube representing the vertical grid defined.
 
     See Also
