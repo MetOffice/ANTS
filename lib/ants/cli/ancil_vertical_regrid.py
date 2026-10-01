@@ -150,11 +150,18 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(target_grid=True, time_constraints=True)
-    parser.add_argument(
-        "--remove-level-zero",
-        type=bool,
+    level_zero = parser.add_mutually_exclusive_group()
+    level_zero.add_argument(
+        "--remove-L0",
+        action="store_true",
+        default=False,
         help="Remove the zeroth level from vertical target",
-        required=True,
+    )
+    level_zero.add_argument(
+        "--keep-L0",
+        action="store_true",
+        default=False,
+        help="Do not remove the zeroth level from vertical target",
     )
     parser.add_argument(
         "--save-ukca",
@@ -169,6 +176,14 @@ def cli_interface():
     parser = _get_parser()
     args = parser.parse_args()
 
+    if args.remove_L0 is False and args.keep_L0 is False:
+        raise ValueError(
+            "--remove-L0 or --keep-L0 much be set to determine "
+            "level zero behaviour if using a vertical namelist."
+        )
+
+    remove_level_zero = args.remove_L0 and not args.keep_L0
+
     source = args.sources
     main(
         source,
@@ -176,7 +191,7 @@ def cli_interface():
         args.target_grid,
         args.begin,
         args.end,
-        args.remove_level_zero,
+        remove_level_zero,
         args.save_ukca,
         args.netcdf_only,
     )
