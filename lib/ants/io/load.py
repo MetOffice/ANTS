@@ -52,7 +52,7 @@ See Also
 :func:`ants.fileformats.pp.load_cubes`,
 :func:`ants.fileformats.pp.load_cubes_little_endian`,
 :func:`ants.fileformats.namelist.load_cap_horizontal`,
-:func:`ants.fileformats.namelist.load_um_vertical`
+:func:`ants.fileformats.namelist.load_vertical`
 
 """
 import copy
@@ -171,12 +171,13 @@ HORIZONTAL_NAMELIST_FORMAT = iris.fileformats.FormatSpecification(
     constraint_aware_handler=False,
 )
 
-
+# load vertical defaults to removing level zero for UM-era files
+# TODO: find a way to pass the argument through this custom loader.
 NAMELIST_VERTICAL_DEFINITION = iris.fileformats.FormatSpecification(
     "Namelist vertical definition",
     iris.fileformats.LeadingLine(),
     lambda line: "&vertlevs" in str(line).lower(),
-    namelist.load_um_vertical,
+    namelist.load_vertical,
     priority=4,
     constraint_aware_handler=False,
 )
