@@ -9,16 +9,11 @@ import numpy as np
 from ants.analysis import make_consistent_with_lsm
 
 
-class TestRegular(ants.tests.TestCase):
+class TestUMSpiralSearch(ants.tests.TestCase):
     def setUp(self):
         self.source = ants.tests.stock.geodetic((2, 2))
         self.lsm = ants.tests.stock.geodetic((2, 2))
         self.lsm.data = self.lsm.data.astype("bool")
-
-    @mock.patch("ants.analysis.UMSpiralSearch")
-    def test_default_filler_called(self, patch_fill):
-        make_consistent_with_lsm(self.source, self.lsm, False)
-        patch_fill.assert_called_once_with(self.source, target_mask=self.lsm)
 
     @mock.patch("ants.analysis.UMSpiralSearch")
     def test_filler_called(self, patch_fill):
@@ -32,7 +27,7 @@ class TestRegular(ants.tests.TestCase):
 
     @mock.patch("ants.utils.cube.guess_horizontal_bounds")
     def test_guess_bounds(self, patch_guess):
-        make_consistent_with_lsm(self.source, self.lsm, False)
+        make_consistent_with_lsm(self.source, self.lsm, False, "spiral")
         patch_guess.assert_has_calls([mock.call(self.lsm), mock.call(self.source)])
         self.assertEqual(2, patch_guess.call_count)
 
@@ -46,6 +41,11 @@ class TestKDTree(ants.tests.TestCase):
         self.source = ants.tests.stock.geodetic((2, 2))
         self.lsm = ants.tests.stock.geodetic((2, 2))
         self.lsm.data = self.lsm.data.astype("bool")
+
+    @mock.patch("ants.analysis.KDTreeFill")
+    def test_default_filler_called(self, patch_fill):
+        make_consistent_with_lsm(self.source, self.lsm, False)
+        patch_fill.assert_called_once_with(self.source, target_mask=self.lsm)
 
     @mock.patch("ants.analysis.KDTreeFill")
     def test_filler_called(self, patch_fill):

@@ -538,7 +538,7 @@ def find_similar_region(
     return tuple([[ind[i] for ind in list(indices)] for i in range(array.ndim)])
 
 
-def make_consistent_with_lsm(sources, lsm, invert_mask, method="spiral"):
+def make_consistent_with_lsm(sources, lsm, invert_mask, method="kdtree"):
     """
     Make the provided source(s) consistent with the provided land sea mask.
 

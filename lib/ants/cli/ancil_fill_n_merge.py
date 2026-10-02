@@ -189,7 +189,7 @@ def main(
 
 
 def _get_parser():
-    parser = ants.AntsArgParser(time_constraints=True)
+    parser = ants.AntsArgParser(time_constraints=True, search_method=True)
     lsm_help = (
         "Path to the land sea mask.  If not supplied, the missing "
         "neighbour search considers all points valid to choose "
@@ -232,13 +232,6 @@ def _get_parser():
         action="store_false",
         help=invmask_help,
         required=False,
-    )
-    parser.add_argument(
-        "--search-method",
-        type=str,
-        help="Select the search method used when filling.",
-        required=False,
-        default="spiral",
     )
     blending_help = (
         "Distance over which blending between the primary and alternate sources "
