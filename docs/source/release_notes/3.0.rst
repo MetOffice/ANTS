@@ -35,7 +35,7 @@ Infrastructure
   integration (CI).
 - :pr:`86`: `pre-commit <https://pre-commit.com/>`_ hooks are now supported in
   ANTS.
-- :pr:`90`: `setuptools-scm <https://setuptools-scm.readthedocs.io/en/latest/>`_
+- :pr:`90`: `setuptools-scm <https://setuptools-scm.readthedocs.io/latest/>`_
   is now used to set the version number automatically from git metadata.
 
 Documentation
