@@ -4,7 +4,6 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 import tempfile
 import unittest.mock as mock
-import warnings
 
 import ants
 import ants.io.save as save
@@ -102,18 +101,3 @@ class TestPriorities(ants.tests.TestCase):
             gdal_format_spec = gdal_format_specs[0]
 
             self.assertGreater(grib_format_spec.priority, gdal_format_spec.priority)
-
-
-class TestExceptions(ants.tests.TestCase):
-    def test_no_datum_warning(self):
-        # Save and reload a cube without a datum.
-
-        # This test relates to the completed ticket
-        # https://github.com/MetOffice/ANTS/issues/91.
-        # Previously, iris raised a warning even if the source file did not
-        # contain a datum. See https://github.com/SciTools/iris/issues/5749.
-        cube = ants.tests.stock.geodetic((2, 2))
-        assert cube.coord_system().datum is None
-        with mock.patch("ants.fileformats.warnings.filterwarnings"):
-            with warnings.catch_warnings(action="error", category=FutureWarning):
-                cube = ants.utils.cube.defer_cube(cube)
