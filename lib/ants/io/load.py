@@ -57,7 +57,6 @@ See Also
 """
 
 import copy
-import warnings
 from contextlib import contextmanager
 from functools import wraps
 
@@ -344,21 +343,9 @@ def _customised_load(func):
         # Ensure that we leave appropriate calling to the underlying iris load
         # function.
 
-        # TODO https://github.com/MetOffice/ANTS/issues/91, remove warning filter
-        # workaround when iris issue https://github.com/SciTools/iris/issues/5749 has
-        # been fixed.
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                "Ignoring a datum in netCDF load for consistency with existing "
-                "behaviour. In a future version of Iris, this datum will be applied. "
-                "To apply the datum when loading, use the "
-                "iris.FUTURE.datum_support flag.",
-                FutureWarning,
-            )
-            # Use context manager to avoid permanently modifying iris behaviour.
-            with ants_format_agent():
-                cubes = func(*args, **kwargs)
+        # Use context manager to avoid permanently modifying iris behaviour.
+        with ants_format_agent():
+            cubes = func(*args, **kwargs)
         if cubes is not None:
             try:
                 ants.utils.cube.derive_circular_status(cubes)
