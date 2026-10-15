@@ -60,7 +60,8 @@ class _CallbackUM(pp._CallbackPP):
 
     def __call__(self, cube, field, filename):
         """
-        ANTS callback to add grid staggering and maintain pseudo level order.
+        ANTS callback to add grid staggering, maintain pseudo level order and
+        restore full precision regular coordinates.
 
         Used as a callback when loading fields files for all ants.io.load
         operations (e.g. :func:`~ants.io.load.load`, :func:`~ants.io.load.load_cube`
@@ -71,14 +72,62 @@ class _CallbackUM(pp._CallbackPP):
         cube : :class:`iris.cube.Cube`
             The cube generated from the field.
         field: ppfield
-            Not used in this implementation, but kept for consistency
-            with the iris load callback protocol.
+            The field from which the cube was generated, used to derive the
+            regular x and y coordinate points.
         filename: str
             The name of the ancillary file.
 
         """
         cube.attributes["grid_staggering"] = self.grid_staggering[filename]
+        _set_regular_coords_float64(cube, field)
         super(_CallbackUM, self).__call__(cube, field, filename)
+
+
+def _set_regular_coords_float64(cube, field):
+    """
+    Replace regular x and y dimension coordinates with float64 equivalents.
+
+    Iris generates the points of regular coordinates in float32 where it
+    considers this sufficiently accurate.  The rounding used differs between
+    iris versions, giving coordinate values which vary by a few float32 ULPs
+    depending on the iris version in use.  Deriving the values in float64 from
+    the field header makes the result independent of the iris version.
+
+    Parameters
+    ----------
+    cube : :class:`iris.cube.Cube`
+        The cube generated from the field, modified in place.
+    field: ppfield
+        The field from which the cube was generated.
+
+    """
+    lbcode = field.lbcode
+    if len(lbcode) == 5 or lbcode[0] not in (1, 2):
+        return
+    with_bounds = lbcode[0] == 2
+    is_rotated = isinstance(field.coord_system(), iris.coord_systems.RotatedGeogCS)
+    axes = (
+        ("longitude", field.bzx, field.bdx, field.lbnpt),
+        ("latitude", field.bzy, field.bdy, field.lbrow),
+    )
+    for name, zeroth, step, count in axes:
+        if step in (0.0, field.bmdi):
+            continue
+        if is_rotated:
+            name = f"grid_{name}"
+        coords = cube.coords(name, dim_coords=True)
+        if len(coords) != 1 or coords[0].shape != (count,):
+            continue
+        coord = coords[0]
+        points = (zeroth + step) + step * np.arange(count, dtype=np.float64)
+        bounds = None
+        if with_bounds:
+            delta = 0.5 * step
+            bounds = np.stack([points - delta, points + delta], axis=-1)
+        # Clear the bounds first so they are never inconsistent with the points.
+        coord.bounds = None
+        coord.points = points
+        coord.bounds = bounds
 
 
 class _IrisPPFieldDataProvider(object):
