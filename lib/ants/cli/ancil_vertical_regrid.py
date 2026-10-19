@@ -14,6 +14,7 @@ regrid algorithm can be specified in the ants configuration file as described
 in :class:`ants.config.GlobalConfiguration`. See :mod:`ants.regrid` for further
 details.
 """
+
 import ants
 import ants.io.save as save
 import ants.utils
