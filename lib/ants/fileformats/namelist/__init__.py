@@ -103,43 +103,50 @@ def _gen_dict(filenames):
 def load_um_vertical(filenames, callback=None):
     """
     Load the vertical namelist definition.
-
-    Applies a correction to the loaded namelist to be consistent with the UM
-    expectations.  Specifically, removes the zeroth level, and modifies the
-    boundaries of the first level to compensate.
-
-    Parameters
-    ----------
-    filenames : str
-        Pathname of a Fortran namelist file, or a list of such paths.
-
-    Returns
-    -------
-    : :class:`iris.cube.Cube`
-        Cube representing the vertical grid defined.
-
-    See Also
-    --------
-    :class:`umgrid.VerticalLevels` : for the vertical definition specification.
-
     """
-    return _load_vertical(filenames, True, callback)
+
+    warnings.warn(
+        "load_um_vertical has been deprecated. Please use "
+        "ants.fileformats.namelist.load_vertical with option "
+        "remove_level_zero=True",
+        FutureWarning,
+    )
+
+    return load_vertical(filenames, callback=callback, remove_level_zero=True)
 
 
 def load_lfric_vertical(filenames, callback=None):
     """
     Load the vertical namelist definition.
+    """
 
-    Includes the zeroth level in the returned cube.
+    warnings.warn(
+        "load_lfric_vertical has been deprecated. Please use "
+        "ants.fileformats.namelist.load_vertical with option "
+        "remove_level_zero=False",
+        FutureWarning,
+    )
+
+    return load_vertical(filenames, callback=callback, remove_level_zero=False)
+
+
+def load_vertical(filenames, callback=None, remove_level_zero=True):
+    """
+    Load the vertical namelist definition.
 
     Parameters
     ----------
     filenames : str
         Pathname of a Fortran namelist file, or a list of such paths.
+    callback : :class:`~collections.abc.Callable`, optional
+        Iris callback function with the signature (cube, field, filename)
+    remove_level_zero : bool
+        Apply a correction to the loaded namelist to remove the zeroth level,
+        and modify the boundaries of the first level to compensate.
 
     Returns
     -------
-    : :class:`iris.cube.Cube`
+    :class:`iris.cube.Cube`
         Cube representing the vertical grid defined.
 
     See Also
@@ -147,15 +154,11 @@ def load_lfric_vertical(filenames, callback=None):
     :class:`umgrid.VerticalLevels` : for the vertical definition specification.
 
     """
-    return _load_vertical(filenames, False, callback)
-
-
-def _load_vertical(filenames, apply_um_workaround=True, callback=None):
     groups = _gen_dict(filenames)
 
     result = None
     if "vertlevs" in groups:
-        result = VerticalLevels(groups).get_cube(apply_um_workaround)
+        result = VerticalLevels(groups).get_cube(remove_level_zero)
     else:
         msg = "No supported groups found: {}.  Supported groups include: {}."
         raise ValueError(msg.format(list(groups.keys()), "vertlevs"))
