@@ -36,7 +36,7 @@ from ants.fileformats.netcdf.cf import (
 from ants.fileformats.netcdf.ukca import LOCAL_ATTS, _ukca_conventions
 
 
-def ancil(cubes, filename, ignore_writing_metadata_files=False):
+def ancil(cubes, filename, ignore_metadata_write=False):
     """
     Save one or more cubes to a F03 UM ancillary file.
 
@@ -74,7 +74,7 @@ def ancil(cubes, filename, ignore_writing_metadata_files=False):
         One or more cubes to be saved.
     filename : str
         The name of the F03 UM ancillary file, including any extension.
-    ignore_writing_metadata_files : bool
+    ignore_metadata_write : bool
         Determines whether attributes should be saved to a seperate metadata file.
         Default setting is False, so will write out the metadata.
 
@@ -96,7 +96,7 @@ def ancil(cubes, filename, ignore_writing_metadata_files=False):
         raise ValueError("F03 UM ancillary files cannot be saved with a .nc extension.")
 
     cubes = ants.utils.cube.as_cubelist(cubes)
-    if not ignore_writing_metadata_files:
+    if not ignore_metadata_write:
         _check_and_sort_metadata_attributes(cubes, filename)
     ancilfile = _cubes_to_ancilfile(cubes)
     _mule_set_lbuser2(ancilfile)
