@@ -2,8 +2,11 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+
+# Some of this file has been edited using Met Office Github Copilot Enterprise.
 import tempfile
 import unittest.mock as mock
+import warnings
 
 import ants
 import ants.io.save as save
@@ -827,4 +830,108 @@ class TestMuleWorkaround(_BaseCommon, ants.tests.TestCase):
         if any(lbuser_set):
             raise RuntimeError(
                 "Mule is populating lbuser2 for us.  Remove " "our workaround."
+            )
+
+
+@ants.tests.skip_mule
+class TestRegularCoordPrecision(ants.tests.TestCase):
+    """
+    Regular horizontal coordinates must be float64 and derived from the header.
+
+    The grid used has a step (0.11 degrees) that cannot be represented exactly
+    in float32.  Iris generates regular coordinates in float32 with a rounding
+    that differs between iris/numpy versions, so a load which relied on that
+    would give values that differ by a few float32 ULPs (up to ~6e-5 degrees)
+    depending on the environment.  The tolerances below are far tighter than
+    float32 resolution so that any such regression is detected.
+
+    """
+
+    _N = 190
+    _X0 = 341.415
+    _Y0 = -0.165
+    _STEP = 0.11
+    _DECIMAL = 12
+
+    def _make_rotated_cube(self):
+        crs = iris.coord_systems.RotatedGeogCS(
+            39.25, 198.0, ellipsoid=iris.coord_systems.GeogCS(6371229.0)
+        )
+        n = np.arange(self._N)
+        y = DimCoord(
+            self._Y0 + self._STEP * n,
+            standard_name="grid_latitude",
+            units="degrees",
+            coord_system=crs,
+        )
+        x = DimCoord(
+            self._X0 + self._STEP * n,
+            standard_name="grid_longitude",
+            units="degrees",
+            coord_system=crs,
+        )
+        cube = iris.cube.Cube(
+            np.zeros((self._N, self._N), dtype=np.float32),
+            dim_coords_and_dims=[(y, 0), (x, 1)],
+        )
+        cube.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi("m01s00i030")
+        cube.attributes["grid_staggering"] = 3
+        return cube
+
+    def _load(self, lbcode=None):
+        with tempfile.NamedTemporaryFile() as fh:
+            save.ancil(self._make_rotated_cube(), fh.name)
+            if lbcode is None:
+                return ants.io.load.load_cube(fh.name)
+            # Rewrite the horizontal grid type, e.g. to request bounds.
+            with tempfile.NamedTemporaryFile() as fh_modified:
+                ancil = mule.AncilFile.from_file(fh.name)
+                for field in ancil.fields:
+                    field.lbcode = lbcode
+                ancil.validate = lambda *args, **kwargs: None
+                ancil.to_file(fh_modified.name)
+                # Mule warns about the non-standard grid type when loading.
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore", message="(?s).*Skipping Field validation.*"
+                    )
+                    return ants.io.load.load_cube(fh_modified.name)
+
+    def test_points_are_float64(self):
+        cube = self._load()
+        for axis in ("x", "y"):
+            self.assertEqual(cube.coord(axis=axis).dtype, np.float64)
+
+    def test_points_values(self):
+        cube = self._load()
+        x = cube.coord(axis="x").points
+        y = cube.coord(axis="y").points
+        n = np.arange(self._N)
+        self.assertArrayAlmostEqual(x, self._X0 + self._STEP * n, self._DECIMAL)
+        self.assertArrayAlmostEqual(y, self._Y0 + self._STEP * n, self._DECIMAL)
+        # Explicit values, independent of the calculation above.
+        self.assertArrayAlmostEqual(
+            x[[0, 1, -1]], [341.415, 341.525, 362.205], self._DECIMAL
+        )
+        self.assertArrayAlmostEqual(
+            y[[0, 1, -1]], [-0.165, -0.055, 20.625], self._DECIMAL
+        )
+
+    def test_no_bounds_for_lbcode_101(self):
+        cube = self._load()
+        for axis in ("x", "y"):
+            self.assertFalse(cube.coord(axis=axis).has_bounds())
+
+    def test_bounds_are_float64_and_centred_on_points(self):
+        cube = self._load(lbcode=102)
+        for axis in ("x", "y"):
+            coord = cube.coord(axis=axis)
+            self.assertEqual(coord.points.dtype, np.float64)
+            self.assertEqual(coord.bounds.dtype, np.float64)
+            half_step = 0.5 * self._STEP
+            self.assertArrayAlmostEqual(
+                coord.bounds[:, 0], coord.points - half_step, self._DECIMAL
+            )
+            self.assertArrayAlmostEqual(
+                coord.bounds[:, 1], coord.points + half_step, self._DECIMAL
             )

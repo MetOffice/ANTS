@@ -10,6 +10,7 @@ import ants.tests
 import iris
 import numpy as np
 from ants.fileformats.ancil import _CallbackUM as CallbackUM
+from iris.fileformats.pp import SplittableInt
 
 
 @ants.tests.skip_mule
@@ -25,7 +26,7 @@ class Test___call__(ants.tests.TestCase):
 
         self.field = mock.Mock(
             name="field",
-            lbcode=[1, 0, 0],
+            lbcode=SplittableInt(1),
             lbnpt=5,
             lbrow=3,
             bzx=341.30499999999995,
@@ -36,9 +37,9 @@ class Test___call__(ants.tests.TestCase):
         )
         self.field.coord_system.return_value = None
 
-    def call(self, field=None):
+    def call(self):
         CallbackUM({mock.sentinel.filename: 6}).__call__(
-            self.cube, field or self.field, mock.sentinel.filename
+            self.cube, self.field, mock.sentinel.filename
         )
 
     def test_check_ppcallback_callable_called(self):
@@ -91,7 +92,7 @@ class Test___call__(ants.tests.TestCase):
 
     def test_regular_coords_bounds(self):
         self._regular_cube(with_bounds=True)
-        self.field.lbcode = [2, 0, 0]
+        self.field.lbcode = SplittableInt(2)
         self.call()
         x = self.cube.coord("longitude")
         self.assertEqual(x.bounds.dtype, np.float64)
@@ -126,7 +127,7 @@ class Test___call__(ants.tests.TestCase):
         # Iris derives bounds from the header step even for a single point,
         # which ants.utils.coord.guess_bounds cannot do.
         self._single_point_x_cube(with_bounds=True)
-        self.field.lbcode = [2, 0, 0]
+        self.field.lbcode = SplittableInt(2)
         self.call()
         x = self.cube.coord("longitude")
         self.assertEqual(x.dtype, np.float64)
@@ -151,17 +152,58 @@ class Test___call__(ants.tests.TestCase):
         self.call()
         self.assertEqual(self.cube.coord("grid_longitude").dtype, np.float64)
 
+    def _assert_float32_untouched(self, *names):
+        for name in names:
+            before = self._before[name]
+            coord = self.cube.coord(name)
+            self.assertEqual(coord, before)
+            self.assertEqual(coord.dtype, np.float32)
+
+    def _remember_coords(self):
+        self._before = {
+            name: self.cube.coord(name).copy() for name in ("latitude", "longitude")
+        }
+
     def test_irregular_axis_untouched(self):
         self._regular_cube()
+        self._remember_coords()
         self.field.bdx = self.field.bmdi
-        before = self.cube.coord("longitude").copy()
         self.call()
-        self.assertEqual(self.cube.coord("longitude"), before)
+        self._assert_float32_untouched("longitude")
         self.assertEqual(self.cube.coord("latitude").dtype, np.float64)
 
     def test_cross_section_untouched(self):
+        # A 5 digit lbcode whose final digit would otherwise be a supported
+        # horizontal grid type.
         self._regular_cube()
-        self.field.lbcode = [10101, 0, 0, 0, 0]
-        before = self.cube.coord("longitude").copy()
+        self._remember_coords()
+        self.field.lbcode = SplittableInt(10101)
         self.call()
-        self.assertEqual(self.cube.coord("longitude"), before)
+        self._assert_float32_untouched("longitude", "latitude")
+
+    def test_unsupported_grid_type_untouched(self):
+        for lbcode in (3, 103):
+            with self.subTest(lbcode=lbcode):
+                self._regular_cube()
+                self._remember_coords()
+                self.field.lbcode = SplittableInt(lbcode)
+                self.call()
+                self._assert_float32_untouched("longitude", "latitude")
+
+    def test_coord_length_mismatch_untouched(self):
+        self._regular_cube()
+        self._remember_coords()
+        self.field.lbnpt = 7
+        self.call()
+        self._assert_float32_untouched("longitude")
+        self.assertEqual(self.cube.coord("latitude").dtype, np.float64)
+
+    def test_coord_not_a_dimension_coord_untouched(self):
+        self._regular_cube()
+        x = self.cube.coord("longitude")
+        self.cube.remove_coord(x)
+        self.cube.add_aux_coord(iris.coords.AuxCoord.from_coord(x), 1)
+        self._remember_coords()
+        self.call()
+        self._assert_float32_untouched("longitude")
+        self.assertEqual(self.cube.coord("latitude").dtype, np.float64)
