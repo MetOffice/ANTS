@@ -42,7 +42,7 @@ def load_data(source, ignore_metadata_read):
         warnings.filterwarnings(
             "ignore", "NetCDF default loading", iris._deprecation.IrisDeprecation
         )
-        cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_read)
+        cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     return cubes
 
 
@@ -88,7 +88,7 @@ def main(
         save.ancil(
             source_cubes,
             output_path,
-            ignore_writing_metadata_files=ignore_metadata_write,
+            ignore_metadata_write=ignore_metadata_write,
         )
     save.netcdf(source_cubes, output_path)
 

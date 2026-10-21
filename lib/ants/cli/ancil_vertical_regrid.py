@@ -27,7 +27,7 @@ def load_data(
     end=None,
     ignore_metadata_read=None,
 ):
-    source_cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_read)
+    source_cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
 
@@ -141,7 +141,7 @@ def main(
             save.ancil(
                 regridded_cubes,
                 output_path,
-                ignore_writing_metadata_files=ignore_metadata_write,
+                ignore_metadata_write=ignore_metadata_write,
             )
         save.netcdf(regridded_cubes, output_path)
 

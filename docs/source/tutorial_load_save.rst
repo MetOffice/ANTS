@@ -1,6 +1,6 @@
 .. meta::
    :description lang=en: Tutorial on loading and saving data with ANTS
-   :keywords: load, save, netcdf, ancil, tutorial
+   :keywords: load, save, netcdf, ancil, metadata, license, licensing, attribution, references, tutorial
    :property=og:locale: en_GB
 
 .. include:: common.txt
@@ -29,10 +29,13 @@ some ANTS specific ones, see :mod:`ants.fileformats`), then additionally:
    none, and
 3. removes any ``forecast_reference_time`` and ``forecast_period``
    coordinates, which are not usually wanted in ancillary fields.
+4. preserves metadata by loading sidecar metdata files alongside the data
+   files.
 
 :mod:`ants.io.save` similarly extends :py:func:`iris.save` with support for
 the F03 UM ancillary fileformat and a UKCA specific flavour of NetCDF, neither
-of which Iris can write natively.
+of which Iris can write natively, and has the option to write metadata files
+alongside the saved files in the case of saving an F03 UM ancillary fileformat.
 
 Loading data
 ------------
@@ -82,6 +85,45 @@ a land binary mask field or a land fraction field:
         "/path/to/target_lsm.nc", land_threshold=0.5
     )
 
+Loading metadata
+----------------
+Metadata in this tutorial refers to information about the data in a file, that does not
+directly affect that data. For example, licensing information or attributions.
+
+Metadata in this tutorial refers to information about the data in a file, that does not
+directly affect that data. For example, licensing information or attributions.
+
+Some ancillary file formats cannot include metadata. Metadata can be very important to
+keep alongside the data as often data will have some form of requirement or restriction
+on it. Because of this, ANTS can handle in external metadata files, provided they match
+the naming convention of `filename.extension.accepted-metadata`. The current accepted
+metadata attributes are "license", "attribution", "restrictions", "institution",
+"acknowledgement", and "references".
+
+This functionality can be turned off through the use of the argument
+``--ignore-metadata-read` on the command line or when calling the ANTS load:
+
+.. code-block:: python
+
+    cube = ants.io.load.load("/path/to/source_file" ,ignore_metadata_read=True)
+
+
+.. note::
+    Any attributes or files referencing licensing should use the 'license' spelling for
+    consistency.
+
+ANTS can load in external metadata files or 'sidecar' files, if they are kept in the
+same directory as the data files, and have the same name (including the extension).
+Metadata can be loaded alongside all files, including NetCDF files, however ANTS will
+not allow you to load a file with a metadata attribute and a sidecar file with the same
+attribute. This is to prevent unintentional loss or overwriting of metadata information.
+
+.. note::
+    When using wildcards for loading with sidecar files, add the file extension to the
+    end to prevent issues with ANTS attempting to load the sidecar files. E.g.
+    `data*.pp` rather than `data*`.
+
+
 Saving data
 -----------
 
@@ -113,6 +155,24 @@ data type coercion and attribute renaming) on top of a standard NetCDF save:
 .. code-block:: python
 
     save.ukca_netcdf(source_cubes, "/path/to/output_ukca.nc")
+
+Saving metadata
+---------------
+Metadata will only be saved to a sidecar file, if the ancil saver is used. This is
+because NetCDF files will include the attributes within the file.
+
+This functionality can be turned off through the use of the argument
+``--ignore-metadata-write`` on the command line or when calling the ANTS save:
+
+.. code-block:: python
+
+    import ants.io.save as save
+
+    save.ancil(source_cubes, "/path/to/output_ancil", ignore_metadata_write=True)
+
+The sidecar files produced by ANTS follow the same naming coventions at those loaded in
+`filename.attribute.accepted-metadata`. Only accepted metadata will be written out.
+
 
 Key Points
 ----------

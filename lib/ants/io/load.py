@@ -212,7 +212,7 @@ def ants_format_agent():
         iris.fileformats.FORMAT_AGENT = original_format_agent
 
 
-def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True):
+def load_landsea_mask(filename, land_threshold=None, ignore_metadata_read=True):
     """
     Load a landsea mask from either a landsea mask file or a landfraction file.
 
@@ -224,7 +224,7 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
         Threshold for converting the land fraction field into a landsea mask
         field.  0.5 would mean that any fraction greater than this will be
         masked.  This argument is used when loading a land fraction field.
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to True (off) by default.
 
@@ -237,7 +237,7 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
     try:
         # Is it a landsea mask field?
         lbm = ants.io.load.load_cube(
-            filename, "land_binary_mask", ignore_metadata_files=ignore_metadata_files
+            filename, "land_binary_mask", ignore_metadata_read=ignore_metadata_read
         )
         lbm = lbm.copy(lbm.data.astype("bool", copy=False))
     except iris.exceptions.ConstraintMismatchError:
@@ -246,7 +246,7 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
             land_fraction = ants.io.load.load_cube(
                 filename,
                 "vegetation_area_fraction",
-                ignore_metadata_files=ignore_metadata_files,
+                ignore_metadata_read=ignore_metadata_read,
             )
             lbm = land_fraction.copy(land_fraction.data > land_threshold)
             lbm.rename("land_binary_mask")
@@ -254,7 +254,7 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
             # It looks like we are wanting to extract a landsea mask from some
             # other field.
             cube = ants.io.load.load(
-                filename, ignore_metadata_files=ignore_metadata_files
+                filename, ignore_metadata_read=ignore_metadata_read
             )[0]
             y = cube.coord(axis="y")
             x = cube.coord(axis="x")
@@ -263,7 +263,7 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
     return lbm
 
 
-def load_grid(filenames, *args, ignore_metadata_files=False, **kwargs):
+def load_grid(filenames, *args, ignore_metadata_read=False, **kwargs):
     """
     Load a grid definition and return an iris cube.
 
@@ -284,7 +284,7 @@ def load_grid(filenames, *args, ignore_metadata_files=False, **kwargs):
         definition.
     *args :
         See :func:`iris.load`
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
@@ -315,7 +315,7 @@ def load_grid(filenames, *args, ignore_metadata_files=False, **kwargs):
     # variable namelists) in the namelist loader at the same time.
     if filenames:
         cubes = load(
-            filenames, *args, ignore_metadata_files=ignore_metadata_files, **kwargs
+            filenames, *args, ignore_metadata_read=ignore_metadata_read, **kwargs
         )
         if cubes:
             results.extend(cubes)
@@ -374,10 +374,10 @@ def _customised_load(func):
                 FutureWarning,
             )
             # Check if metadata functionality has been turned off.
-            ignore_metadata_files = False
-            if "ignore_metadata_files" in kwargs:
-                ignore_metadata_files = kwargs.pop("ignore_metadata_files")
-            if not ignore_metadata_files:
+            ignore_metadata_read = False
+            if "ignore_metadata_read" in kwargs:
+                ignore_metadata_read = kwargs.pop("ignore_metadata_read")
+            if not ignore_metadata_read:
                 # Get the inputs of the function.
                 # Chain any user callback after the metadata callback.
                 bound = inspect.signature(func).bind(*args, **kwargs)
@@ -477,7 +477,7 @@ class _CallbackMetadata:
                 cube.attributes[attribute_name] = metadata
 
 
-def load_cube(*args, ignore_metadata_files=False, **kwargs):
+def load_cube(*args, ignore_metadata_read=False, **kwargs):
     """
     Loads a single cube.
 
@@ -489,7 +489,7 @@ def load_cube(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cube`
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
@@ -500,12 +500,10 @@ def load_cube(*args, ignore_metadata_files=False, **kwargs):
         A :class:`~iris.cube.Cube`.
     """
     loading_function = _customised_load(iris.load_cube)
-    return loading_function(
-        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
-    )
+    return loading_function(*args, ignore_metadata_read=ignore_metadata_read, **kwargs)
 
 
-def load(*args, ignore_metadata_files=False, **kwargs):
+def load(*args, ignore_metadata_read=False, **kwargs):
     """
     Loads any number of Cubes for each constraint.
 
@@ -518,7 +516,7 @@ def load(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load`
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
@@ -529,12 +527,10 @@ def load(*args, ignore_metadata_files=False, **kwargs):
         A :class:`~iris.cube.CubeList`.
     """
     loading_function = _customised_load(iris.load)
-    return loading_function(
-        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
-    )
+    return loading_function(*args, ignore_metadata_read=ignore_metadata_read, **kwargs)
 
 
-def load_cubes(*args, ignore_metadata_files=False, **kwargs):
+def load_cubes(*args, ignore_metadata_read=False, **kwargs):
     """
     Loads exactly one Cube for each constraint.
 
@@ -547,7 +543,7 @@ def load_cubes(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cubes`
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
@@ -559,12 +555,10 @@ def load_cubes(*args, ignore_metadata_files=False, **kwargs):
 
     """
     loading_function = _customised_load(iris.load_cubes)
-    return loading_function(
-        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
-    )
+    return loading_function(*args, ignore_metadata_read=ignore_metadata_read, **kwargs)
 
 
-def load_raw(*args, ignore_metadata_files=False, **kwargs):
+def load_raw(*args, ignore_metadata_read=False, **kwargs):
     """
     Loads non-merged cubes.
 
@@ -577,7 +571,7 @@ def load_raw(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_raw`
-    ignore_metadata_files : bool
+    ignore_metadata_read : bool
         The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
@@ -588,6 +582,4 @@ def load_raw(*args, ignore_metadata_files=False, **kwargs):
         A :class:`~iris.cube.CubeList`.
     """
     loading_function = _customised_load(iris.load_raw)
-    return loading_function(
-        *args, ignore_metadata_files=ignore_metadata_files, **kwargs
-    )
+    return loading_function(*args, ignore_metadata_read=ignore_metadata_read, **kwargs)

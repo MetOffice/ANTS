@@ -44,18 +44,18 @@ def load_data(
     end=None,
     ignore_metadata_read=False,
 ):
-    source_cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_read)
+    source_cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
     if target_grid:
         target_cube = ants.io.load.load_grid(
-            target_grid, ignore_metadata_files=ignore_metadata_read
+            target_grid, ignore_metadata_read=ignore_metadata_read
         )
     else:
         target_cube = ants.io.load.load_landsea_mask(
             target_landseamask,
             land_fraction_threshold,
-            ignore_metadata_files=ignore_metadata_read,
+            ignore_metadata_read=ignore_metadata_read,
         )
     return source_cubes, target_cube
 
@@ -165,7 +165,7 @@ def main(
             save.ancil(
                 regridded_cubes,
                 output_path,
-                ignore_writing_metadata_files=ignore_metadata_write,
+                ignore_metadata_write=ignore_metadata_write,
             )
         save.netcdf(regridded_cubes, output_path)
 

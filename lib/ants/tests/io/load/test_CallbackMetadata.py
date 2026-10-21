@@ -49,7 +49,7 @@ def test_no_metadata_loaded(tmp_path):
     temporary_license_path = tmp_path / "cube_attribute.pp.license"
     temporary_license_path.write_text(license_text, encoding="utf-8")
     loaded_test_cube = ants.io.load.load_cube(
-        temporary_cube_path, ignore_metadata_files=True
+        temporary_cube_path, ignore_metadata_read=True
     )
     assert "license" not in loaded_test_cube.attributes
 

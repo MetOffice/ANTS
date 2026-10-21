@@ -140,7 +140,7 @@ def test_metadata_not_loaded():
         "load_files/ancil_file_with_pseudo_levels",
         sidecars={"license": "An example license\n"},
     ) as file_path:
-        loaded_cube = ants.io.load.load_cube(file_path, ignore_metadata_files=True)
+        loaded_cube = ants.io.load.load_cube(file_path, ignore_metadata_read=True)
     assert "license" not in loaded_cube.attributes
 
 

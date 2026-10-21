@@ -306,7 +306,7 @@ class TestAntsArgParser(ants.tests.TestCase):
         self.assertEqual(args, target_args)
 
     def test_set_ignore_metadata_write_flag(self):
-        "Tests that ignore_metadata_files will be set to True when passed in."
+        "Tests that ignore_metadata_write will be set to True when passed in."
         new = [
             "program",
             "/path/to/source",

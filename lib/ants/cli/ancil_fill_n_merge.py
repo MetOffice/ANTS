@@ -61,14 +61,14 @@ def load_data(
 
     """
     primary_cubes = ants.io.load.load(
-        primary_source, ignore_metadata_files=ignore_metadata_read
+        primary_source, ignore_metadata_read=ignore_metadata_read
     )
     if begin is not None:
         primary_cubes = create_time_constrained_cubes(primary_cubes, begin, end)
     alternate_cubes = None
     if alternate_source:
         alternate_cubes = ants.io.load.load(
-            alternate_source, ignore_metadata_files=ignore_metadata_read
+            alternate_source, ignore_metadata_read=ignore_metadata_read
         )
         if begin is not None:
             alternate_cubes = create_time_constrained_cubes(alternate_cubes, begin, end)
@@ -199,7 +199,7 @@ def main(
         ants.analysis.make_consistent_with_lsm(result, lbm, invert_mask, search_method)
 
     if not netcdf_only:
-        save.ancil(result, output, ignore_writing_metadata_files=ignore_metadata_write)
+        save.ancil(result, output, ignore_metadata_write=ignore_metadata_write)
     save.netcdf(result, output)
 
     return result
