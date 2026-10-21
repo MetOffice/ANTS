@@ -3,7 +3,7 @@
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
 
-#Some of this file has been edited using Met Office Github Copilot Enterprise.
+# Some of this file has been edited using Met Office Github Copilot Enterprise.
 import unittest.mock as mock
 
 import ants.tests
@@ -97,6 +97,49 @@ class Test___call__(ants.tests.TestCase):
         self.assertEqual(x.bounds.dtype, np.float64)
         self.assertArrayAlmostEqual(x.bounds[:, 0], x.points - 0.055, decimal=12)
         self.assertArrayAlmostEqual(x.bounds[:, 1], x.points + 0.055, decimal=12)
+
+    def _single_point_x_cube(self, with_bounds):
+        self.field.lbnpt = 1
+        self.field.bzx = -349.75
+        self.field.bdx = 0.5
+        y = iris.coords.DimCoord.from_regular(
+            self.field.bzy,
+            self.field.bdy,
+            3,
+            standard_name="latitude",
+            units="degrees",
+        )
+        x = iris.coords.DimCoord.from_regular(
+            self.field.bzx,
+            self.field.bdx,
+            1,
+            standard_name="longitude",
+            units="degrees",
+            with_bounds=with_bounds,
+        )
+        cube = iris.cube.Cube(np.zeros((3, 1)))
+        cube.add_dim_coord(y, 0)
+        cube.add_dim_coord(x, 1)
+        self.cube = cube
+
+    def test_single_point_axis_bounds(self):
+        # Iris derives bounds from the header step even for a single point,
+        # which ants.utils.coord.guess_bounds cannot do.
+        self._single_point_x_cube(with_bounds=True)
+        self.field.lbcode = [2, 0, 0]
+        self.call()
+        x = self.cube.coord("longitude")
+        self.assertEqual(x.dtype, np.float64)
+        self.assertArrayAlmostEqual(x.points, [-349.25], decimal=12)
+        self.assertArrayAlmostEqual(x.bounds, [[-349.5, -349.0]], decimal=12)
+
+    def test_single_point_axis_no_bounds(self):
+        self._single_point_x_cube(with_bounds=False)
+        self.call()
+        x = self.cube.coord("longitude")
+        self.assertEqual(x.dtype, np.float64)
+        self.assertArrayAlmostEqual(x.points, [-349.25], decimal=12)
+        self.assertFalse(x.has_bounds())
 
     def test_rotated_names(self):
         self._regular_cube()
