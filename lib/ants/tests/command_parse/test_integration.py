@@ -54,7 +54,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             sources=["/path/to/source"],
             netcdf_only=False,
-            ignore_metadata_files=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -71,7 +72,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             ants_config=None,
             netcdf_only=False,
-            ignore_metadata_files=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
             new_arg="new_arg_value",
         )
         self.assertEqual(args, target_args)
@@ -180,7 +182,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=2016,
             end=2021,
             netcdf_only=False,
-            ignore_metadata_files=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -213,7 +216,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=1990,
             end=1996,
             netcdf_only=False,
-            ignore_metadata_files=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -273,8 +277,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             with self.assertRaises(exceptions.TimeConstraintMissingException):
                 parser.parse_args()
 
-    def test_set_ignore_metadata_files_flag(self):
-        "Tests that ignore_metadata_files will be set to True when passed in."
+    def test_set_ignore_metadata_read_flag(self):
+        "Tests that ignore_metadata_read will be set to True when passed in."
         new = [
             "program",
             "/path/to/source",
@@ -282,7 +286,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             "/path/to/lsm",
             "-o",
             "/path/to/output",
-            "--ignore-metadata-files",
+            "--ignore-metadata-read",
         ]
         with mock.patch("sys.argv", new=new):
             parser = AntsArgParser(target_lsm=True)
@@ -295,7 +299,36 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             sources=["/path/to/source"],
             netcdf_only=False,
-            ignore_metadata_files=True,
+            ignore_metadata_read=True,
+            ignore_metadata_write=False,
+        )
+        self.assertFalse(self.mock_config.called)
+        self.assertEqual(args, target_args)
+
+    def test_set_ignore_metadata_write_flag(self):
+        "Tests that ignore_metadata_files will be set to True when passed in."
+        new = [
+            "program",
+            "/path/to/source",
+            "--target-lsm",
+            "/path/to/lsm",
+            "-o",
+            "/path/to/output",
+            "--ignore-metadata-write",
+        ]
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(target_lsm=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            land_threshold=None,
+            target_lsm="/path/to/lsm",
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=True,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)

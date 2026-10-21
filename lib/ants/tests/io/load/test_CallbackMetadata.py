@@ -51,8 +51,7 @@ def test_no_metadata_loaded(tmp_path):
     loaded_test_cube = ants.io.load.load_cube(
         temporary_cube_path, ignore_metadata_files=True
     )
-    with pytest.raises(KeyError):
-        loaded_test_cube.attributes["license"]
+    assert "license" not in loaded_test_cube.attributes
 
 
 def test_user_callback_added():
@@ -65,7 +64,7 @@ def test_user_callback_added():
     assert class_instance._user_callback == user_callback
 
 
-def test_args_parsed_correctly_with_kwargs(tmp_path):
+def test_user_callback_called__keyword_arg(tmp_path):
     """Tests that when passed a user callback using a keyword argument,
     the callback is parsed correctly."""
     mock_callback = mock.Mock()
@@ -76,7 +75,7 @@ def test_args_parsed_correctly_with_kwargs(tmp_path):
     mock_callback.assert_called()
 
 
-def test_args_parsed_correctly_with_positional_args(tmp_path):
+def test_user_callback_called__positional_arg(tmp_path):
     """Tests that when passed a user callback using a keyword argument,
     the callback is parsed correctly."""
     mock_callback = mock.Mock()
@@ -102,13 +101,13 @@ def test__retrieve_metadata_incorrect_name():
     """Tests that files without a valid metadata name won't be read."""
     class_instance = ants.io.load._CallbackMetadata(None)
     test_cube = ants.tests.stock.geodetic(shape=(2, 2))
-    path = ["fake-path/fake-cube.pp"]
+    path = ["fake-path/fake-cube.invalid"]
     expected_message = (
-        "Attribute pp is not a valid metadata file "
-        "name. Accepted metadata names are license, attribution "
-        "and restrictions."
+        "Attribute invalid is not a valid metadata file "
+        r"name. Accepted metadata names are: \['license', 'attribution', "
+        r"'restrictions', 'institution', 'acknowledgement', 'references'\]"
     )
-    with pytest.raises(UserWarning, match=expected_message):
+    with pytest.raises(ants.exceptions.MetadataWarning, match=expected_message):
         class_instance._retrieve_metadata(path, test_cube)
 
 
@@ -129,10 +128,10 @@ def test_attribute_already_on_cube():
 
 
 @pytest.mark.filterwarnings(
-    "ignore:The attribute name licence has been changed to 'license', in line with "
-    "ANTS working practices.:UserWarning"
+    "ignore:The attribute name 'licence' has been changed to 'license', in line with "
+    "ANTS working practices.:ants.exceptions.MetadataWarning"
 )
-def test_missplet_license_with_licensed_cube():
+def test_misspelt_license_with_licensed_cube():
     """Tests that when given a sidecar file with a miss-spelt license and a cube with an
     existing license, an error will be given."""
     class_instance = ants.io.load._CallbackMetadata(None)
@@ -158,13 +157,15 @@ def test_misspelt_license_added(tmp_path):
     temporary_license_path.write_text(license_text, encoding="utf-8")
     # ignore warning that will be raised
     warning_message = (
-        "The attribute name licence has been changed to 'license', in "
+        "The attribute name 'licence' has been changed to 'license', in "
         "line with ANTS working practices."
     )
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", message=warning_message, category=UserWarning)
+        warnings.filterwarnings(
+            "ignore", message=warning_message, category=ants.exceptions.MetadataWarning
+        )
         loaded_cube = ants.io.load.load_cube(temporary_cube_path)
-        assert loaded_cube.attributes["license"] == "a license"
+    assert loaded_cube.attributes["license"] == "a license"
 
 
 def test_invalid_metadata_name(tmp_path):
@@ -176,8 +177,9 @@ def test_invalid_metadata_name(tmp_path):
     temporary_license_path.write_text(" ", encoding="utf-8")
 
     warning_message = (
-        "Attribute invalid-name is not a valid metadata file name. "
-        "Accepted metadata names are license, attribution and restrictions."
+        "Attribute invalid-name is not a valid metadata file "
+        r"name. Accepted metadata names are: \['license', 'attribution', "
+        r"'restrictions', 'institution', 'acknowledgement', 'references'\]"
     )
-    with pytest.raises(UserWarning, match=warning_message):
+    with pytest.raises(ants.exceptions.MetadataWarning, match=warning_message):
         ants.io.load.load_cube(temporary_cube_path)

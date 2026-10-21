@@ -2,12 +2,15 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the content of this file has been produced with the assistance of
+# Met Office GitHub Copilot Enterprise.
 
 import tempfile
 
 import ants
 import ants.tests
 import iris.fileformats
+import pytest
 from ants.fileformats.ancil import mule
 from ants.io.load import ants_format_agent
 
@@ -103,3 +106,94 @@ def test_forecast_reference_time():
         result = ants.io.load.load_cube(temp_file.name)
     result_coords = [c.name() for c in result.coords()]
     assert "forecast_reference_time" not in result_coords
+
+
+@ants.tests.skip_mule
+def test_metadata_loaded():
+    """Loads an ancil file, along with associated metadata from sidecar files."""
+    expected_attributes = {
+        "license": "An example license\n",
+        "attribution": "An example attribution\n",
+        "restrictions": "An example restrictions\n",
+        "institution": "An example institution\n",
+        "acknowledgement": "An example acknowledgement\n",
+        "references": "An example references\n",
+    }
+
+    with ants.tests.isolated_resource(
+        "load_files/ancil_file_with_pseudo_levels", sidecars=expected_attributes
+    ) as file_path:
+        loaded_cube = ants.io.load.load_cube(file_path)
+
+    assert loaded_cube.attributes["license"] == "An example license\n"
+    assert loaded_cube.attributes["attribution"] == "An example attribution\n"
+    assert loaded_cube.attributes["restrictions"] == "An example restrictions\n"
+    assert loaded_cube.attributes["institution"] == "An example institution\n"
+    assert loaded_cube.attributes["acknowledgement"] == "An example acknowledgement\n"
+    assert loaded_cube.attributes["references"] == "An example references\n"
+
+
+@ants.tests.skip_mule
+def test_metadata_not_loaded():
+    """Loads an ancil file, ignoring associated metadata from sidecar files."""
+    with ants.tests.isolated_resource(
+        "load_files/ancil_file_with_pseudo_levels",
+        sidecars={"license": "An example license\n"},
+    ) as file_path:
+        loaded_cube = ants.io.load.load_cube(file_path, ignore_metadata_files=True)
+    assert "license" not in loaded_cube.attributes
+
+
+@ants.tests.skip_mule
+# pytest.warns re-emits unmatched warnings with module "warnings", so the
+# module-scoped "mule" filter in pyproject.toml no longer applies.
+@pytest.mark.filterwarnings(
+    "ignore:Ancillary files do not define the UM version number:UserWarning"
+)
+@pytest.mark.filterwarnings(
+    "ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning"  # noqa: E501
+)
+def test_misnamed_licence_warning():
+    """Loads an ancil file, along with associated metadata from licence sidecar file.
+    If a sidecar file has the .licence extension, a warning will be raised, and
+    the metadata should be added to the license attribute.
+    """
+    expected_msg = (
+        "The attribute name 'licence' has been changed to "
+        "'license', in line with ANTS working practices."
+    )
+    with ants.tests.isolated_resource(
+        "load_files/ancil_file_with_pseudo_levels",
+        sidecars={"licence": "An example licence\n"},
+    ) as file_path:
+        with pytest.warns(ants.exceptions.MetadataWarning, match=expected_msg):
+            loaded_cube = ants.io.load.load_cube(file_path)
+    assert loaded_cube.attributes["license"] == "An example licence\n"
+
+
+@ants.tests.skip_mule
+# pytest.warns re-emits unmatched warnings with module "warnings", so the
+# module-scoped "mule" filter in pyproject.toml no longer applies.
+@pytest.mark.filterwarnings(
+    "ignore:Ancillary files do not define the UM version number:UserWarning"
+)
+@pytest.mark.filterwarnings(
+    "ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning"  # noqa: E501
+)
+def test_invalid_metadata_warning():
+    """Loads an ancil file, and tests that a warning is raised for an unsupported
+    sidecar file: .invalid"""
+    expected_msg = (
+        "Attribute invalid is not a valid metadata file "
+        r"name. Accepted metadata names are: \['license', 'attribution', "
+        r"'restrictions', 'institution', 'acknowledgement', 'references'\]"
+    )
+
+    with ants.tests.isolated_resource(
+        "load_files/ancil_file_with_pseudo_levels",
+        sidecars={"invalid": "Invalid metadata file content"},
+    ) as file_path:
+        with pytest.warns(ants.exceptions.MetadataWarning, match=expected_msg):
+            loaded_cube = ants.io.load.load_cube(file_path)
+
+    assert "invalid" not in loaded_cube.attributes

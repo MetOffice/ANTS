@@ -37,16 +37,23 @@ import ants.io.save as save
 import iris
 
 
-def load_data(source, ignore_metadata_files):
+def load_data(source, ignore_metadata_read):
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore", "NetCDF default loading", iris._deprecation.IrisDeprecation
         )
-        cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_files)
+        cubes = ants.io.load.load(source, ignore_metadata_files=ignore_metadata_read)
     return cubes
 
 
-def main(source_path, output_path, grid_staggering, netcdf_only, ignore_metadata_files):
+def main(
+    source_path,
+    output_path,
+    grid_staggering,
+    netcdf_only,
+    ignore_metadata_read,
+    ignore_metadata_write,
+):
     """
     Convert specified source file to an ancillary.
 
@@ -58,6 +65,12 @@ def main(source_path, output_path, grid_staggering, netcdf_only, ignore_metadata
         Output ancillary file path.  A NetCDF will also be written.
     grid_staggering : :obj:`int`, optional
         Grid staggering lookup, see UM F03 - FLH(9).
+    netcdf_only : bool
+        If True, only write to netCDF. If False, write to both netCDF and ancillary.
+    ignore_metadata_read : :obj:`bool`, optional
+        If True, do not read metadata sidecar files alongside the source.
+    ignore_metadata_write : :obj:`bool`, optional
+        If True, do not write metadata sidecar files alongside the ancillary.
 
     Returns
     -------
@@ -66,7 +79,7 @@ def main(source_path, output_path, grid_staggering, netcdf_only, ignore_metadata
         written to an ancillary.
 
     """
-    source_cubes = load_data(source_path, ignore_metadata_files)
+    source_cubes = load_data(source_path, ignore_metadata_read)
     if grid_staggering is not None:
         for source_cube in source_cubes:
             source_cube.attributes["grid_staggering"] = grid_staggering
@@ -75,7 +88,7 @@ def main(source_path, output_path, grid_staggering, netcdf_only, ignore_metadata
         save.ancil(
             source_cubes,
             output_path,
-            ignore_writing_metadata_files=ignore_metadata_files,
+            ignore_writing_metadata_files=ignore_metadata_write,
         )
     save.netcdf(source_cubes, output_path)
 
@@ -102,7 +115,8 @@ def cli_interface():
         args.output,
         args.grid_staggering,
         args.netcdf_only,
-        args.ignore_metadata_files,
+        args.ignore_metadata_read,
+        args.ignore_metadata_write,
     )
 
 

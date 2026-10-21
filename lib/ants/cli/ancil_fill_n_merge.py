@@ -25,7 +25,7 @@ def load_data(
     land_fraction_threshold=None,
     begin=None,
     end=None,
-    ignore_metadata_files=False,
+    ignore_metadata_read=False,
 ):
     """
     Load the necessary data for performing a merge and fill operation.
@@ -46,7 +46,7 @@ def load_data(
         Datetime to start the processing.
     end: :obj:`datetime`, optional
         Datetime to end the processing.
-    ignore_metadata_files : :obj:`bool`, optional
+    ignore_metadata_read : :obj:`bool`, optional
         When set to True, files containing metadata will not be loaded alongside data
         and added as attributes to the cube.
 
@@ -61,14 +61,14 @@ def load_data(
 
     """
     primary_cubes = ants.io.load.load(
-        primary_source, ignore_metadata_files=ignore_metadata_files
+        primary_source, ignore_metadata_files=ignore_metadata_read
     )
     if begin is not None:
         primary_cubes = create_time_constrained_cubes(primary_cubes, begin, end)
     alternate_cubes = None
     if alternate_source:
         alternate_cubes = ants.io.load.load(
-            alternate_source, ignore_metadata_files=ignore_metadata_files
+            alternate_source, ignore_metadata_files=ignore_metadata_read
         )
         if begin is not None:
             alternate_cubes = create_time_constrained_cubes(alternate_cubes, begin, end)
@@ -105,7 +105,8 @@ def main(
     netcdf_only,
     search_method,
     blending_distance,
-    ignore_metadata_files,
+    ignore_metadata_read,
+    ignore_metadata_write,
 ):
     """
     Perform merge and fill operation on the provided sources.
@@ -161,9 +162,12 @@ def main(
         is applied. Note that this is in units of grid cells, not a physical distance.
         If ``None``, no blending is applied, and there will be a hard edge between
         the two sources.
-    ignore_metadata_files : :obj:`bool`, optional
+    ignore_metadata_read : :obj:`bool`, optional
         When set to True, files containing metadata will not be loaded alongside data
         and added as attributes to the cube.
+    ignore_metadata_write : bool
+        If True, do not write metadata sidecar files alongside the ancillary.
+
 
     Returns
     -------
@@ -183,7 +187,7 @@ def main(
         land_fraction_threshold,
         begin,
         end,
-        ignore_metadata_files,
+        ignore_metadata_read,
     )
 
     result = primary_cubes
@@ -195,7 +199,7 @@ def main(
         ants.analysis.make_consistent_with_lsm(result, lbm, invert_mask, search_method)
 
     if not netcdf_only:
-        save.ancil(result, output, ignore_writing_metadata_files=ignore_metadata_files)
+        save.ancil(result, output, ignore_writing_metadata_files=ignore_metadata_write)
     save.netcdf(result, output)
 
     return result
@@ -284,7 +288,8 @@ def cli_interface():
         netcdf_only=args.netcdf_only,
         search_method=args.search_method,
         blending_distance=args.blending_distance,
-        ignore_metadata_files=args.ignore_metadata_files,
+        ignore_metadata_read=args.ignore_metadata_read,
+        ignore_metadata_write=args.ignore_metadata_write,
     )
 
 

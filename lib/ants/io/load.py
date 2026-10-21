@@ -224,7 +224,8 @@ def load_landsea_mask(filename, land_threshold=None, ignore_metadata_files=True)
         Threshold for converting the land fraction field into a landsea mask
         field.  0.5 would mean that any fraction greater than this will be
         masked.  This argument is used when loading a land fraction field.
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to True (off) by default.
 
     Returns
@@ -283,7 +284,8 @@ def load_grid(filenames, *args, ignore_metadata_files=False, **kwargs):
         definition.
     *args :
         See :func:`iris.load`
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load`
@@ -377,27 +379,15 @@ def _customised_load(func):
                 ignore_metadata_files = kwargs.pop("ignore_metadata_files")
             if not ignore_metadata_files:
                 # Get the inputs of the function.
-                sig = inspect.signature(func)
-                inputs = sig.bind(*args, **kwargs)
-                # Check if a constraint has been passed in so it can be preserved
-                if "constraints" in inputs.arguments.keys():
-                    constraints = inputs.arguments["constraints"]
-                elif "constraint" in inputs.arguments.keys():
-                    constraints = inputs.arguments["constraint"]
-                else:
-                    constraints = None
-                # Add a user callback to the metadata callback if supplied.
-                if "callback" in inputs.arguments.keys():
-                    callback = _CallbackMetadata(inputs.arguments["callback"])
-                else:
-                    callback = _CallbackMetadata(None)
-                # Always pass in as positional to avoid constrint naming mismatch
-                updated_binding = sig.bind(
-                    inputs.arguments["uris"], constraints, callback
+                # Chain any user callback after the metadata callback.
+                bound = inspect.signature(func).bind(*args, **kwargs)
+                bound.apply_defaults()
+                bound.arguments["callback"] = _CallbackMetadata(
+                    bound.arguments["callback"]
                 )
                 # Use context manager to avoid permanently modifying iris behaviour.
                 with ants_format_agent():
-                    cubes = func(*updated_binding.args, **updated_binding.kwargs)
+                    cubes = func(*bound.args, **bound.kwargs)
             else:
                 # Use context manager to avoid permanently modifying iris behaviour.
                 with ants_format_agent():
@@ -458,15 +448,15 @@ class _CallbackMetadata:
             "acknowledgement",
             "references",
         ]
-        other_license = "licence"
         for metadata_file in metadata_files:
             file_name_splits = str(metadata_file).split(".")
             attribute_name = file_name_splits[-1]
-            if attribute_name == other_license:
+            # Check for misspelling
+            if attribute_name == "licence":
                 warnings.warn(
-                    f"The attribute name {attribute_name} has been changed to "
+                    "The attribute name 'licence' has been changed to "
                     "'license', in line with ANTS working practices.",
-                    category=UserWarning,
+                    category=ants.exceptions.MetadataWarning,
                 )
                 attribute_name = "license"
             if attribute_name in cube.attributes:
@@ -478,9 +468,8 @@ class _CallbackMetadata:
             if attribute_name not in valid_metadata_names:
                 warnings.warn(
                     f"Attribute {attribute_name} is not a valid metadata file "
-                    "name. Accepted metadata names are license, attribution "
-                    "and restrictions.",
-                    category=UserWarning,
+                    f"name. Accepted metadata names are: {valid_metadata_names}",
+                    category=ants.exceptions.MetadataWarning,
                 )
             else:
                 with open(metadata_file, "r") as open_file:
@@ -500,7 +489,8 @@ def load_cube(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cube`
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_cube`
@@ -528,7 +518,8 @@ def load(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load`
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load`
@@ -556,7 +547,8 @@ def load_cubes(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_cubes`
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_cubes`
@@ -585,7 +577,8 @@ def load_raw(*args, ignore_metadata_files=False, **kwargs):
     ----------
     *args :
         See :func:`iris.load_raw`
-    ignore_metadata_files : The option to turn off the ability to load external metadata
+    ignore_metadata_files : bool
+        The option to turn off the ability to load external metadata
         files. Set to False (on) by default.
     **kwargs :
         See :func:`iris.load_raw`

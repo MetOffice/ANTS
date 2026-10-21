@@ -33,11 +33,14 @@ class AntsArgParser(argparse.ArgumentParser):
             sources <SOURCE1> <SOURCE2> ... <SOURCEN>     Source data path(s).
             --output <OUTPUT>, -o <OUTPUT>                Output filepath
             --ants-config <ANTS_CONFIG>                   Configuration path.
-            --ignore-metadata-files                       Stops the application from
+            --ignore-metadata-read                        Stops the application from
                                                           searching for metadata files
                                                           with the same name as the
                                                           source and loading them
                                                           alongside the source.
+            --ignore-metadata-write                       Stops the application from
+                                                          writing metadata files
+                                                          alongside the outputs.
 
         Additionally, there are standardised optional arguments and these are
         activated by passing the relevant keyword argument.  See 'Parameters'
@@ -94,8 +97,6 @@ class AntsArgParser(argparse.ArgumentParser):
             help="Source data path(s).",
         )
 
-        target_obj = self
-
         # Arguments change below depending on whether target_lsm, target_grid,
         # or both are requested.  land-threshold is needed with target_lsm
         # whether or not target_grid is asked for:
@@ -146,14 +147,14 @@ class AntsArgParser(argparse.ArgumentParser):
             self.add_argument(
                 "--target-lsm",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 help="Path to the land sea mask.",
             )
         elif target_grid:
-            target_obj.add_argument(
+            self.add_argument(
                 "--target-grid",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 nargs="+",
                 help="Path to the target grid file.",
             )
@@ -177,10 +178,16 @@ class AntsArgParser(argparse.ArgumentParser):
             required=False,
         )
         self.add_argument(
-            "--ignore-metadata-files",
+            "--ignore-metadata-read",
             action="store_true",
             help="Stops the application from searching for metadata files with "
             "the same name as the source and loading them alongside the source.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-write",
+            action="store_true",
+            help="Stops the application from writing metadata files alongside outputs.",
             required=False,
         )
         if time_constraints:
