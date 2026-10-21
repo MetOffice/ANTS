@@ -37,16 +37,23 @@ import ants.io.save as save
 import iris
 
 
-def load_data(source):
+def load_data(source, ignore_metadata_read):
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore", "NetCDF default loading", iris._deprecation.IrisDeprecation
         )
-        cubes = ants.io.load.load(source)
+        cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     return cubes
 
 
-def main(source_path, output_path, grid_staggering, netcdf_only):
+def main(
+    source_path,
+    output_path,
+    grid_staggering,
+    netcdf_only,
+    ignore_metadata_read,
+    ignore_metadata_write,
+):
     """
     Convert specified source file to an ancillary.
 
@@ -58,6 +65,12 @@ def main(source_path, output_path, grid_staggering, netcdf_only):
         Output ancillary file path.  A NetCDF will also be written.
     grid_staggering : :obj:`int`, optional
         Grid staggering lookup, see UM F03 - FLH(9).
+    netcdf_only : bool
+        If True, only write to netCDF. If False, write to both netCDF and ancillary.
+    ignore_metadata_read : :obj:`bool`, optional
+        If True, do not read metadata sidecar files alongside the source.
+    ignore_metadata_write : :obj:`bool`, optional
+        If True, do not write metadata sidecar files alongside the ancillary.
 
     Returns
     -------
@@ -66,13 +79,17 @@ def main(source_path, output_path, grid_staggering, netcdf_only):
         written to an ancillary.
 
     """
-    source_cubes = load_data(source_path)
+    source_cubes = load_data(source_path, ignore_metadata_read)
     if grid_staggering is not None:
         for source_cube in source_cubes:
             source_cube.attributes["grid_staggering"] = grid_staggering
 
     if not netcdf_only:
-        save.ancil(source_cubes, output_path)
+        save.ancil(
+            source_cubes,
+            output_path,
+            ignore_metadata_write=ignore_metadata_write,
+        )
     save.netcdf(source_cubes, output_path)
 
     return source_cubes
@@ -98,6 +115,8 @@ def cli_interface():
         args.output,
         args.grid_staggering,
         args.netcdf_only,
+        args.ignore_metadata_read,
+        args.ignore_metadata_write,
     )
 
 

@@ -176,3 +176,7 @@ class DateRangeNotFullyAvailableException(ValueError):
         )
         self.message = message
         super().__init__(self.message)
+
+
+class MetadataWarning(Warning):
+    """Raised when unexpected or non-standard metadata is encountered."""
