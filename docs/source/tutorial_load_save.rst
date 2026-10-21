@@ -101,7 +101,7 @@ metadata attributes are "license", "attribution", "restrictions", "institution",
 "acknowledgement", and "references".
 
 This functionality can be turned off through the use of the argument
-``--ignore-metadata-read` on the command line or when calling the ANTS load:
+``--ignore-metadata-read`` on the command line or when calling the ANTS load:
 
 .. code-block:: python
 
