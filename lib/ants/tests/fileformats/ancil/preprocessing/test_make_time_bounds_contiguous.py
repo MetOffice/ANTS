@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import tempfile
 
 import ants.io.save as save
@@ -88,7 +90,8 @@ class TestAll(ants.tests.TestCase):
         make_time_bounds_contiguous(self.ffv)
         # Comparing each field to the one 3 after it to account for 3 levels
         # per time
-        for start, end in zip(self.ffv.fields[3:], self.ffv.fields[0:-3]):
+        self.assertGreater(len(self.ffv.fields), 3)
+        for start, end in zip(self.ffv.fields[3:], self.ffv.fields[0:-3], strict=True):
             self.assertContiguousFields(start, end)
 
     def test_same_bounds_for_all_levels_start_time(self):

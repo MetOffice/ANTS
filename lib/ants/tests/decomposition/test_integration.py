@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 """
 Integration tests for all decomposition frameworks.
 
@@ -11,6 +13,7 @@ suitable for multiprocessing or any parallelism framework).
 """
 
 import os
+import unittest
 import unittest.mock as mock
 
 import ants.decomposition as decomp
@@ -104,19 +107,18 @@ class Common(object):
         # Need to remove slurm_ntasks environment variable (if
         # present).  Hence, want to preserve original environment to restore
         # it on test completion:
-        self._original_environment = os.environ.copy()
+        patch = mock.patch.dict(os.environ)
+        patch.start()
+        self.addCleanup(patch.stop)
         os.environ.pop("SLURM_NTASKS", None)
 
         patch = mock.patch("warnings.warn")
         self.mock_warnings = patch.start()
         self.addCleanup(patch.stop)
 
-    def tearDown(self):
-        os.environ = self._original_environment
-
     def _assert_metadata_equal(self, actual_results, expected_results):
         for result, expected in zip(
-            as_cubelist(actual_results), as_cubelist(expected_results)
+            as_cubelist(actual_results), as_cubelist(expected_results), strict=True
         ):
             self.assertEqual(result.metadata, expected.metadata)
 
@@ -125,13 +127,13 @@ class Common(object):
 
     def _assert_data_equal(self, actual_results, expected_results):
         for result, expected in zip(
-            as_cubelist(actual_results), as_cubelist(expected_results)
+            as_cubelist(actual_results), as_cubelist(expected_results), strict=True
         ):
             self.assertArrayEqual(result.data, expected.data)
 
     def _assert_cube_data_array_types_equal(self, actual_results, expected_results):
         for result, expected in zip(
-            as_cubelist(actual_results), as_cubelist(expected_results)
+            as_cubelist(actual_results), as_cubelist(expected_results), strict=True
         ):
             self.assertEqual(type(result.data), type(expected.data))
 
@@ -237,3 +239,16 @@ class TestMultiprocessingDomainDecompose(Common, ants.tests.TestCase):
 
 class TestDomainDecompose(Common, ants.tests.TestCase):
     decomposition_framework = decomp.DomainDecompose()
+
+
+class TestEnvironmentRestored(ants.tests.TestCase):
+    def test_environment_restored_after_test(self):
+        environ = os.environ
+        with mock.patch.dict(os.environ, {"SLURM_NTASKS": "4"}):
+            os.environ.pop("ANTS_NPROCESSES", None)
+            result = unittest.TestResult()
+            TestMultiprocessingDomainDecompose("test_unary").run(result)
+            self.assertTrue(result.wasSuccessful())
+            self.assertIs(os.environ, environ)
+            self.assertEqual(os.environ["SLURM_NTASKS"], "4")
+            self.assertNotIn("ANTS_NPROCESSES", os.environ)
