@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import collections
 import functools
 import os
@@ -335,8 +337,9 @@ def enable_all_lazy_data(test_function):
                 "be updated accordingly."
             )
         ants.utils.cube.iris.fileformats.netcdf.loader._LAZYVAR_MIN_BYTES = 0
-        result = test_function(*args, **kwargs)
-        ants.utils.cube.iris.fileformats.netcdf.loader._LAZYVAR_MIN_BYTES = 5000
-        return result
+        try:
+            return test_function(*args, **kwargs)
+        finally:
+            ants.utils.cube.iris.fileformats.netcdf.loader._LAZYVAR_MIN_BYTES = 5000
 
     return wrapper

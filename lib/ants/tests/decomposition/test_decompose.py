@@ -2,8 +2,11 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import copy
 import os
+import unittest
 import unittest.mock as mock
 
 import ants.tests
@@ -26,7 +29,9 @@ class TestAll(ants.tests.TestCase):
         # Similarly, need to remove slurm_ntasks environment variable (if
         # present).  Hence, want to preserve original environment to restore
         # it on test completion:
-        self._original_environment = os.environ.copy()
+        patch = mock.patch.dict(os.environ)
+        patch.start()
+        self.addCleanup(patch.stop)
         os.environ.pop("SLURM_NTASKS", None)
 
         patch = mock.patch("ants.decomposition.CONFIG", new=new_config)
@@ -44,9 +49,6 @@ class TestAll(ants.tests.TestCase):
         self.addCleanup(patch.stop)
 
         self.cube = ants.tests.stock.geodetic((2, 2), name="source")
-
-    def tearDown(self):
-        os.environ = self._original_environment
 
     @mock.patch("ants.utils.cube.defer_cube")
     def test_default_args(self, *args):
@@ -265,3 +267,14 @@ class TestAll(ants.tests.TestCase):
 
         # DomainDecompose should have been initialised with a pad_width of 2
         self.decomposer.assert_called_once_with(pad_width=2)
+
+
+class TestEnvironmentRestored(ants.tests.TestCase):
+    def test_environment_restored_after_test(self):
+        environ = os.environ
+        with mock.patch.dict(os.environ, {"SLURM_NTASKS": "4"}):
+            result = unittest.TestResult()
+            TestAll("test_default_args").run(result)
+            self.assertTrue(result.wasSuccessful())
+            self.assertIs(os.environ, environ)
+            self.assertEqual(os.environ["SLURM_NTASKS"], "4")

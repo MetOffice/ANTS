@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import ants
 import ants.tests
 import ants.tests.stock as stock
@@ -31,10 +33,7 @@ class TestAll(ants.tests.TestCase):
     def assert_cube_climatology(self, cube):
         # Check cube cell methods.
         tar_cell_methods = [iris.coords.CellMethod("mean", coords="time")]
-        for res_cell_method, tar_cell_method in zip(
-            cube.cell_methods, tar_cell_methods
-        ):
-            self.assertEqual(res_cell_method, tar_cell_method)
+        self.assertEqual(cube.cell_methods, tuple(tar_cell_methods))
 
         # Check time coordinate.
         target_pnts = [

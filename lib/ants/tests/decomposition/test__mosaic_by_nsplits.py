@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import ants.tests
 from ants.decomposition import _mosaic_by_nsplits as mosaic_by_nsplits
 
@@ -11,7 +13,7 @@ class TestAll(ants.tests.TestCase):
         self.src_shape = (2, 2, 2)
 
     def _test_iterable_compare(self, result, target):
-        for res, tgt in zip(result, target):
+        for res, tgt in zip(result, target, strict=True):
             self.assertEqual(res, tgt)
 
     def test_single_slice(self):
@@ -36,6 +38,7 @@ class TestAll(ants.tests.TestCase):
             (slice(0, None, 1), slice(0, 1), slice(0, 1)),
             (slice(0, None, 1), slice(0, 1), slice(1, None, 1)),
             (slice(0, None, 1), slice(1, None, 1), slice(0, 1)),
+            (slice(0, None, 1), slice(1, None, 1), slice(1, None, 1)),
         ]
         self._test_iterable_compare(iter_result, iter_target)
 

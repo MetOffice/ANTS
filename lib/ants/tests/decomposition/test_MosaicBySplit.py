@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the contents of this file have been modified using Met Office
+# Github Copilot Enterprise.
 import ants.tests
 import numpy as np
 from ants.decomposition import MosaicBySplit
@@ -16,7 +18,7 @@ class TestAll(ants.tests.TestCase):
         # Ensure that our generator factory works by calling more than once.
         for generator in range(2):
             slices = splitter()
-            for slce, tar in zip(slices, target):
+            for slce, tar in zip(slices, target, strict=True):
                 self.assertTrue((slce == tar).all())
 
     def test_unsuitable_sliceable_noshape(self):
