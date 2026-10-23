@@ -19,7 +19,7 @@ jobs:
         env:
           SHUMLIB_VERSION: 2025.10.1
           SHUMLIB_PLATFORM: vm-x86-gfortran-gcc
-          MULE_VERSION: 2025.10.1
+          MULE_VERSION: 2026.09.1
         steps:
             - name: Checkout ANTS
               uses: actions/checkout@v4

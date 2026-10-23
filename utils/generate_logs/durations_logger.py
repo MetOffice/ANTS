@@ -9,6 +9,7 @@ logging if rich is available. Console log level is user configurable via the com
 line flag ``verbosity``, which calls ``set_console_handler_log_level`` in ``main.py``.
 
 """
+
 import logging
 import sys
 from typing import TextIO

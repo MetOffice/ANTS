@@ -291,32 +291,33 @@ class TestAll(_Common, ants.tests.TestCase):
         self.assertTrue(len(res.coords("model_level_number", dim_coords=True)) > 0)
 
 
-class TestCoordinates(_Common):
-    # This class deliberately does not inherit from ants.tests.TestCase.  This
-    # means we can use pytest parametrize.
-    @pytest.mark.parametrize(
-        "name",
-        [
-            ("model_level_number"),
-            ("latitude"),
-            ("longitude"),
-            ("level_height"),
-            ("sigma"),
-            ("surface_altitude"),
-            ("altitude"),
-        ],
-    )
-    def test_neq_2d_return_coordinates(self, name):
-        """Ensure that all the spatial coordinates on the result are correct.
+@pytest.mark.parametrize(
+    "name",
+    [
+        ("model_level_number"),
+        ("latitude"),
+        ("longitude"),
+        ("level_height"),
+        ("sigma"),
+        ("surface_altitude"),
+        ("altitude"),
+    ],
+)
+def test_neq_2d_return_coordinates(name):
+    """Ensure that all the spatial coordinates on the result are correct.
 
-        Correct in this case means the same as on the target."""
-        self.setUp()  # Needed because this class is not a unittest.TestCase.
-        expected = self.target.coord(name)
+    Correct in this case means the same as on the target."""
+    source = stock.simple_4d_with_hybrid_height()[0:1]
+    ants.utils.cube.set_crs(source, ants.coord_systems.UM_SPHERE)
+    ants.utils.cube.guess_horizontal_bounds(source)
+    target = source.copy()[0]
 
-        result = self.source.regrid(self.target, interpolation.Linear())
-        actual = result.coord(name)
+    expected = target.coord(name)
 
-        assert actual == expected
+    result = source.regrid(target, interpolation.Linear())
+    actual = result.coord(name)
+
+    assert actual == expected
 
 
 @ants.tests.skip_stratify
