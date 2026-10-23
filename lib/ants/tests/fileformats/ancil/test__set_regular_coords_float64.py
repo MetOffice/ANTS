@@ -53,6 +53,10 @@ class _Common:
 
     The two axes have different steps so that mixing them up is detected.
 
+    The cube is built from the header (see ``make_cube``), so the two always
+    describe the same grid.  Tests that change the header must build the cube
+    again afterwards.
+
     """
 
     def setUp(self):
@@ -71,34 +75,38 @@ class _Common:
         self.field.coord_system.return_value = iris.coord_systems.GeogCS(6371229.0)
         self.cube = self.make_cube()
 
-    @staticmethod
-    def make_cube(
-        n_rows=3,
-        n_cols=5,
-        lat_name="latitude",
-        lon_name="longitude",
-        with_bounds=False,
-    ):
+    def make_cube(self, lat_name="latitude", lon_name="longitude", with_bounds=False):
         """
-        Return a cube with float32 placeholder horizontal coordinates.
+        Return the cube that iris would build from the header in ``self.field``.
 
-        By the time ANTS' callback runs, iris has already built the coordinates
-        (as float32).  The function under test only replaces their points and
-        bounds, so the placeholder values are arbitrary.
+        By the time ANTS' callback runs, iris has already built the horizontal
+        coordinates from the header, as float32.  So that the cube always
+        agrees with the header (shape, coordinate system, points, and bounds if
+        requested), the coordinates are the header's float64 points and bounds
+        rounded to float32.
 
         """
+        field = self.field
+        crs = field.coord_system()
         coords = []
-        for name, size in ((lat_name, n_rows), (lon_name, n_cols)):
-            points = np.arange(size, dtype=np.float32)
+        for name, zero, step, count in (
+            (lat_name, field.bzy, field.bdy, field.lbrow),
+            (lon_name, field.bzx, field.bdx, field.lbnpt),
+        ):
+            points = (zero + step) + step * np.arange(count, dtype=np.float64)
             bounds = None
             if with_bounds:
-                bounds = np.stack([points - 0.5, points + 0.5], axis=-1)
+                bounds = bounds_around(points, 0.5 * step).astype(np.float32)
             coords.append(
                 iris.coords.DimCoord(
-                    points, bounds=bounds, standard_name=name, units="degrees"
+                    points.astype(np.float32),
+                    bounds=bounds,
+                    standard_name=name,
+                    units="degrees",
+                    coord_system=crs,
                 )
             )
-        cube = iris.cube.Cube(np.zeros((n_rows, n_cols)))
+        cube = iris.cube.Cube(np.zeros((field.lbrow, field.lbnpt)))
         cube.add_dim_coord(coords[0], 0)
         cube.add_dim_coord(coords[1], 1)
         return cube
@@ -133,10 +141,12 @@ class TestPoints(_Common, ants.tests.TestCase):
 
     def test_rotated_pole_coordinates(self):
         """A rotated pole grid has its grid_latitude and grid_longitude rebuilt."""
-        self.cube = self.make_cube(lat_name="grid_latitude", lon_name="grid_longitude")
+        # lbcode 101: rotated pole version of the regular grid type 1.
+        self.field.lbcode = SplittableInt(101)
         self.field.coord_system.return_value = iris.coord_systems.RotatedGeogCS(
             39.25, 198.0
         )
+        self.cube = self.make_cube(lat_name="grid_latitude", lon_name="grid_longitude")
         _set_regular_coords_float64(self.cube, self.field)
         actual = self.cube.coord("grid_longitude").points
         self.assertArrayEqual(actual, LON_POINTS)
@@ -194,12 +204,12 @@ class TestSinglePointAxis(_Common, ants.tests.TestCase):
     def setUp(self):
         super().setUp()
         self.field.lbnpt = 1
-        self.cube = self.make_cube(n_cols=1)
+        self.cube = self.make_cube()
 
     def test_single_point_has_bounds_when_requested(self):
         """With a last lbcode digit of 2 a one point axis gets bounds."""
         self.field.lbcode = SplittableInt(2)
-        self.cube = self.make_cube(n_cols=1, with_bounds=True)
+        self.cube = self.make_cube(with_bounds=True)
         _set_regular_coords_float64(self.cube, self.field)
         actual = self.cube.coord("longitude").bounds
         self.assertArrayEqual(actual, bounds_around(LON_POINTS[:1], LON_HALF_STEP))
