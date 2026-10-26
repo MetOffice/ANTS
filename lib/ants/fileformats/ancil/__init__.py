@@ -79,6 +79,8 @@ class _CallbackUM(pp._CallbackPP):
 
         """
         cube.attributes["grid_staggering"] = self.grid_staggering[filename]
+        # TODO: workaround for iris coordinate precision issue:
+        # https://github.com/SciTools/iris/issues/7344
         _set_regular_coords_float64(cube, field)
         super(_CallbackUM, self).__call__(cube, field, filename)
 
