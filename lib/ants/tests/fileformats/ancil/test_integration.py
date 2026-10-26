@@ -1066,16 +1066,8 @@ class TestRegularCoordPrecision(ants.tests.TestCase):
         x = cube.coord(axis="x")
         y = cube.coord(axis="y")
         # Check x axis bounds
-        self.assertArrayAlmostEqual(
-            x.bounds[:, 0], x.points - half_step, self._DECIMAL
-        )
-        self.assertArrayAlmostEqual(
-            x.bounds[:, 1], x.points + half_step, self._DECIMAL
-        )
+        self.assertArrayAlmostEqual(x.bounds[:, 0], x.points - half_step, self._DECIMAL)
+        self.assertArrayAlmostEqual(x.bounds[:, 1], x.points + half_step, self._DECIMAL)
         # check y axis bounds
-        self.assertArrayAlmostEqual(
-            y.bounds[:, 0], y.points - half_step, self._DECIMAL
-        )
-        self.assertArrayAlmostEqual(
-            y.bounds[:, 1], y.points + half_step, self._DECIMAL
-        )
+        self.assertArrayAlmostEqual(y.bounds[:, 0], y.points - half_step, self._DECIMAL)
+        self.assertArrayAlmostEqual(y.bounds[:, 1], y.points + half_step, self._DECIMAL)
