@@ -42,7 +42,7 @@ class Test2D(Common, ants.tests.TestCase):
         sy = self.source.coord(axis="y")
         self._invert_coord(sy)
 
-        actual = _fill_outside_bounds(self.source, self.target, np.NaN)
+        actual = _fill_outside_bounds(self.source, self.target, np.nan)
         self.assertArrayEqual(actual.data, self.result)
 
     def test_decreasing_target(self):
@@ -55,7 +55,7 @@ class Test2D(Common, ants.tests.TestCase):
         ty = self.target.coord(axis="y")
         self._invert_coord(ty)
 
-        actual = _fill_outside_bounds(self.source, self.target, np.NaN)
+        actual = _fill_outside_bounds(self.source, self.target, np.nan)
         self.assertArrayEqual(actual.data, self.result[::-1, ::-1])
 
     def test_masked(self):
@@ -63,7 +63,7 @@ class Test2D(Common, ants.tests.TestCase):
         # unmasked while masked elements inside the extent remain masked.
         self.target.data = np.ma.array(self.target.data)
         self.target.data[0, :] = np.ma.masked
-        actual = _fill_outside_bounds(self.source, self.target, np.NaN)
+        actual = _fill_outside_bounds(self.source, self.target, np.nan)
 
         expected = np.ma.array(self.result)
         expected[0, 1:3] = np.ma.masked
@@ -83,7 +83,7 @@ class TestND(Common, ants.tests.TestCase):
 
         self.source = iris.cube.CubeList([cube1, cube2]).merge_cube()
 
-        actual = _fill_outside_bounds(self.source, self.target, np.NaN)
+        actual = _fill_outside_bounds(self.source, self.target, np.nan)
         self.assertArrayEqual(actual.data, self.result)
 
     def test_xzy(self):
@@ -102,7 +102,7 @@ class TestND(Common, ants.tests.TestCase):
         self.target.transpose((2, 0, 1))
         self.result = self.result.transpose((2, 0, 1))
 
-        actual = _fill_outside_bounds(self.source, self.target, np.NaN)
+        actual = _fill_outside_bounds(self.source, self.target, np.nan)
         self.assertArrayEqual(actual.data, self.result)
 
 

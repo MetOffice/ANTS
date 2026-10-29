@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Parts of this code have been modified with Met Office Github Copilot
+# Enterprise
 """
 ANTS regridding provides capability which extend beyond what is currently
 provided by iris for the convenience of ancillary generation.
@@ -17,6 +19,7 @@ The reader is referred to the module documentation for further details.
 For further details see the user guide.
 
 """
+
 import logging
 import sys
 
@@ -182,7 +185,7 @@ class GeneralRegridScheme:
 
 
 def _create_horizontal_regrid_scheme_instance(
-    scheme_name: str, extrapolation_mode: str | None
+    scheme_name: str, extrapolation_mode: str | float | None
 ):
     """Create a horizontal regrid scheme instance from a named regrid scheme.
 
@@ -197,9 +200,11 @@ def _create_horizontal_regrid_scheme_instance(
     ----------
     scheme_name: str
         The name of the scheme to create.
-    extrapolation_mode: str | None
-        The extrapolation mode to be used by the scheme. Note that not all schemes
-        support extrapolation, e.g. AreaWeighted. In these cases, None should be passed.
+    extrapolation_mode: str | float | None
+        The extrapolation mode to be used by the scheme. The ants configuration
+        parser reads 'nan' as a float, so this is cast to a string before use.
+        Note that not all schemes support extrapolation, e.g. AreaWeighted. In these
+        cases, None should be passed.
         If None is passed for a scheme which does support extrapolation, that scheme's
         default extrapolation mode will be used.
     """
@@ -212,13 +217,13 @@ def _create_horizontal_regrid_scheme_instance(
         regrid_scheme_instance = regrid_scheme_class()
     else:
         regrid_scheme_instance = regrid_scheme_class(
-            extrapolation_mode=extrapolation_mode.lower()
+            extrapolation_mode=str(extrapolation_mode).lower()
         )
     return regrid_scheme_instance
 
 
 def _create_vertical_regrid_scheme_instance(
-    scheme_name: str, extrapolation_mode: str | None
+    scheme_name: str, extrapolation_mode: str | float | None
 ):
     """Create a vertical regrid scheme instance from a named regrid scheme.
 
@@ -228,16 +233,18 @@ def _create_vertical_regrid_scheme_instance(
     ----------
     scheme_name: str
         The name of the scheme to create.
-    extrapolation_mode: str | None
-        The extrapolation mode to be used by the scheme. Note that not all schemes
-        support extrapolation, e.g. Conservative. In these cases, None should be passed.
+    extrapolation_mode: str | float | None
+        The extrapolation mode to be used by the scheme. The ants configuration
+        parser reads 'nan' as a float, so this is cast to a string before use.
+        Note that not all schemes support extrapolation, e.g. Conservative. In these
+        cases, None should be passed.
         If None is passed for a scheme which does support extrapolation, that scheme's
         default extrapolation mode will be used.
     """
     regrid_scheme_class = getattr(interpolation, scheme_name, None)
     if extrapolation_mode is not None:
         regrid_scheme_instance = regrid_scheme_class(
-            extrapolation=extrapolation_mode.lower()
+            extrapolation=str(extrapolation_mode).lower()
         )
     else:
         regrid_scheme_instance = regrid_scheme_class()

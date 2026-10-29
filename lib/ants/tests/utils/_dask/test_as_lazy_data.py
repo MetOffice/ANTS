@@ -5,6 +5,7 @@
 from unittest import mock
 
 import ants.tests
+import numpy as np
 from ants.utils._dask import as_lazy_data
 
 
@@ -14,6 +15,8 @@ class TestAll(ants.tests.TestCase):
         # we expect: We have to do this because it's private.
         patch = mock.patch("iris._lazy_data.as_lazy_data", spec_set=True)
         with patch as patched:
+            mock.sentinel.data.shape = 3
+            mock.sentinel.data.dtype = np.int16
             as_lazy_data(
                 mock.sentinel.data,
                 chunks=mock.sentinel.chunks,
