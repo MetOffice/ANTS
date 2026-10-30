@@ -98,7 +98,7 @@ class TestAll(_Common, ants.tests.TestCase):
             res = source.regrid(target, interpolation.Linear())
 
         self.assertIs(res, source)
-        self.assertFalse(patched_relevel.called)
+        patched_relevel.assert_not_called()
 
     def test_eq_2d_relevel_not_called(self):
         # Let's make the source vertical coordinates horizontal to the target.
@@ -112,7 +112,7 @@ class TestAll(_Common, ants.tests.TestCase):
             res = self.source.regrid(self.target, interpolation.Linear())
 
         self.assertIs(res, self.source)
-        self.assertFalse(patched_relevel.called)
+        patched_relevel.assert_not_called()
 
     def assert_relevel_called_with(self, scheme, interpolator):
         patch_relevel = mock.patch(
@@ -288,7 +288,7 @@ class TestAll(_Common, ants.tests.TestCase):
         self.source.remove_aux_factory(self.source.aux_factories[0])
         self.target.remove_aux_factory(self.target.aux_factories[0])
         res = self.source.regrid(self.target, interpolation.Linear())
-        self.assertTrue(len(res.coords("model_level_number", dim_coords=True)) > 0)
+        self.assertGreater(len(res.coords("model_level_number", dim_coords=True)), 0)
 
 
 @pytest.mark.parametrize(

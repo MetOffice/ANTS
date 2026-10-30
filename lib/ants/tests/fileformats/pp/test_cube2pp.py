@@ -19,21 +19,21 @@ class TestCalendarSubstitutionToStandard(ants.tests.TestCase):
     # https://github.com/SciTools/iris/blob/13999940a045dc3a4496aa12e8867142d2377719/docs/src/whatsnew/3.3.rst#-incompatible-changes
     def test_gregorian_to_standard_calendar_substitution(self):
         tunit = cf_units.Unit("days since 0000-01-01 00:00:00", calendar="gregorian")
-        self.assertTrue(tunit.calendar == "standard")
+        self.assertEqual(tunit.calendar, "standard")
 
     def test_calendar_proleptic_gregorian_not_substituted(self):
         tunit = cf_units.Unit(
             "days since 0000-01-01 00:00:00", calendar="proleptic_gregorian"
         )
-        self.assertTrue(tunit.calendar == "proleptic_gregorian")
+        self.assertEqual(tunit.calendar, "proleptic_gregorian")
 
     def test_calendar_360_day_not_substituted(self):
         tunit = cf_units.Unit("days since 0000-01-01 00:00:00", calendar="360_day")
-        self.assertTrue(tunit.calendar == "360_day")
+        self.assertEqual(tunit.calendar, "360_day")
 
     def test_standard_calendar(self):
         tunit = cf_units.Unit("days since 0000-01-01 00:00:00", calendar="standard")
-        self.assertTrue(tunit.calendar == "standard")
+        self.assertEqual(tunit.calendar, "standard")
 
 
 class TestYearZero(ants.tests.TestCase):

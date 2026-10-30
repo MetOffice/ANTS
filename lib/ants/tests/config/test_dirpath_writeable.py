@@ -56,7 +56,7 @@ class TestAll(ants.tests.TestCase):
         self.mock_access.return_value = True
         res = dirpath_writeable(self.filepath)
         self.assertEqual(res, self.filepath)
-        self.assertFalse(self.mock_mkdir.called)
+        self.mock_mkdir.assert_not_called()
 
     def test_expansions(self):
         res = dirpath_writeable(self.filepath)

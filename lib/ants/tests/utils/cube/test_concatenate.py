@@ -29,17 +29,17 @@ class TestAll(ants.tests.TestCase):
     @unittest.expectedFailure
     def test_iris_concat_behaviour(self):
         # If this starts passing then we can remove our concatenation wrapper.
-        self.assertTrue(len(self.source.concatenate()) == 1)
+        self.assertEqual(len(self.source.concatenate()), 1)
 
     def test_workaround(self):
         res = concatenate(self.source)
-        self.assertTrue(len(res) == 1)
+        self.assertEqual(len(res), 1)
 
     def test_silent_existing_dim_coord_failure(self):
         dimcoord = iris.coords.DimCoord(range(2), long_name="existing")
         self.source[0].add_dim_coord(dimcoord, 0)
         res = concatenate(self.source)
-        self.assertTrue(len(res) == 2)
+        self.assertEqual(len(res), 2)
 
     def test_silent_unable_represent_aux_as_dim_coord_failure(self):
         coord = self.source[1].coord("latitude")
@@ -48,4 +48,4 @@ class TestAll(ants.tests.TestCase):
         points[1] = coord.points[0]
         coord.points = points
         res = concatenate(self.source)
-        self.assertTrue(len(res) == 2)
+        self.assertEqual(len(res), 2)
