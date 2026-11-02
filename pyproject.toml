@@ -21,6 +21,7 @@ skip = ".git"
 # Configure pytest.
 [tool.pytest.ini_options]
 addopts = "--durations=5"
+xfail_strict = true
 filterwarnings = [
     # During unittesting only, treat all warnings as errors by default:
     'error',
