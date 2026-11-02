@@ -340,6 +340,12 @@ class Test_unrotated_lam_behaviour(ants.tests.TestCase):
         with mock.patch("ants.fileformats.pp._iris_workarounds"):
             self.check_values()
 
+    def test_iris_future_flag(self):
+        # Check that bplon behaviour is correct for future iris behaviour.
+        with iris.FUTURE.context(lam_pole_offset=True):
+            with mock.patch("ants.fileformats.pp._iris_workarounds"):
+                self.check_values()
+
 
 class TestSetLbuser0(ants.tests.TestCase):
     """
