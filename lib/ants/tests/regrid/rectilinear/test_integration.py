@@ -95,22 +95,27 @@ class TestAreaWeighted(_TestCommon, ants.tests.TestCase):
         self.source = stock.geodetic((2, 2))
         self.target = stock.geodetic((2, 2))
 
-        purturbation = 1e-12
+        perturbation = 1e-12
         self.source2 = self.source.copy()
         points = self.source2.coord(axis="x").points
-        self.source2.coord(axis="x").points = points + purturbation
+        self.source2.coord(axis="x").points = points + perturbation
 
     def test_success(self):
+        # Check that a second source cube with a perturbed horizontal grid
+        # is sufficiently close within a tolerance of the original source
+        # horizontal grid that no error is raised when regridding with ants.
+
         regridder = regrid.rectilinear.AreaWeighted().regridder(
             self.source, self.target
         )
-        regridder(self.source2)
+        result = regridder(self.source2)
+        self.assertEqual(result.coord(axis="x"), self.target.coord(axis="x"))
 
     def test_failure(self):
         # If this test fails then iris AreaWeighted regrid cache usage now
-        # supports tolerant grid comparison.
-        # This means that we can then remove
+        # supports tolerant grid comparison. This means that we can then remove
         # ants.regrid.rectilinear._override_coord_data
+
         regridder = iris.analysis.AreaWeighted().regridder(self.source, self.target)
         msg = "The given cube is not defined on the same source grid as this regridder"
         with self.assertRaisesRegex(ValueError, msg):
