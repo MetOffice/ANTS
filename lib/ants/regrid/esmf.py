@@ -412,33 +412,27 @@ class ESMFRegridder(object):
         if keywarg_diff:
             msg = "unexpected keyword argument {}"
             raise ValueError(msg.format(keywarg_diff))
-
         if esmpy is None:
             raise _ESMPY_IMPORT_ERROR
         _supported_cube_check(src_cube)
         _supported_cube_check(target_cube)
-
         # Set some parameters.
         self.handle = None
         self.coordSystem = esmpy.api.constants.CoordSys.SPH_DEG
         self.method = esmpy.api.constants.RegridMethod.CONSERVE
         self.stagger = esmpy.StaggerLoc.CENTER
-
         method = kwargs.get("method", "areaweighted")
         if method.lower() != "areaweighted":
             raise ValueError("Currently only area weighted regridding " "supported.")
-
         # Simply return if the src and tgt grids are identical.
         if (src_cube.coord(axis="x") == target_cube.coord(axis="x")) and (
             src_cube.coord(axis="y") == target_cube.coord(axis="y")
         ):
             return
         _source_cube_sanity_check(src_cube)
-
         # Build the 2D esmf grid and field objects.
         self.esmpy_src_grid, self.esmpy_src_field = self._build_field(src_cube)
         self.esmpy_tgt_grid, self.esmpy_tgt_field = self._build_field(target_cube)
-
         # Compute/read the weights following ESMPy weights tutorial.  See
         # ESMPy docs for details of arguments.
         self._cache_fnme = self._gen_cache_filename([src_cube, target_cube])
@@ -872,7 +866,6 @@ class ESMFRegridder(object):
         #
         # Build the esmpy field object.
         #
-
         staggering = "corner"
         if self.method != esmpy.api.constants.RegridMethod.CONSERVE:
             # Need to pass corner coordinates in all cases. When the field is
@@ -884,20 +877,16 @@ class ESMFRegridder(object):
         extractor = _LatLonExtractor(cube, staggering)
         lats = extractor.get_latitude()
         lons = extractor.get_longitude()
-
         # Create the grid.
         cellDims = np.array([lons.shape[0] - 1, lats.shape[1] - 1])
         grid = esmpy.Grid(max_index=cellDims, coord_sys=self.coordSystem)
-
         # Allocate space for the vertices, esmpy wants the first coordinate to
         # be longitudes.
         grid.add_coords(staggerloc=esmpy.StaggerLoc.CORNER, coord_dim=0)
         # No need to add lats, it will be added automatically with lons
-
         # Get pointers to the esmf coordinates.
         lonPoint = grid.get_coords(coord_dim=0, staggerloc=esmpy.StaggerLoc.CORNER)
         latPoint = grid.get_coords(coord_dim=1, staggerloc=esmpy.StaggerLoc.CORNER)
-
         # When esmpy runs in parallel, the start/end indices may be other than
         # 0,-1.
         # CP: Is esmpy running in parallel being tested??  I suggest just
@@ -909,7 +898,6 @@ class ESMFRegridder(object):
         iend0 = grid.upper_bounds[esmpy.StaggerLoc.CORNER][0]
         ibeg1 = grid.lower_bounds[esmpy.StaggerLoc.CORNER][1]
         iend1 = grid.upper_bounds[esmpy.StaggerLoc.CORNER][1]
-
         lonPoint[...] = lons[ibeg0:iend0, ibeg1:iend1]
         latPoint[...] = lats[ibeg0:iend0, ibeg1:iend1]
 
