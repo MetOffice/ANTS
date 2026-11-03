@@ -172,7 +172,7 @@ HORIZONTAL_NAMELIST_FORMAT = iris.fileformats.FormatSpecification(
 )
 
 # load vertical defaults to removing level zero for UM-era files
-# TODO: find a way to pass the argument through this custom loader.
+# TODO: find a way to pass the argument through this custom loader. Issue #177
 NAMELIST_VERTICAL_DEFINITION = iris.fileformats.FormatSpecification(
     "Namelist vertical definition",
     iris.fileformats.LeadingLine(),
