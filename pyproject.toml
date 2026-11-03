@@ -1,3 +1,4 @@
+# Some of the contents of this file have been modified using Met Office Github Copilot Enterprise
 # Override default exlude pattern for black.
 # By default black will exlude files with "build" in the filepath, but ants is installed
 # to $CYLC_WORKFLOW_RUN_DIR/share/fcm_make_ants/build and we want these files to be checked.
@@ -32,22 +33,10 @@ filterwarnings = [
     'ignore:The \`numpy.can_cast\` function is not implemented by Dask array:FutureWarning:dask',
 
     # Warning for behaviours internal to mule
-    'ignore:tostring\(\) is deprecated. Use tobytes\(\) instead.:DeprecationWarning:mule',
-    'ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning:mule',
     'ignore:Ancillary files do not define the UM version number in the Fixed Length Header:UserWarning:mule',
-    'ignore:The binary mode of fromstring is deprecated, as it behaves surprisingly on unicode inputs. Use frombuffer instead:DeprecationWarning:mule',
-
-    # Warning for behaviour internal to stratify
-    'ignore:`product` is deprecated as of NumPy 1.25.0, and will be removed in NumPy 2.0. Please use `prod` instead.:DeprecationWarning:ants.regrid.interpolation',
-
-    # Warning for behaviour internal to iris when caculating gradients in ants.analysis
-    "ignore:Using 'divide' with a bounded coordinate is not well defined; ignoring bounds.:UserWarning:ants.analysis",
 
     # Warning for output was conversion to zonal mean.
     'ignore:Output converted to zonal mean.',
-
-    # Warning for behaviour internal to iris when saving a pp file in tests
-    'ignore:NumPy will stop allowing conversion of out-of-bound Python integers to integer arrays.  The conversion of -99 to uint32 will fail in the future.:DeprecationWarning',
 
     # Warning for tests for now deprecated functionality, see #34:
     'ignore:ants.utils.cube.concatenate and ants.utils.cube.concatenate_cube are deprecated:FutureWarning',
@@ -56,7 +45,27 @@ filterwarnings = [
     "ignore:Unable to import mule:UserWarning",
 
     # Warning for the optional dependency of um_spiral_search (from shumlib) not being present:
-    "ignore:No module named 'um_spiral_search':UserWarning"
+    "ignore:No module named 'um_spiral_search':UserWarning",
+
+    # Warning for shapely's vectorized.contains being used internally by ants.analysis._merge
+    "ignore:The 'shapely.vectorized.contains' function is deprecated and will be removed a future version. Use 'shapely.contains_xy' instead \\(available since shapely 2.0.0\\).:DeprecationWarning:ants.analysis._merge",
+
+    # Warning for numpy.in1d being used internally by ants.utils.ndarray
+    'ignore:\`in1d\` is deprecated. Use \`np.isin\` instead.:DeprecationWarning:ants.utils.ndarray',
+
+    # Warning raised by Python itself when forking a multi-threaded process, seen in decomposition tests
+    'ignore:This process \(pid=.*\) is multi-threaded, use of fork\(\) may lead to deadlocks in the child.:DeprecationWarning:multiprocessing.popen_fork',
+
+    # Warning for behaviour internal to iris when handling legacy date precision
+    'ignore:You are using legacy date precision for Iris units:FutureWarning:iris.common.mixin',
+
+    # Warning for behaviour internal to iris/cf_units when summarising long time interval coordinates
+    "ignore:This method is no longer needed due to cftime's improved handling of long time intervals.:DeprecationWarning:iris.coords",
+
+    # Warning for behaviour internal to iris when saving LAM grids to PP format
+    "ignore:Saving a cube defined on a Limited Area Model \\(LAM\\) grid to PP format will set the 'pole longitude' field:FutureWarning:iris.fileformats.pp_save_rules",
+
+    "ignore:Saving to netcdf with legacy-style attribute handling for backwards compatibility."
 
     # Additional filters are defined in ./lib/ants/tests/conftest.py, including:
     # 1. Warning when catopy downloads and caches Natural Earth data.
@@ -76,7 +85,7 @@ authors = [{name = "Model Inputs And Outputs team, Met Office", email = "miao@me
 description = "Toolkit for generating ancillary files"
 readme = "README.rst"
 license = {file ="LICENSE.txt"}
-requires-python = ">=3.7"
+requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: POSIX :: Linux",

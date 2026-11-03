@@ -21,14 +21,23 @@ class TestAll(ants.tests.TestCase):
         self.addCleanup(patch.stop)
 
     def test_single_cube(self):
+        """Test that arguments are being passed in correctly with a single cube as
+        input"""
         cube = mock.Mock(name="cube", spec_set=iris.cube.Cube)
         guess_horizontal_bounds(cube)
-        self.mock_hgrid.called_once_with(cube)
-        self.mock_guess.called_once_with(mock.sentinel.x, mock.sentinel.y)
+        self.mock_hgrid.assert_called_once_with(cube)
+        assert (
+            mock.call(mock.sentinel.x, strict=False) in self.mock_guess.call_args_list
+        )
+        assert (
+            mock.call(mock.sentinel.y, strict=False) in self.mock_guess.call_args_list
+        )
 
     def test_multi_cube(self):
+        """Test that both cubes are used when a cubelist is passed into
+        guess_horizontal_bounds"""
         cube = mock.Mock(name="cube", spec_set=iris.cube.Cube)
         cube2 = mock.Mock(name="cube2", spec_set=iris.cube.Cube)
         guess_horizontal_bounds([cube, cube2])
-        self.mock_hgrid.called_with(cube)
-        self.mock_hgrid.called_with(cube2)
+        assert mock.call(cube) in self.mock_hgrid.call_args_list
+        assert mock.call(cube2) in self.mock_hgrid.call_args_list

@@ -26,7 +26,7 @@ class TestAll(ants.tests.TestCase):
 
     def test_iris_call(self):
         load_cubes(mock.sentinel.dummy)
-        self.mock_callback.called_once_with(self.grid_staggering)
+        self.mock_callback.assert_called_once_with(self.grid_staggering)
         self.mock_load.assert_called_once_with(
             mock.sentinel.dummy, self.mock_callback()
         )
