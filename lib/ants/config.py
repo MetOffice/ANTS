@@ -49,6 +49,7 @@ Additionally, the following environmental variable hooks are available:
   see different results). This environment variable is read by cartopy directly.
 
 """
+
 import argparse
 import configparser
 import copy
