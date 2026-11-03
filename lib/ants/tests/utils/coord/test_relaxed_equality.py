@@ -57,7 +57,7 @@ class TestAll(ants.tests.TestCase):
         coord2 = self.coord1.copy()
         with mock.patch("ants.utils.coord.guess_bounds") as patched_guess:
             self.assertTrue(relaxed_equality(self.coord1, coord2))
-        self.assertFalse(patched_guess.called)
+        patched_guess.assert_not_called()
         self.assertFalse(self.coord1.has_bounds())
 
     def test_different_var_names(self):

@@ -55,7 +55,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             sources=["/path/to/source"],
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_add_args(self):
@@ -177,7 +177,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             end=2021,
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_flags(self):
@@ -208,7 +208,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             end=1996,
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_input(self):

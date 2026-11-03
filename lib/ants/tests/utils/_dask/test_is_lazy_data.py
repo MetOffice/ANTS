@@ -15,4 +15,4 @@ class TestAll(ants.tests.TestCase):
         patch = mock.patch("iris._lazy_data.is_lazy_data", spec_set=True)
         with patch as patched:
             is_lazy_data(mock.sentinel.data)
-        self.assertTrue(patched.called)
+        patched.assert_called_once()
