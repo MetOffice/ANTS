@@ -55,7 +55,7 @@ class Test__start_yx(ants.tests.TestCase):
         grid = CAPGrid(
             {"grid": {"lambda_origin_targ": targ_x, "phi_origin_targ": targ_y}}
         )
-        (res_y, res_x) = grid._start_yx
+        res_y, res_x = grid._start_yx
         self.assertIs(res_x, targ_x)
         self.assertIs(res_y, targ_y)
 
@@ -65,7 +65,7 @@ class Test_shape(ants.tests.TestCase):
         # Shape determined directly
         sample = {"grid": {"points_lambda_targ": 30, "points_phi_targ": 30}}
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid.shape
+        res_y, res_x = grid.shape
 
         self.assertEqual(res_x, 30)
         self.assertEqual(res_y, 30)
@@ -80,7 +80,7 @@ class Test_shape(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid.shape
+        res_y, res_x = grid.shape
         self.assertIs(res_x, 12)
         self.assertIs(res_y, 7)
 
@@ -94,7 +94,7 @@ class Test_shape(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid.shape
+        res_y, res_x = grid.shape
         self.assertIs(res_x, 12)
         self.assertIs(res_y, 6)
 
@@ -117,7 +117,7 @@ class Test__step_yx(ants.tests.TestCase):
     def test_explicit_definition(self):
         sample = {"grid": {"delta_phi_targ": 30, "delta_lambda_targ": 30}}
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
 
         self.assertEqual(res_x, 30)
         self.assertEqual(res_y, -30)
@@ -134,7 +134,7 @@ class Test__step_yx(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
         self.assertEqual(res_x, 12)
         self.assertEqual(res_y, -2.5)
 
@@ -150,7 +150,7 @@ class Test__step_yx(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
         self.assertEqual(res_x, 12)
         self.assertEqual(res_y, -2.5)
 
@@ -185,7 +185,7 @@ class Test__step_yx(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
         self.assertEqual(res_x, 12)
 
     def test_contradictory_overspecified_phi_endgame(self):
@@ -214,7 +214,7 @@ class Test__step_yx(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
         self.assertEqual(res_y, -2.5)
 
     def test_contradictory_overspecified_phi_newdynamics(self):
@@ -243,7 +243,7 @@ class Test__step_yx(ants.tests.TestCase):
             }
         }
         grid = CAPGrid(sample)
-        (res_y, res_x) = grid._step_yx
+        res_y, res_x = grid._step_yx
         self.assertEqual(res_y, -2.5)
 
 

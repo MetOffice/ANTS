@@ -2,8 +2,11 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+
+# Some of this file has been edited using Met Office Github Copilot Enterprise.
 import tempfile
 import unittest.mock as mock
+import warnings
 
 import ants
 import ants.io.save as save
@@ -33,7 +36,7 @@ class _BaseCommon(object):
         elif nlat is not None and nlon is not None:
             raise RuntimeError("Overspecified, both data and 'nlat/nlon' " "specified")
         else:
-            (nlat, nlon) = data.shape[-2:]
+            nlat, nlon = data.shape[-2:]
         # Mask an element since we lose the fill_value when the array is not
         # masked.
         if np.ma.isMaskedArray(data):
@@ -828,3 +831,243 @@ class TestMuleWorkaround(_BaseCommon, ants.tests.TestCase):
             raise RuntimeError(
                 "Mule is populating lbuser2 for us.  Remove " "our workaround."
             )
+
+
+@ants.tests.skip_mule
+class TestRegularCoordPrecision(ants.tests.TestCase):
+    """
+    Regular horizontal coordinates loaded from a file are float64 and exact.
+
+    Iris builds the coordinates of a regular grid in float32, and the rounding
+    it uses differs between iris/numpy versions.  A load that relied on that
+    would give values differing by a few float32 ULPs (up to ~6e-5 degrees)
+    depending on the environment.  These tests save a cube to an ancillary
+    file and load it back through ``ants.io.load``, so that the whole loading
+    path (including iris) is exercised, rather than ANTS' callback in
+    isolation.
+
+    The grid mimics the rotated pole grid of ``gcm_qrparm.mask``, where the
+    problem was found.  Its 0.11 degree step cannot be represented exactly in
+    float32, which is what makes the test sensitive to the problem.
+
+    """
+
+    # A square grid of 190 x 190 points...
+    _N = 190
+    # ...starting at these first points, and spaced by this step (degrees).
+    _X0 = 341.415
+    _Y0 = -0.165
+    _STEP = 0.11
+    # Decimal places to compare to.  Points are not compared exactly because
+    # saving stores a start and step in the file header (the step is estimated
+    # from the spacing of the points), not the points themselves.  The loaded
+    # points can therefore differ from the originals by float64 rounding, of
+    # order 1e-13.  float32 resolution at these values is ~1e-5, so 12 decimal
+    # places is still far tighter than float32 can achieve.
+    _DECIMAL = 12
+
+    def _make_rotated_cube(self):
+        """Return a cube on the rotated pole grid defined by the class attributes."""
+        crs = iris.coord_systems.RotatedGeogCS(
+            39.25, 198.0, ellipsoid=iris.coord_systems.GeogCS(6371229.0)
+        )
+        n = np.arange(self._N)
+        y = DimCoord(
+            self._Y0 + self._STEP * n,
+            standard_name="grid_latitude",
+            units="degrees",
+            coord_system=crs,
+        )
+        x = DimCoord(
+            self._X0 + self._STEP * n,
+            standard_name="grid_longitude",
+            units="degrees",
+            coord_system=crs,
+        )
+        cube = iris.cube.Cube(
+            np.zeros((self._N, self._N), dtype=np.float32),
+            dim_coords_and_dims=[(y, 0), (x, 1)],
+        )
+        # Attributes required to save as an ancillary file.
+        cube.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi("m01s00i030")
+        cube.attributes["grid_staggering"] = 3
+        return cube
+
+    def _save_and_load(self):
+        """
+        Return the cube after saving it as an ancillary file and loading it back.
+
+        Saving uses ``ants.io.save.ancil`` and loading uses
+        ``ants.io.load.load_cube``, so iris builds the coordinates from the
+        header of the file, as it does for any ancillary ANTS is given.
+
+        """
+        with tempfile.NamedTemporaryFile() as fh:
+            save.ancil(self._make_rotated_cube(), fh.name)
+            return ants.io.load.load_cube(fh.name)
+
+    def _save_with_bounds_and_load(self):
+        """
+        Return the cube after loading a copy of the file whose header asks for bounds.
+
+        The final digit of the header's ``lbcode`` says whether the grid points
+        are cell centres with bounds (2) or points without bounds (1).
+        ``ants.io.save.ancil`` writes 101 (rotated pole grid, no bounds) even
+        when the cube's coordinates have bounds, because the ``lbcode`` comes
+        from iris' pp saving rules, which never set that final digit to 2.
+        The saved file is therefore rewritten with mule to have ``lbcode`` 102
+        (rotated pole grid, with bounds), and that file is loaded with ants.
+
+        """
+        with tempfile.NamedTemporaryFile() as fh:
+            save.ancil(self._make_rotated_cube(), fh.name)
+            with tempfile.NamedTemporaryFile() as fh_modified:
+                ancil = mule.AncilFile.from_file(fh.name)
+                for field in ancil.fields:
+                    field.lbcode = 102
+                # Mule's validation only accepts an lbcode of 1 or 101, and
+                # reports any other as a validation failure ("Skipping Field
+                # validation due to irregular lbcode") when writing the file.
+                ancil.validate = lambda *args, **kwargs: None
+                ancil.to_file(fh_modified.name)
+                # Loading the file reports the same thing as a warning.  The
+                # warning text spans several lines, hence (?s) so that "."
+                # matches newlines.
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore", message="(?s).*Skipping Field validation.*"
+                    )
+                    return ants.io.load.load_cube(fh_modified.name)
+
+    def test_points_are_float64(self):
+        """
+        The loaded horizontal coordinates are float64.
+
+        Iris creates the coordinates of a regular grid as float32, so this
+        checks that ANTS replaces them with the full precision float64 values
+        from the header.
+
+        """
+        cube = self._save_and_load()
+        self.assertEqual(np.float64, cube.coord(axis="x").dtype)
+        self.assertEqual(np.float64, cube.coord(axis="y").dtype)
+
+    def test_longitude_points(self):
+        """
+        Every longitude point equals the value the file was saved from.
+
+        The points are compared to 12 decimal places.  Points that had been
+        through float32 are only correct to about 5 decimal places (and differ
+        between iris/numpy versions), so this fails unless the points are the
+        float64 values derived from the header.
+
+        """
+        cube = self._save_and_load()
+        expected = self._X0 + self._STEP * np.arange(self._N)
+        self.assertArrayAlmostEqual(
+            cube.coord(axis="x").points, expected, self._DECIMAL
+        )
+
+    def test_latitude_points(self):
+        """
+        Every latitude point equals the value the file was saved from.
+
+        As for the longitude points, a comparison to 12 decimal places fails
+        unless the points are the float64 values derived from the header.
+
+        """
+        cube = self._save_and_load()
+        expected = self._Y0 + self._STEP * np.arange(self._N)
+        self.assertArrayAlmostEqual(
+            cube.coord(axis="y").points, expected, self._DECIMAL
+        )
+
+    def test_known_end_point_values(self):
+        """
+        The first, second and last points match values written out in full.
+
+        The longitude and latitude points tests compute their expected values
+        from the same constants used to build the cube.  These fixed values
+        guard against a mistake in those constants or in how they are used, which
+        those tests could not detect.
+
+        """
+        cube = self._save_and_load()
+        x_points = cube.coord(axis="x").points
+        y_points = cube.coord(axis="y").points
+        self.assertArrayAlmostEqual(
+            x_points[[0, 1, -1]], [341.415, 341.525, 362.205], self._DECIMAL
+        )
+        self.assertArrayAlmostEqual(
+            y_points[[0, 1, -1]], [-0.165, -0.055, 20.625], self._DECIMAL
+        )
+
+    def test_no_bounds_for_lbcode_101(self):
+        """
+        A header that does not ask for bounds (lbcode 101) gives no bounds.
+
+        This checks that replacing the points does not also add bounds to the
+        coordinates when the file does not ask for them.
+
+        """
+        cube = self._save_and_load()
+        self.assertFalse(cube.coord(axis="x").has_bounds())
+        self.assertFalse(cube.coord(axis="y").has_bounds())
+
+    def test_points_and_bounds_are_float64_for_lbcode_102(self):
+        """
+        A header that asks for bounds (lbcode 102) gives float64 points and bounds.
+
+        This is the counterpart of ``test_points_are_float64`` and
+        ``test_no_bounds_for_lbcode_101`` for a file whose header asks for
+        bounds: the bounds are present, and both the points and the bounds are
+        float64.
+
+        """
+        cube = self._save_with_bounds_and_load()
+        # Points checks
+        self.assertEqual(np.float64, cube.coord(axis="x").dtype)
+        self.assertEqual(np.float64, cube.coord(axis="y").dtype)
+        # Bounds checks
+        self.assertTrue(cube.coord(axis="x").has_bounds())
+        self.assertTrue(cube.coord(axis="y").has_bounds())
+        self.assertEqual(np.float64, cube.coord(axis="x").bounds.dtype)
+        self.assertEqual(np.float64, cube.coord(axis="y").bounds.dtype)
+
+    def test_points_values_for_lbcode_102(self):
+        """
+        The points equal the saved values when the header asks for bounds.
+
+        The bounds tests compare the bounds to the loaded points, so they
+        would not notice if the points themselves were wrong.  This checks the
+        points of a file with bounds (lbcode 102) directly, to 12 decimal
+        places, as the points tests do for a file without bounds.
+
+        """
+        cube = self._save_with_bounds_and_load()
+        n = np.arange(self._N)
+        self.assertArrayAlmostEqual(
+            cube.coord(axis="x").points, self._X0 + self._STEP * n, self._DECIMAL
+        )
+        self.assertArrayAlmostEqual(
+            cube.coord(axis="y").points, self._Y0 + self._STEP * n, self._DECIMAL
+        )
+
+    def test_bounds_are_half_a_step_for_lbcode_102(self):
+        """
+        A header that asks for bounds (lbcode 102) gives bounds of half a step.
+
+        Each cell's lower and upper bounds are half the grid step below and
+        above its point, to 12 decimal places.
+
+        """
+        cube = self._save_with_bounds_and_load()
+        half_step = 0.5 * self._STEP
+        x = cube.coord(axis="x")
+        y = cube.coord(axis="y")
+        # Check x axis bounds
+        self.assertArrayAlmostEqual(x.bounds[:, 0], x.points - half_step, self._DECIMAL)
+        self.assertArrayAlmostEqual(x.bounds[:, 1], x.points + half_step, self._DECIMAL)
+        # check y axis bounds
+        self.assertArrayAlmostEqual(y.bounds[:, 0], y.points - half_step, self._DECIMAL)
+        self.assertArrayAlmostEqual(y.bounds[:, 1], y.points + half_step, self._DECIMAL)

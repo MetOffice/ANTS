@@ -15,6 +15,7 @@ The following additional functionality is provided on load by ANTS:
 1. Pseudo-level order from the PP file is preserved.
 
 """
+
 import collections
 import itertools
 
@@ -218,7 +219,7 @@ def _iris_workarounds(cube, field, field_index):
     if field.bdy != RMDI and field.bdx == 0.0:
         field.bdx = 360.0
 
-    # Overide bplon as iris doesn not support properly support unrotated pp
+    # Overide bplon as iris does not support properly support unrotated pp
     # LAMs.  See https://github.com/SciTools/iris/issues/3560
     if not ants.utils.cube.is_global(cube):
         if x_coord.coord_system == ants.coord_systems.UM_SPHERE.crs:

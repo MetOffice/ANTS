@@ -5,6 +5,7 @@
 """
 Stub doc for testing.
 """
+
 import argparse
 import unittest.mock as mock
 
@@ -54,7 +55,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             sources=["/path/to/source"],
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_add_args(self):
@@ -95,13 +96,12 @@ class TestAntsArgParser(ants.tests.TestCase):
         self.assertIs(args.ants_config, None)
 
     def test_missing_lbm(self):
+        """Tests that the system will exit if not given an lbm."""
         new = ["program", "/path/to/source", "-o", "/path/to/output"]
         with mock.patch("sys.argv", new=new):
-            with mock.patch("sys.exit") as sys_exit:
-                with mock.patch("sys.stderr"):
-                    parser = AntsArgParser(target_lsm=True)
-                    parser.parse_args()
-        sys_exit.assert_called_once_with(2)
+            with self.assertRaises(SystemExit):
+                parser = AntsArgParser(target_lsm=True)
+                parser.parse_args()
 
     def test_configuration_parse(self):
         config_path = "/path/to/config/file"
@@ -177,7 +177,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             end=2021,
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_flags(self):
@@ -208,7 +208,7 @@ class TestAntsArgParser(ants.tests.TestCase):
             end=1996,
             netcdf_only=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_input(self):

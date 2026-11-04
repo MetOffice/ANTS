@@ -249,11 +249,9 @@ class TestTableMakerExtractDriver:
             non_cylc_eight_db = Path(temp_directory) / "non_cylc_eight_db"
             connection = sqlite3.connect(non_cylc_eight_db)
             cursor = connection.cursor()
-            cursor.execute(
-                """CREATE TABLE IF NOT EXISTS task_jobs
+            cursor.execute("""CREATE TABLE IF NOT EXISTS task_jobs
                 (name TEXT NOT NULL, time_run TEXT NOT NULL, submit_num TEXT NOT NULL)
-                """
-            )
+                """)
             connection.close()
             table_maker_instance_invalid_cylc_db = TableMaker(
                 non_cylc_eight_db,

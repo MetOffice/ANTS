@@ -11,6 +11,10 @@ Tutorials
    :maxdepth: 2
 
    tutorial_application.rst
+   tutorial_load_save.rst
+   tutorial_regridding.rst
+   tutorial_merge_fill.rst
+   tutorial_cli_walkthroughs.rst
    tutorial_KGO.rst
    tutorial_sources.rst
    tutorial_rose_stem.rst

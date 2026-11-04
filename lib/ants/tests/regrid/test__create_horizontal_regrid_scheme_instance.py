@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Parts of this code have been modified with Met Office Github Copilot
+# Enterprise
 import ants.tests
 from ants.regrid import _create_horizontal_regrid_scheme_instance
 from ants.regrid.esmf import ConservativeESMF
@@ -27,6 +29,15 @@ class TestLinear(ants.tests.TestCase):
         )
         self.assertIsInstance(scheme, Linear)
         self.assertEqual(expected_extrapolation, scheme._extrapolation)
+
+    def test_nan_float_extrapolation(self):
+        """Test that a float NaN, as read from the ants configuration file, is
+        interpreted as the 'nan' extrapolation mode."""
+        scheme = _create_horizontal_regrid_scheme_instance(
+            "Linear", extrapolation_mode=float("nan")
+        )
+        self.assertIsInstance(scheme, Linear)
+        self.assertEqual("nan", scheme._extrapolation)
 
 
 class TestNearest(ants.tests.TestCase):

@@ -120,12 +120,12 @@ class TestAreaWeighted(_TestCommon, ants.tests.TestCase):
         initial_type = "int32"
         expected_type = "float64"
 
-        self.assertTrue(self.source.dtype == initial_type)
+        self.assertEqual(self.source.dtype, initial_type)
         regridder = regrid.rectilinear.AreaWeighted().regridder(
             self.source, self.target
         )
         result = regridder(self.source)
-        self.assertTrue(result.dtype == expected_type)
+        self.assertEqual(result.dtype, expected_type)
         self.assertTrue(result.has_lazy_data)
 
 
@@ -148,7 +148,7 @@ class TestLinear_regridder(_TestCommon, ants.tests.TestCase):
             regridder(regridme)
 
         tgt_crs = ants.coord_systems.UM_SPHERE.crs
-        self.assertTrue(mock_rect.called)
+        mock_rect.assert_called_once()
         res_cube = mock_rect.call_args[0][0]
         self.assertEqual(res_cube.coord(axis="x").coord_system, tgt_crs)
         self.assertEqual(res_cube.coord(axis="y").coord_system, tgt_crs)

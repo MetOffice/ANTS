@@ -87,4 +87,4 @@ class TestAll(ants.tests.TestCase):
         patch_func = "ants.io.save._coerce_netcdf_classic_dtypes"
         with mock.patch(patch_func) as patched:
             save.netcdf(self.cubes, self.filename)
-        self.assertTrue(patched.called)
+        patched.assert_called_once()

@@ -32,6 +32,7 @@ Classes:
     DataTable:          Helper dataclass for storing table elements.
 
 """
+
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timedelta

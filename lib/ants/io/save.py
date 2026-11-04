@@ -20,6 +20,7 @@ Additionally, ANTS has support for 'ukca' flavoured NetCDF, chosen by
 specifying ``saver='ukca'`` (see :func:`ants.io.save.ukca_netcdf`).
 
 """
+
 import os
 import sys
 import warnings
@@ -309,7 +310,8 @@ def _update_history_cmd(cube):
     combined_history = []
     if combine_histories:
         for cc in cubes:
-            combined_history.append(cc.attributes["history"])
+            if "history" in cc.attributes:
+                combined_history.append(cc.attributes["history"])
         combined_history = "\n".join(combined_history)
         for cc in cubes:
             cc.attributes["history"] = combined_history

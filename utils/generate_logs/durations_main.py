@@ -9,6 +9,7 @@ The module contains an entry point ``main`` function, an argparse ``parse_argume
 function argparse ``type`` validator functions and a ``validate_sql_lite_db`` function.
 
 """
+
 import argparse
 import logging
 import sqlite3

@@ -110,7 +110,7 @@ def _extract_overlap(source, target, fix_period=False, pad_width=0):
     src_crs = source_x.coord_system.as_ants_crs()
     box = _bounding_box(target_x, target_y, src_crs)
 
-    (minx, miny, maxx, maxy) = box.bounds
+    minx, miny, maxx, maxy = box.bounds
     slices = utils.cube.get_slices(source, [miny, maxy], [minx, maxx], pad_width)
 
     if len(slices) > 2:

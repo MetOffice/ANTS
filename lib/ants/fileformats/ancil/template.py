@@ -7,6 +7,7 @@
 Tools for generating the template required for saving ancillary files.
 
 """
+
 import itertools
 import re
 
@@ -136,7 +137,7 @@ def _set_grid_definition(headers, grid, field):
     headers["fixed_length_header"]["horiz_grid_type"] = horiz_grid_type
 
     # REAL CONSTANTS
-    (regular_x, regular_y) = field.is_regular
+    regular_x, regular_y = field.is_regular
     if regular_x:
         headers["real_constants"]["col_spacing"] = field.bdx
         # Longitude of first column in degrees (longitudes in range 0-360)

@@ -79,7 +79,7 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         with mock.patch("esmpy.api.regrid.Regrid") as patch_esmpy_regrid:
             regridder = self.scheme.regridder(self.src, self.src)
             regridder(self.src)
-        self.assertFalse(patch_esmpy_regrid.called)
+        patch_esmpy_regrid.assert_not_called()
 
     def test_grid_latitude_coordinate(self):
         """Check expected grid latitude."""
@@ -172,7 +172,7 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
 
         regridder = self.scheme.regridder(src_cube, self.tgt)
         result = regridder(src_cube)
-        self.assertTrue((result.data == 0).sum() > 0)
+        self.assertGreater((result.data == 0).sum(), 0)
 
     def test_masked_data(self):
         self.src.data = np.ma.array(self.src.data)
@@ -370,7 +370,7 @@ class Test_cache(Common1D, ants.tests.TestCase):
         with mock.patch("esmpy.api.regrid.RegridFromFile") as cache_regrid:
             del regridder
             self.scheme.regridder(self.src, self.tgt, persistent_cache=False)
-            self.assertTrue(cache_regrid.called)
+            cache_regrid.assert_called_once()
 
 
 class CommonND(object):
@@ -557,4 +557,4 @@ class Test___del__(Common1D, ants.tests.TestCase):
                 regridder = self.scheme.regridder(self.src, self.tgt)
         del regridder
         for obj in [grid1, grid2, field1, field2, rpatched()]:
-            self.assertTrue(obj.destroy.called)
+            obj.destroy.assert_called_once()

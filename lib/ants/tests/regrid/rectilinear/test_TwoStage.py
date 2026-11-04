@@ -132,9 +132,9 @@ class TestTwoStage(ants.tests.TestCase):
         re = regridder.regridder(src_cube, tgt_cube)
         re(src_cube)
 
-        self.assertTrue(self.area_patch.called)
-        self.assertFalse(self.regtar_patch.called)
-        self.assertFalse(self.linear_patch.called)
+        self.area_patch.assert_called_once()
+        self.regtar_patch.assert_not_called()
+        self.linear_patch.assert_not_called()
 
     def test_diff_crs_regrid(self):
         src_cube = ants.tests.stock.geodetic((4, 4))
@@ -143,9 +143,9 @@ class TestTwoStage(ants.tests.TestCase):
         re = regridder.regridder(src_cube, tgt_cube)
         re(src_cube)
 
-        self.assertTrue(self.area_patch.called)
-        self.assertTrue(self.regtar_patch.called)
-        self.assertTrue(self.linear_patch.called)
+        self.area_patch.assert_called_once()
+        self.regtar_patch.assert_called_once()
+        self.linear_patch.assert_called_once()
 
     def test_homogenised_crs(self):
         src_cube = ants.tests.stock.geodetic((4, 4))
@@ -157,9 +157,9 @@ class TestTwoStage(ants.tests.TestCase):
         re = regridder.regridder(src_cube, tgt_cube)
         re(src_cube)
 
-        self.assertTrue(self.area_patch.called)
-        self.assertFalse(self.regtar_patch.called)
-        self.assertFalse(self.linear_patch.called)
+        self.area_patch.assert_called_once()
+        self.regtar_patch.assert_not_called()
+        self.linear_patch.assert_not_called()
 
 
 class Test___repr__(ants.tests.TestCase):
