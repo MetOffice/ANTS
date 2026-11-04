@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the content of this file has been produced with the assistance of Met Office
+# Github Copilot Enterprise
 import logging
 from unittest import mock
 
@@ -22,6 +24,24 @@ def test_license_attribute_written(tmp_path):
     with open(expected_filename, "r") as file:
         actual_license = file.read()
     assert actual_license == license
+
+
+def test_global_and_local_metadata():
+    """Tests that when given both a local and global variables will be preserved."""
+    cube = stock.geodetic(shape=(2, 2))
+    cube.attributes.globals["license"] = "a global license"
+    cube.attributes.locals["license"] = "a local license"
+    cube.rename("test cube")
+    with mock.patch("ants.io.save._write_metadata_file") as mock_method:
+        _check_and_sort_metadata_attributes([cube], "filename")
+    mock_method.assert_called_once_with(
+        [
+            "test cube = a global license\n",
+            "test cube = a local license\n",
+        ],
+        "filename",
+        "license",
+    )
 
 
 @pytest.mark.filterwarnings(

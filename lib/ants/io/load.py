@@ -55,6 +55,7 @@ See Also
 :func:`ants.fileformats.namelist.load_um_vertical`
 
 """
+
 import copy
 import glob
 import inspect
@@ -474,7 +475,7 @@ class _CallbackMetadata:
             else:
                 with open(metadata_file, "r") as open_file:
                     metadata = open_file.read()
-                cube.attributes[attribute_name] = metadata
+                cube.attributes.globals[attribute_name] = metadata
 
 
 def load_cube(*args, ignore_metadata_read=False, **kwargs):
