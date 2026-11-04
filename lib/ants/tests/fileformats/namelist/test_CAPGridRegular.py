@@ -265,8 +265,7 @@ class Test_get_cube(ants.tests.TestCase):
         grid = CAPGrid(sample)
         msg = r"x values overlap, points range: \(60.0, 460.0\)."
         with self.assertRaisesRegex(RuntimeError, msg):
-            with mock.patch("warnings.warn"):
-                grid.get_cube()
+            grid.get_cube()
 
     def test_y_values_extending_beyond_expected_range_endgame(self):
         # Here we ensure that latitudes do not extend beyond [-90, 90].
@@ -443,11 +442,6 @@ class Test_attributes(ants.tests.TestCase):
 
 
 class Test_x(ants.tests.TestCase):
-    def setUp(self):
-        patch = mock.patch("warnings.warn")
-        self.mock_warnings = patch.start()
-        self.addCleanup(patch.stop)
-
     def test_newdynamics_n48(self):
         sample = {
             "grid": {
@@ -486,11 +480,6 @@ class Test_x(ants.tests.TestCase):
 
 
 class Test_y(ants.tests.TestCase):
-    def setUp(self):
-        patch = mock.patch("warnings.warn")
-        self.mock_warnings = patch.start()
-        self.addCleanup(patch.stop)
-
     def test_newdynamics_n48(self):
         sample = {
             "grid": {
@@ -529,11 +518,6 @@ class Test_y(ants.tests.TestCase):
 
 
 class Test_is_endgame(ants.tests.TestCase):
-    def setUp(self):
-        patch = mock.patch("warnings.warn")
-        self.mock_warnings = patch.start()
-        self.addCleanup(patch.stop)
-
     def test_newdynamics(self):
         sample = {
             "grid": {

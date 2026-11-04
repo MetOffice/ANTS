@@ -101,12 +101,16 @@ class TestValue(ants.tests.TestCase):
             target.coord(axis="x").circular = True
 
         overlap = extract_overlap(source, grid, fix_period=fix_period, pad_width=0)
+        breakpoint()
         self.assertEqual(overlap, target)
 
     def test_wraparound_dateline_discon_fixed_period(self):
         # wraparound resulting in discontiguous bounds when defined over the
         # original range i.e. we need to change range in order for iris to deem
         # it contiguous so we raise an exception here.
+        # TODO: this comment states an exception is raised but it never is. This
+        # could be related to the source and target swapping when extracting the
+        # bounding box.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.wraparound_discontiguous_over_orig_range(True)
@@ -160,9 +164,9 @@ class TestValue(ants.tests.TestCase):
         grid.coord(axis="x").coord_system = iris.coord_systems.GeogCS(6371330.0)
         grid.coord(axis="y").coord_system = iris.coord_systems.GeogCS(6371330.0)
         msg = "Unable to perform extraction and maintain contiguous " "coordinates."
-        with mock.patch("warnings.warn") as warn:
+
+        with self.assertWarnsRegex(UserWarning, msg):
             overlap = extract_overlap(source, grid, fix_period=False, pad_width=0)
-        warn.assert_called_once_with(msg)
 
         target = [4.0625, 185.9375]
         self.assertArrayEqual(overlap.coord(axis="x").points, target)
