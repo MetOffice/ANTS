@@ -13,8 +13,15 @@ points defining a single polygon in a specified polygon file.
 Rotated pole domains can be specified using the land sea mask argument,
 where the longitude, latitude pairs are transformed to the new pole.
 Unless a source cube is provided with the source coordinate reference system,
-it assumed that the points defined in the json file are on a standard spherical
+it is assumed that the points defined in the json file are on a standard spherical
 unrotated geodetic coordinate reference system.
+
+Points crossing the antimeridian after rotation are transformed to ensure the
+resulting polygon is contiguous. This means that longitude bounds of the polygon
+can be either [-180, 180] or [0, 360] depending on which representation allows
+the polygon to be contiguous. The user can optionally specify a minimum longitude.
+The longitudes will then be translated by k*360 so the minimum longitude of
+the transformed points lies in [minimum_lon, minimum_lon + 360.0).
 """
 
 import argparse
@@ -133,23 +140,101 @@ def _validate_orientation(target_lsm):
     return not invalid_crs
 
 
-def _validate_args(target_lsm_path, source_path):
+def _validate_args(target_lsm_path, source_path, minimum_lon):
     if source_path is not None and target_lsm_path is None:
         raise ValueError("If --source is passed then --target-lsm must also be given.")
+    if minimum_lon is not None and target_lsm_path is None:
+        raise ValueError(
+            "If --minimum-lon is passed then --target-lsm must also be given."
+        )
 
 
-def _transform_coordinates(target_lsm, source, points):
+def _check_within_domain(target_lsm, rotated_points):
+    """
+    Warn if the transformed points lie outside the target lsm domain.
+
+    Bounds are guessed on copies of the coordinates if not present, so the
+    target lsm is not modified.
+
+    Parameters
+    ----------
+    target_lsm : :class:`iris.cube.Cube`
+        The lsm cube defining the target domain.
+    rotated_points : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
+
+    Warns
+    -----
+    UserWarning
+        If any point lies outside the target lsm domain.
+    """
+
+    # Find the bounds of the target lsm if there are none
+    target_x_coord = target_lsm.coord(axis="X").copy()
+    target_y_coord = target_lsm.coord(axis="Y").copy()
+    if not target_x_coord.has_bounds():
+        target_x_coord.guess_bounds()
+    if not target_y_coord.has_bounds():
+        target_y_coord.guess_bounds()
+
+    # Find the extent of the target lsm domain.
+    bounds_lon = target_x_coord.bounds
+    bounds_lat = target_y_coord.bounds
+    min_lon, max_lon = bounds_lon.min(), bounds_lon.max()
+    min_lat, max_lat = bounds_lat.min(), bounds_lat.max()
+    lons, lats = rotated_points[:, 0], rotated_points[:, 1]
+
+    # Check if the polygon lies in the domain specified by the target lsm.
+    if (
+        lons.min() < min_lon
+        or lons.max() > max_lon
+        or lats.min() < min_lat
+        or lats.max() > max_lat
+    ):
+        warnings.warn("The transformed points lie outside the target lsm domain.")
+
+
+def _translate_lons_to_minimum(lons, minimum_lon):
+    """
+    Uniformly translate longitudes so that the minimum longitude lies
+    in [minimum_lon, minimum_lon + 360.0).
+
+    Parameters
+    ----------
+    lons : :class:`numpy.ndarray`
+        Contiguous longitudes in degrees.
+    minimum_lon : float
+        Longitude from which the points are translated.
+
+    Returns
+    -------
+    : :class:`numpy.ndarray`
+        The translated longitudes.
+    """
+
+    period = 360.0
+    n_periods = (minimum_lon - lons.min()) / period
+    translation = int(np.ceil(n_periods))
+
+    return lons + translation * period
+
+
+def _transform_coordinates(target_lsm, source, points, minimum_lon):
     """
     Transform the longitude-latitude points to the rotated pole.
 
-    If the transformation results in the points spanning the antimeridian, this
+    If the transformation results in points spanning the antimeridian, this
     can cause incorrect polygons to be created because shapely does not wrap
     between 180.0 and -180.0 degrees.
 
     If the distance between sequential transformed longitude points exceeds
-    180.0 degrees, it is assumed these points cross the antimeridian. The points
-    are instead defined in the interval [0.0, 360.0] by adding 360.0 degrees
-    to the negative longitudes.
+    180.0 degrees, it is assumed these points cross the antimeridian, and
+    360.0 degrees is added to the negative longitudes so that the polygon is
+    contiguous.
+
+    If ``minimum_lon`` is given, all longitudes are then translated by the
+    same multiple of 360.0 degrees so that the minimum longitude lies in
+    [minimum_lon, minimum_lon + 360.0).
 
     Parameters
     ----------
@@ -160,6 +245,9 @@ def _transform_coordinates(target_lsm, source, points):
         file.
     points : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of m longitude-latitude pairs.
+    minimum_lon : float or None
+        Longitude from which the transformed points are translated. If None,
+        no translation is applied.
 
     Returns
     -------
@@ -187,31 +275,21 @@ def _transform_coordinates(target_lsm, source, points):
     closed_lon = np.vstack([rotated_points, rotated_points[0, :]])
     lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
 
-    # Add 360.0 degrees to negative longitudes if the points cross the antimeridian.
     if np.any(lon_diff > 180.0):
         warnings.warn(
             "The transformed points are assumed to cross the antimeridian. "
-            "The longitudinal points will instead be defined in the interval"
-            " [0, 360.0] degrees."
+            "360 degrees has been added to negative longitudes so that the "
+            "polygon is contiguous."
         )
-        neg_indices = np.where(rotated_points[:, 0] < 0)
-        rotated_points[neg_indices, 0] += 360.0
+        rotated_points[rotated_points[:, 0] < 0, 0] += 360.0
+        # TODO: check for polygons that encircle the pole
 
-    # Find the bounds of the target lsm.
-    bounds_lon = target_lsm.coord(axis="X").bounds
-    bounds_lat = target_lsm.coord(axis="Y").bounds
-    min_lon, max_lon = bounds_lon.min(), bounds_lon.max()
-    min_lat, max_lat = bounds_lat.min(), bounds_lat.max()
-    lons, lats = rotated_points[:, 0], rotated_points[:, 1]
+    if minimum_lon is not None:
+        rotated_points[:, 0] = _translate_lons_to_minimum(
+            rotated_points[:, 0], minimum_lon
+        )
 
-    # Check if the polygon lies in the domain specified by the target lsm.
-    if (
-        lons.min() < min_lon
-        or lons.max() > max_lon
-        or lats.min() < min_lat
-        or lats.max() > max_lat
-    ):
-        warnings.warn("The transformed points lie outside the target lsm domain.")
+    _check_within_domain(target_lsm, rotated_points)
 
     _LOGGER.info(
         "Input json file transformed to new pole rotated coordinate system at "
@@ -253,7 +331,7 @@ def _load_cubes(target_lsm_path, source_path):
     return target_lsm, source
 
 
-def _transform_if_required(target_lsm, source, points):
+def _transform_if_required(target_lsm, source, points, minimum_lon):
     """
     Perform the transformation to a rotated pole if the coordinate system
     is valid.
@@ -271,6 +349,9 @@ def _transform_if_required(target_lsm, source, points):
         file.
     points : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of m longitude-latitude pairs.
+    minimum_lon : float or None
+        Longitude from which the transformed points are translated. If None,
+        no translation is applied.
 
     Returns
     -------
@@ -281,7 +362,7 @@ def _transform_if_required(target_lsm, source, points):
     _check_coord_system_type(target_lsm)
 
     if _validate_orientation(target_lsm):
-        rotated_points = _transform_coordinates(target_lsm, source, points)
+        rotated_points = _transform_coordinates(target_lsm, source, points, minimum_lon)
     else:
         rotated_points = np.copy(points)
 
@@ -343,7 +424,7 @@ def _load_points_from_json(json_file):
     return points
 
 
-def main(json_file, output, target_lsm_path, source_path):
+def main(json_file, output, target_lsm_path, source_path, minimum_lon):
     """
     Create a shape file from pairs of longitude, latitude points.
 
@@ -367,6 +448,9 @@ def main(json_file, output, target_lsm_path, source_path):
     source_path : str
         File path to a source file specifying the coordinate system of the
         input json file.
+    minimum_lon : float or None
+        Longitude from which the transformed points are translated. If None,
+        no translation is applied.
     """
 
     # Load a json and make a polygon
@@ -376,7 +460,7 @@ def main(json_file, output, target_lsm_path, source_path):
     # Transform points to a rotated pole if required
     if target_lsm_path is not None:
         target_lsm, source = _load_cubes(target_lsm_path, source_path)
-        points = _transform_if_required(target_lsm, source, points)
+        points = _transform_if_required(target_lsm, source, points, minimum_lon)
         _save_json(output, target_lsm_path, source_path, target_lsm, source)
 
     polygon = Polygon(points)
@@ -420,6 +504,15 @@ def _get_parser():
         " coordinate system.",
     )
     parser.add_argument(
+        "--minimum-lon",
+        type=float,
+        required=False,
+        help="Longitude from which the transformed polygon is translated. All "
+        "points are translated by the same multiple of 360 degrees so that the "
+        "polygon's minimum longitude lies in [minimum-lon, minimum-lon + 360). "
+        "If not given, no translation is applied. Requires --target-lsm.",
+    )
+    parser.add_argument(
         "--source",
         type=ants.config.filepath_readable,
         required=False,
@@ -432,8 +525,8 @@ def cli_interface():
     parser = _get_parser()
     args = parser.parse_args()
 
-    _validate_args(args.target_lsm, args.source)
-    main(args.json_file, args.output, args.target_lsm, args.source)
+    _validate_args(args.target_lsm, args.source, args.minimum_lon)
+    main(args.json_file, args.output, args.target_lsm, args.source, args.minimum_lon)
 
 
 if __name__ == "__main__":
