@@ -18,6 +18,7 @@ details.
 import ants
 import ants.io.save as save
 import ants.utils
+from ants.fileformats.namelist import load_vertical
 from ants.utils.cube import create_time_constrained_cubes
 
 
@@ -26,12 +27,18 @@ def load_data(
     target_grid,
     begin=None,
     end=None,
+    remove_level_zero=False,
 ):
     source_cubes = ants.io.load.load(source)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
 
-    target_cube = ants.io.load.load_grid(target_grid)
+    try:
+        target_cube = next(
+            load_vertical(target_grid, remove_level_zero=remove_level_zero)
+        )
+    except ValueError:
+        target_cube = ants.io.load.load_grid(target_grid)
 
     check_target(target_cube, source_cubes)
 
@@ -86,6 +93,7 @@ def main(
     target_path,
     begin,
     end,
+    remove_level_zero,
     save_ukca,
     netcdf_only,
 ):
@@ -126,6 +134,7 @@ def main(
         target_path,
         begin,
         end,
+        remove_level_zero,
     )
 
     regridded_cubes = regrid(source_cubes, target_cube)
@@ -142,6 +151,21 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(target_grid=True, time_constraints=True)
+    level_zero = parser.add_mutually_exclusive_group(required=True)
+    level_zero.add_argument(
+        "--remove-L0",
+        action="store_true",
+        dest="remove_level_zero",
+        default=False,
+        help="Remove the zeroth level from vertical target",
+    )
+    level_zero.add_argument(
+        "--keep-L0",
+        action="store_false",
+        dest="remove_level_zero",
+        default=False,
+        help="Do not remove the zeroth level from vertical target",
+    )
     parser.add_argument(
         "--save-ukca",
         action="store_true",
@@ -162,6 +186,7 @@ def cli_interface():
         args.target_grid,
         args.begin,
         args.end,
+        args.remove_level_zero,
         args.save_ukca,
         args.netcdf_only,
     )

@@ -8,11 +8,7 @@ from io import StringIO
 import ants.tests
 import iris
 import numpy as np
-from ants.fileformats.namelist import (
-    load_cap_horizontal,
-    load_lfric_vertical,
-    load_um_vertical,
-)
+from ants.fileformats.namelist import load_cap_horizontal, load_vertical
 
 
 @ants.tests.skip_f90nml
@@ -96,7 +92,9 @@ eta_rho = 0.05, 0.1625, 0.3125, 0.5, 0.8
             "f90nml.parser.open", create=True, return_value=self.file1
         )
         with patch_open:
-            cube = next(load_um_vertical(self.filename, callback=callback))
+            cube = next(
+                load_vertical(self.filename, remove_level_zero=True, callback=callback)
+            )
         return cube
 
     def _run_lfric_vertical(self, callback=None):
@@ -104,7 +102,9 @@ eta_rho = 0.05, 0.1625, 0.3125, 0.5, 0.8
             "f90nml.parser.open", create=True, return_value=self.file1
         )
         with patch_open:
-            cube = next(load_lfric_vertical(self.filename, callback=callback))
+            cube = next(
+                load_vertical(self.filename, remove_level_zero=False, callback=callback)
+            )
         return cube
 
     def test_um_vertical_model_level_number(self):
