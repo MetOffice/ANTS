@@ -71,9 +71,11 @@ class TestWarnings(ants.tests.TestCase):
         message = "load_um_vertical has been deprecated. Please use "
         "ants.fileformats.namelist.load_vertical with option "
         "remove_level_zero=True"
-        with patch("ants.fileformats.namelist.load_um_vertical"):
+        with patch("ants.fileformats.namelist.load_vertical"):
             with self.assertRaisesRegex(FutureWarning, message):
-                ants.load_um_vertical("test_ants_load_fake_filepath")
+                ants.fileformats.namelist.load_um_vertical(
+                    "test_ants_load_fake_filepath"
+                )
 
     def test_ants_load_lfric_vertical(self):
         """Tests that calling the deprecated function ants.load_um_vertical will
@@ -81,6 +83,8 @@ class TestWarnings(ants.tests.TestCase):
         message = "load_lfric_vertical has been deprecated. Please use "
         "ants.fileformats.namelist.load_vertical with option "
         "remove_level_zero=False"
-        with patch("ants.fileformats.namelist.load_lfric_vertical"):
+        with patch("ants.fileformats.namelist.load_vertical"):
             with self.assertRaisesRegex(FutureWarning, message):
-                ants.load_lfric_vertical("test_ants_load_fake_filepath")
+                ants.fileformats.namelist.load_lfric_vertical(
+                    "test_ants_load_fake_filepath"
+                )
