@@ -219,9 +219,8 @@ def _translate_lons_to_minimum(lons, minimum_lon):
     return lons + translation * period
 
 
-def _transform_coordinates(target_lsm, source, points, minimum_lon):
-    """
-    Transform the longitude-latitude points to the rotated pole.
+def _make_contiguous(rotated_points):
+    """Translate points so a contiguous polygon is formed.
 
     If the transformation results in points spanning the antimeridian, this
     can cause incorrect polygons to be created because shapely does not wrap
@@ -232,9 +231,48 @@ def _transform_coordinates(target_lsm, source, points, minimum_lon):
     360.0 degrees is added to the negative longitudes so that the polygon is
     contiguous.
 
-    If ``minimum_lon`` is given, all longitudes are then translated by the
-    same multiple of 360.0 degrees so that the minimum longitude lies in
-    [minimum_lon, minimum_lon + 360.0).
+    Parameters
+    ----------
+    rotated_points : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
+
+    Returns
+    -------
+    : :class:`numpy.ndarray`
+        An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
+
+    Warns
+    -----
+    UserWarning
+        If the transformed points are assumed to cross the antimeridian.
+
+    Notes
+    -----
+        This function does not make polygons encircling the pole contiguous.
+    """
+
+    # Create a wrapped array of longitudes and find the point-wise difference.
+    new_points = np.array(rotated_points, dtype=float)
+    closed_lon = np.vstack([new_points, new_points[0, :]])
+    lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
+
+    if np.any(lon_diff > 180.0):
+        warnings.warn(
+            "The transformed points are assumed to cross the antimeridian. "
+            "360 degrees has been added to negative longitudes so that the "
+            "polygon is contiguous."
+        )
+        new_points[new_points[:, 0] < 0, 0] += 360.0
+
+    return new_points
+
+
+def _transform_coordinates(target_lsm, source, points):
+    """
+    Transform the longitude-latitude points to the rotated pole.
+
+    By default, the transformed longitudes are output in the interval
+    [-180.0, 180.0] from the cartopy crs projection limits.
 
     Parameters
     ----------
@@ -245,21 +283,11 @@ def _transform_coordinates(target_lsm, source, points, minimum_lon):
         file.
     points : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of m longitude-latitude pairs.
-    minimum_lon : float or None
-        Longitude from which the transformed points are translated. If None,
-        no translation is applied.
 
     Returns
     -------
     : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
-    Warns
-    -----
-    UserWarning
-        If the transformed points are assumed to cross the antimeridian.
-    UserWarning
-        If the transformed polygon lies at least partially outside of the
-        domain specified in the target lsm.
     """
 
     source_crs = source.coord_system().as_cartopy_crs()
@@ -270,26 +298,6 @@ def _transform_coordinates(target_lsm, source, points, minimum_lon):
     rotated_points = target_crs.transform_points(
         source_crs, points[:, 0], points[:, 1]
     )[:, :2]
-
-    # Create a wrapped array of longitudes and find the point-wise difference.
-    closed_lon = np.vstack([rotated_points, rotated_points[0, :]])
-    lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
-
-    if np.any(lon_diff > 180.0):
-        warnings.warn(
-            "The transformed points are assumed to cross the antimeridian. "
-            "360 degrees has been added to negative longitudes so that the "
-            "polygon is contiguous."
-        )
-        rotated_points[rotated_points[:, 0] < 0, 0] += 360.0
-        # TODO: check for polygons that encircle the pole
-
-    if minimum_lon is not None:
-        rotated_points[:, 0] = _translate_lons_to_minimum(
-            rotated_points[:, 0], minimum_lon
-        )
-
-    _check_within_domain(target_lsm, rotated_points)
 
     _LOGGER.info(
         "Input json file transformed to new pole rotated coordinate system at "
@@ -333,12 +341,18 @@ def _load_cubes(target_lsm_path, source_path):
 
 def _transform_if_required(target_lsm, source, points, minimum_lon):
     """
-    Perform the transformation to a rotated pole if the coordinate system
-    is valid.
+    Transform the points to a rotated pole if the coordinate system if
+    required.
 
     The points are transformed to the specified rotated pole coordinate system
     if the provided coordinate system is a rotated pole and is not coincident
-    with the geographic north pole.
+    with the geographic north pole. Following transformation, the longitudes
+    are adjusted so that the polygon does not wrap the antimeridian. If
+    ``minimum_lon`` is passed, the longitudes are translated by the same multiple
+    of 360.0 degrees.
+
+    If the input target lsm  is coincident with the north pole, the points
+    are returned and ``minimum_lon`` is ignored.
 
     Parameters
     ----------
@@ -362,7 +376,13 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
     _check_coord_system_type(target_lsm)
 
     if _validate_orientation(target_lsm):
-        rotated_points = _transform_coordinates(target_lsm, source, points, minimum_lon)
+        rotated_points = _transform_coordinates(target_lsm, source, points)
+        rotated_points = _make_contiguous(rotated_points)
+        if minimum_lon is not None:
+            rotated_points[:, 0] = _translate_lons_to_minimum(
+                rotated_points[:, 0], minimum_lon
+            )
+        _check_within_domain(target_lsm, rotated_points)
     else:
         rotated_points = np.copy(points)
 
@@ -419,7 +439,7 @@ def _load_points_from_json(json_file):
 
     with open(json_file, "r") as polygon_json:
         points = json.load(polygon_json)
-    points = np.array(points)
+    points = np.array(points, dtype=float)
 
     return points
 
