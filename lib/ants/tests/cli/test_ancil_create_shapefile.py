@@ -250,14 +250,31 @@ class Test__translate_lons_to_minimum(ants.tests.TestCase):
 class Test__make_contiguous(ants.tests.TestCase):
     def test_points_made_contiguous(self):
         """Test that a set of points with longitude difference greater than
-        180 emits a warning and negative longitudes are changed.
+        180 emits a warning and large step differences are changed to the shorter
+        complement.
+        """
+        rotated_points = np.array([[170, 10], [-170, 10], [-170, -10], [170, -10]])
+        expected_points = np.array([[170, 10], [190, 10], [190, -10], [170, -10]])
+        warning_msg = re.escape(
+            "The transformed points are assumed to cross the antimeridian. "
+            "The points will instead be defined so that a contiguous polygon "
+            "can be made."
+        )
+        with self.assertWarnsRegex(UserWarning, warning_msg):
+            rotated_points = _make_contiguous(rotated_points)
+        self.assertArrayEqual(rotated_points, expected_points)
+
+    def test_points_made_contiguous_positive(self):
+        """Test that a set of points with longitude difference greater than
+        180 emits a warning and that the longitudes are not unwrapped below -180
+        degrees.
         """
         rotated_points = np.array([[-170, 10], [170, 10], [170, -10], [-170, -10]])
         expected_points = np.array([[190, 10], [170, 10], [170, -10], [190, -10]])
         warning_msg = re.escape(
             "The transformed points are assumed to cross the antimeridian. "
-            "360 degrees has been added to negative longitudes so that the "
-            "polygon is contiguous."
+            "The points will instead be defined so that a contiguous polygon "
+            "can be made."
         )
         with self.assertWarnsRegex(UserWarning, warning_msg):
             rotated_points = _make_contiguous(rotated_points)
@@ -271,6 +288,27 @@ class Test__make_contiguous(ants.tests.TestCase):
 
         rotated_points = _make_contiguous(rotated_points)
         self.assertArrayEqual(rotated_points, expected_points)
+
+    def test_pole_encirclement(self):
+        """Test a set of points that encircle the pole raise an error."""
+
+        rotated_points = np.array(
+            [[-170, 80], [-100, 70], [-20, 75], [40, 80], [100, 80], [150, 70]]
+        )
+        msg = "Points encircling a pole are not supported."
+        with self.assertRaisesRegex(ValueError, msg):
+            _ = _make_contiguous(rotated_points)
+
+    def test_pole_encirclement_reverse_order(self):
+        """Test a set of points encirlcing the pole in the opposite direction
+        the pole raises an error."""
+
+        rotated_points = np.array(
+            [[150, 70], [100, 80], [40, 80], [-20, 75], [-100, 70], [-170, 80]]
+        )
+        msg = "Points encircling a pole are not supported."
+        with self.assertRaisesRegex(ValueError, msg):
+            _ = _make_contiguous(rotated_points)
 
 
 class Test__transform_coordinates(ants.tests.TestCase):
@@ -477,8 +515,8 @@ class Test__transform_if_required(ants.tests.TestCase):
         )
         warning_msg = re.escape(
             "The transformed points are assumed to cross the antimeridian. "
-            "360 degrees has been added to negative longitudes so that the "
-            "polygon is contiguous."
+            "The points will instead be defined so that a contiguous polygon "
+            "can be made."
         )
 
         with self.assertWarnsRegex(UserWarning, warning_msg):
@@ -509,6 +547,61 @@ class Test__transform_if_required(ants.tests.TestCase):
         rotated_coords = _transform_if_required(
             target_lsm, self.sphere_source, self.points, minimum_lon
         )
+
+        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+
+    def test_multiple_seam_crossings(self):
+        """Test a valid set of points that would define a polygon crossing the
+        antimeridian multiple times.
+
+        In this specific example we must represent the unwrapped longitudes in
+        a range wider than 360 degrees to preserve the topology of the polygon.
+        """
+        complex_points = np.array(
+            [
+                [-10, 20],
+                [10, 20],
+                [170, 10],
+                [190, 10],
+                [300, 3],
+                [365, 0],
+                [300, -3],
+                [190, -10],
+                [170, -10],
+                [10, -20],
+                [-10, -20],
+                [10, 0],
+            ]
+        )
+        expected_points = np.array(
+            [
+                [170, 20],
+                [190, 20],
+                [350, 10],
+                [370, 10],
+                [480, 3],
+                [545, 0],
+                [480, -3],
+                [370, -10],
+                [350, -10],
+                [190, -20],
+                [170, -20],
+                [190, 0],
+            ]
+        )
+        crs = iris.coord_systems.RotatedGeogCS(
+            90.0, 180.0, 180.0, ellipsoid=self.sphere_crs
+        )
+        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        warning_msg = re.escape(
+            "The transformed points are assumed to cross the antimeridian. "
+            "The points will instead be defined so that a contiguous polygon "
+            "can be made."
+        )
+        with self.assertWarnsRegex(UserWarning, warning_msg):
+            rotated_coords = _transform_if_required(
+                target_lsm, self.sphere_source, complex_points, None
+            )
 
         self.assertArrayAlmostEqual(rotated_coords, expected_points)
 
@@ -582,5 +675,4 @@ class Test_ite_transform(ants.tests.TestCase):
         target_lsm = CubeBuilder(crs, (93, 75), xlim=(352.8725, 365.261))._cube
 
         rotated_points = _transform_if_required(target_lsm, source, points, minimum_lon)
-        breakpoint()
         self.assertArrayAlmostEqual(rotated_points, expected_points)

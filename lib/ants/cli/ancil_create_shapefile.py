@@ -17,9 +17,7 @@ it is assumed that the points defined in the json file are on a standard spheric
 unrotated geodetic coordinate reference system.
 
 Points crossing the antimeridian after rotation are transformed to ensure the
-resulting polygon is contiguous. This means that longitude bounds of the polygon
-can be either [-180, 180] or [0, 360] depending on which representation allows
-the polygon to be contiguous. The user can optionally specify a minimum longitude.
+resulting polygon is contiguous. The user can optionally specify a minimum longitude.
 The longitudes will then be translated by k*360 so the minimum longitude of
 the transformed points lies in [minimum_lon, minimum_lon + 360.0).
 """
@@ -79,7 +77,7 @@ def _check_polygon_validity(polygon, ccw_expected):
     Parameters
     ----------
     polygon : :class:`~shapely.geometry.Polygon`
-        The polygon made from the input json file.
+        The polygon constructed from the input points.
     ccw_expected : bool
         Expected polygon orientation before transformation.
 
@@ -222,14 +220,15 @@ def _translate_lons_to_minimum(lons, minimum_lon):
 def _make_contiguous(rotated_points):
     """Translate points so a contiguous polygon is formed.
 
-    If the transformation results in points spanning the antimeridian, this
-    can cause incorrect polygons to be created because shapely does not wrap
-    between 180.0 and -180.0 degrees.
-
     If the distance between sequential transformed longitude points exceeds
-    180.0 degrees, it is assumed these points cross the antimeridian, and
-    360.0 degrees is added to the negative longitudes so that the polygon is
-    contiguous.
+    180.0 degrees, it is assumed these points cross the antimeridian as a
+    shorter path exists joining these two points. The points are then unwrapped
+    to use the complementary shorter distance.
+
+    Longitudes are treated as a closed ring which must return to its starting
+    point. If after unwrapping the points do not return to the starting value,
+    the ring winds around the globe and it is rejected as pole-encircling
+    points. Points containing the pole are not supported.
 
     Parameters
     ----------
@@ -241,28 +240,47 @@ def _make_contiguous(rotated_points):
     : :class:`numpy.ndarray`
         An ``(m, 2)`` numpy array of transformed longitude-latitude pairs.
 
+    Raises
+    ------
+    ValueError
+        If unwrapping finds non-zero longitude winding.
+
     Warns
     -----
     UserWarning
         If the transformed points are assumed to cross the antimeridian.
-
-    Notes
-    -----
-        This function does not make polygons encircling the pole contiguous.
     """
 
-    # Create a wrapped array of longitudes and find the point-wise difference.
     new_points = np.array(rotated_points, dtype=float)
-    closed_lon = np.vstack([new_points, new_points[0, :]])
-    lon_diff = np.abs(closed_lon[:-1, 0] - closed_lon[1:, 0])
+    lons = new_points[:, 0]
+    closed_lons = np.concatenate((lons, lons[:1]))
 
-    if np.any(lon_diff > 180.0):
+    # Unwrap by taking the complement of large step sizes with respect to
+    # the period.
+    unwrapped_lons = np.unwrap(closed_lons, period=360.0)
+
+    # A non-zero longitude offset following unwrapping means the closed set
+    # of points winds around the pole.
+    if not np.isclose(
+        unwrapped_lons[0],
+        unwrapped_lons[-1],
+    ):
+        raise ValueError("Points encircling a pole are not supported.")
+
+    # If the unwrapped points have changed,
+    if not np.allclose(unwrapped_lons[:-1], lons):
         warnings.warn(
             "The transformed points are assumed to cross the antimeridian. "
-            "360 degrees has been added to negative longitudes so that the "
-            "polygon is contiguous."
+            "The points will instead be defined so that a contiguous polygon "
+            "can be made."
         )
-        new_points[new_points[:, 0] < 0, 0] += 360.0
+
+        # wrapping depends on the first point and can wrap by -360 degrees
+        # instead of +360 degrees
+        if np.any(unwrapped_lons[:-1] < -180.0):
+            unwrapped_lons += 360.0
+
+        new_points[:, 0] = unwrapped_lons[:-1]
 
     return new_points
 
@@ -527,10 +545,11 @@ def _get_parser():
         "--minimum-lon",
         type=float,
         required=False,
-        help="Longitude from which the transformed polygon is translated. All "
+        help="Longitude from which the transformed points are translated. All "
         "points are translated by the same multiple of 360 degrees so that the "
         "polygon's minimum longitude lies in [minimum-lon, minimum-lon + 360). "
-        "If not given, no translation is applied. Requires --target-lsm.",
+        "If not given, no translation is applied. Requires --target-lsm."
+        "Only applied if a transformation is performed.",
     )
     parser.add_argument(
         "--source",
