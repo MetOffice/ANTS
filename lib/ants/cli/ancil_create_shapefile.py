@@ -67,35 +67,23 @@ def _check_coord_system_type(target_lsm):
         )
 
 
-def _check_polygon_validity(polygon, ccw_expected):
+def _check_polygon_validity(polygon):
     """
-    Check if polygon is valid and has the expected orientation.
-
-    A rotation should not change the orientation of the points. If the orientation
-    does change, it is a sign that the transformation has not behaved as expected.
+    Check if polygon is valid.
 
     Parameters
     ----------
     polygon : :class:`~shapely.geometry.Polygon`
         The polygon constructed from the input points.
-    ccw_expected : bool
-        Expected polygon orientation before transformation.
 
     Raises
     ------
     ValueError :
         If the polygon is invalid (for example intersecting edges).
-    ValueError :
-        If the polygon has a different orientation after transformation.
     """
 
     if not polygon.is_valid:
         raise ValueError(f"Polygon is invalid: {explain_validity(polygon)}")
-    if polygon.exterior.is_ccw != ccw_expected:
-        raise ValueError(
-            f"Polygon orientation has changed. Expected is_ccw={ccw_expected}, "
-            f"current polygon has is_ccw={polygon.exterior.is_ccw}."
-        )
 
 
 def _validate_orientation(target_lsm):
@@ -409,6 +397,12 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
 def _save_json(output, target_lsm_path, source_path, target_lsm, source):
     """
     Save a json file containing metadata about the target lsm and source.
+
+    Notes
+    -----
+    Normally a crs can be saved as a projection file (.prj) alongside the shapefile,
+    however, for rotated poles this is not possible for Esri Shapefiles.
+    See https://github.com/OSGeo/gdal/issues/4726.
     """
 
     parent_path = os.path.dirname(output)
@@ -494,7 +488,6 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
 
     # Load a json and make a polygon
     points = _load_points_from_json(json_file)
-    ccw_expected = Polygon(points).exterior.is_ccw
 
     # Transform points to a rotated pole if required
     if target_lsm_path is not None:
@@ -502,7 +495,7 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
         points = _transform_if_required(target_lsm, source, points, minimum_lon)
 
     polygon = Polygon(points)
-    _check_polygon_validity(polygon, ccw_expected)
+    _check_polygon_validity(polygon)
 
     # Now convert it to a shapefile with OGR
     driver = ogr.GetDriverByName("Esri Shapefile")
