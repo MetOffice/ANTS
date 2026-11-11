@@ -58,6 +58,7 @@
     "install_tasks" : ["install_graph"],
     "core" : ["ancil_2anc_graph", "fill_n_merge", "general_regrid"],
     "fill_n_merge": ["fill_n_merge_land_cover_graph", "fill_n_merge_invert_mask_graph"],
+    "fill_n_merge_transform": ["fill_n_merge_land_cover_transformed_graph"],
     "general_regrid": ["general_regrid_grid_to_grid_graph", "general_regrid_grid_to_variable_graph", "general_regrid_grid_to_n48e_namelist_graph", "general_regrid_grid_to_n48_namelist_graph", "general_regrid_3d_to_3d_graph", "general_regrid_3d_to_3d_with_extrapolation", "general_regrid_time_constrained", "general_regrid_invert_mask_graph"],
     "vertical_regrid": ["vertical_regrid_zonal_mean", "vertical_regrid_3d"],
     "documentation": ["build_documentation_graph"],
@@ -210,7 +211,7 @@ fi
 
         [[ancil_fill_n_merge_{{ source }}_transformed_latitude_weighted_kdtree]]
             inherit = ANCIL_FILL_N_MERGE_{{ source }}
-            script = rose task-run --app-key=ancil_fill_n_merge -O {{ source }} -O latitude-weighted-kdtree
+            script = rose task-run --app-key=ancil_fill_n_merge -O {{ source }}_transformed -O latitude-weighted-kdtree
 
         {% else %}
 

@@ -2,6 +2,9 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+#
+# Parts of this file have been created with the assistance of MetOffice
+# Enterprise Copilot.
 
 import re
 import unittest
@@ -16,6 +19,7 @@ from ants.cli.ancil_create_shapefile import (
     _check_polygon_validity,
     _check_within_domain,
     _load_cubes,
+    _load_points_from_json,
     _make_contiguous,
     _transform_coordinates,
     _transform_if_required,
@@ -372,6 +376,22 @@ class Test__transform_coordinates(ants.tests.TestCase):
         )
 
         self.assertArrayAlmostEqual(rotated_coords, expected_points)
+
+
+class Test__load_points_from_json(ants.tests.TestCase):
+    def test_improperly_shaped_input(self):
+        """Test that a json file with the incorrect shape will raise
+        an error.
+        """
+        json_data = "[[1,2,3], [4,5,6], [7,8,9]]"
+        mock_open = mock.mock_open(read_data=json_data)
+        with mock.patch("builtins.open", mock_open):
+            msg = re.escape(
+                "The input longitude-latitude pairs must have shape (n, 2)."
+            )
+
+            with self.assertRaisesRegex(ValueError, msg):
+                _load_points_from_json("json/path")
 
 
 class Test__validate_args(ants.tests.TestCase):

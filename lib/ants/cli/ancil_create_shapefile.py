@@ -47,7 +47,7 @@ def _check_coord_system_type(target_lsm):
     Parameters
     ----------
     target_lsm : :class:`iris.cube.Cube`
-        The lsm cube specifiying the rotated pole coordinate system.
+        The lsm cube specifying the rotated pole coordinate system.
 
     Raises
     ------
@@ -359,8 +359,7 @@ def _load_cubes(target_lsm_path, source_path):
 
 def _transform_if_required(target_lsm, source, points, minimum_lon):
     """
-    Transform the points to a rotated pole if the coordinate system if
-    required.
+    Transform the points to a target crs if required.
 
     The points are transformed to the specified rotated pole coordinate system
     if the provided coordinate system is a rotated pole and is not coincident
@@ -459,6 +458,8 @@ def _load_points_from_json(json_file):
         points = json.load(polygon_json)
     points = np.array(points, dtype=float)
 
+    if points.ndim != 2 or points.shape[1] != 2:
+        raise ValueError("The input longitude-latitude pairs must have shape (n, 2).")
     return points
 
 
