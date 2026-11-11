@@ -500,7 +500,6 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
     if target_lsm_path is not None:
         target_lsm, source = _load_cubes(target_lsm_path, source_path)
         points = _transform_if_required(target_lsm, source, points, minimum_lon)
-        _save_json(output, target_lsm_path, source_path, target_lsm, source)
 
     polygon = Polygon(points)
     _check_polygon_validity(polygon, ccw_expected)
@@ -527,6 +526,10 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
 
     # Save and close everything
     datasource = layer = feature = geometry = None
+
+    # Save metadata on the projection
+    if target_lsm_path is not None:
+        _save_json(output, target_lsm_path, source_path, target_lsm, source)
 
 
 def _get_parser():
