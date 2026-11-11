@@ -57,12 +57,11 @@ class Test__check_polygon_validity(ants.tests.TestCase):
 
         invalid_points = np.array([[1, 1], [-1, -1], [1, -1], [-1, 1]])
         invalid_poly = Polygon(invalid_points)
-        is_ccw = False
 
         error_msg = "Polygon is invalid: "
 
         with self.assertRaisesRegex(ValueError, error_msg):
-            _check_polygon_validity(invalid_poly, is_ccw)
+            _check_polygon_validity(invalid_poly)
 
 
 class Test__validate_orientation(ants.tests.TestCase):
@@ -230,10 +229,16 @@ class Test__translate_lons_to_minimum(ants.tests.TestCase):
 
         self.assertArrayEqual(translated_lons, expected_lons)
 
-    @unittest.skip("TODO: tolerance")
+    @unittest.expectedFailure
     def test_tolerance(self):
-        # tolerance may need to be investigated
-        pass
+        """Test the sensitivity of rounding errors causing whole period
+        translations."""
+
+        lons = np.array([-5 - 1e-13, 0, 5])
+        minimum_lon = -5
+        expected_lons = np.array([-5, 0, 5])
+        translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
+        self.assertArrayEqual(translated_lons, expected_lons)
 
 
 class Test__make_contiguous(ants.tests.TestCase):
