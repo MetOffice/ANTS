@@ -164,7 +164,6 @@ def _check_within_domain(target_lsm, rotated_points):
     UserWarning
         If any point lies outside the target lsm domain.
     """
-
     # Find the bounds of the target lsm if there are none
     target_x_coord = target_lsm.coord(axis="X").copy()
     target_y_coord = target_lsm.coord(axis="Y").copy()
@@ -245,7 +244,7 @@ def _make_contiguous(rotated_points):
 
     Warns
     -----
-    UserWarning
+    UserWarning.
         If the transformed points are assumed to cross the antimeridian.
     """
 

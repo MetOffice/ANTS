@@ -33,6 +33,31 @@ from ants.utils.cube import CubeBuilder
 from shapely.geometry import Polygon
 
 
+def build_rotated_cube(
+    grid_north_pole_latitude,
+    grid_north_pole_longitude,
+    north_pole_grid_longitude=0.0,
+    shape=(2, 2),
+    ellipsoid=iris.coord_systems.GeogCS(6371229.0),
+    xlim=None,
+    ylim=None,
+    with_bounds=True,
+):
+    """Build a cube on a rotated geodetic crs."""
+
+    crs = iris.coord_systems.RotatedGeogCS(
+        grid_north_pole_latitude=grid_north_pole_latitude,
+        grid_north_pole_longitude=grid_north_pole_longitude,
+        north_pole_grid_longitude=north_pole_grid_longitude,
+        ellipsoid=ellipsoid,
+    )
+    cube = CubeBuilder(
+        crs, shape=shape, xlim=xlim, ylim=ylim, with_bounds=with_bounds
+    )._cube
+
+    return cube
+
+
 class Test__check_coord_system_type(ants.tests.TestCase):
 
     def test_unrotated_target_lsm(self):
@@ -74,10 +99,7 @@ class Test__validate_orientation(ants.tests.TestCase):
         """Test that a warning is raised when an identity transform is
         passed if  Check the function returns False."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 0.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 0.0, 180.0)
         self.warning_msg = re.escape(
             "target_lsm has a geodetic coordinate system with pole located"
             " at grid_longitude=0.0, grid_latitude=90.0."
@@ -93,10 +115,8 @@ class Test__validate_orientation(ants.tests.TestCase):
         to an identity transform is passed. Check the function returns
         False."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 360.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 180.0, 360.0)
+
         self.warning_msg = re.escape(
             "target_lsm has a geodetic coordinate system with pole located"
             " at grid_longitude=180.0, grid_latitude=90.0."
@@ -111,11 +131,7 @@ class Test__validate_orientation(ants.tests.TestCase):
         source when the target is an identity. The UM Sphere is defined on
         a spherical geodetic crs."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 0.0, ellipsoid=self.sphere_crs
-        )
-
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 180.0)
         UM_SPHERE_cube = CubeBuilder(UM_SPHERE.crs, (2, 2))._cube
 
         self.warning_msg = re.escape(
@@ -131,10 +147,7 @@ class Test__validate_orientation(ants.tests.TestCase):
         """Test that True is returned when target_lsm has a rotated pole
         that is deemed valid."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 90.0, 0.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 90.0)
         self.assertTrue(_validate_orientation(self.sphere_cube, target_lsm))
 
     def test_valid_pole(self):
@@ -142,26 +155,15 @@ class Test__validate_orientation(ants.tests.TestCase):
         In this case the pole would not rotate be an identity map, as the
         two longitude options are specified in different frames of reference."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 45.0, 135.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
-
+        target_lsm = build_rotated_cube(90.0, 45.0, 135.0)
         self.assertTrue(_validate_orientation(self.sphere_cube, target_lsm))
 
     def test_different_source(self):
         """Test that the validation check returns True when the source
         is not a spherical geodetic crs."""
 
-        sphere_identity_crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 0.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(sphere_identity_crs, (2, 2))._cube
-
-        rotated_source_crs = iris.coord_systems.RotatedGeogCS(
-            10.0, 30.0, 0.0, ellipsoid=self.sphere_crs
-        )
-        rotated_source = CubeBuilder(rotated_source_crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 180.0)
+        rotated_source = build_rotated_cube(10.0, 30.0)
 
         self.assertTrue(_validate_orientation(rotated_source, target_lsm))
 
@@ -169,10 +171,6 @@ class Test__validate_orientation(ants.tests.TestCase):
 class Test__check_within_domain(ants.tests.TestCase):
     def setUp(self):
         self.rotated_points = np.array([[0, 10], [0, -10], [-20, -10], [-20, 10]])
-        self.sphere_crs = iris.coord_systems.GeogCS(6371229.0)
-        self.crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 10.0, 180.0, ellipsoid=self.sphere_crs
-        )
         self.warning_msg = re.escape(
             "The transformed points lie outside the target lsm domain."
         )
@@ -181,10 +179,9 @@ class Test__check_within_domain(ants.tests.TestCase):
         """Test that no warning is emitted if the transformed polygon
         lies inside the target domain."""
 
-        target_lsm = CubeBuilder(
-            self.crs, (2, 2), xlim=(-25.0, 5.0), ylim=(-12, 12)
-        )._cube
-
+        # The choice of target_lsm pole location does not matter here as
+        # the rotated points should already be in the target_lsm reference frame
+        target_lsm = build_rotated_cube(80.0, 10.0, xlim=(-25.0, 5), ylim=(-12, 12))
         with warnings.catch_warnings():
             warnings.simplefilter("error", UserWarning)
             _check_within_domain(target_lsm, self.rotated_points)
@@ -193,13 +190,9 @@ class Test__check_within_domain(ants.tests.TestCase):
         """Test that no warning is emitted when the target is passed
         without bounds."""
 
-        target_lsm = CubeBuilder(
-            self.crs,
-            (2, 2),
-            xlim=(-25.0, 5.0),
-            ylim=(-12, 12),
-            with_bounds=False,
-        )._cube
+        target_lsm = build_rotated_cube(
+            80.0, 10.0, xlim=(-25.0, 5), ylim=(-12, 12), with_bounds=False
+        )
         self.assertFalse(target_lsm.coord("grid_longitude").has_bounds())
         self.assertFalse(target_lsm.coord("grid_latitude").has_bounds())
         with warnings.catch_warnings():
@@ -215,10 +208,7 @@ class Test__check_within_domain(ants.tests.TestCase):
         lies at least partially outside of the valid target domain
         in longitude."""
 
-        target_lsm = CubeBuilder(
-            self.crs, (2, 2), xlim=(-10.0, 5.0), ylim=(-12, 12)
-        )._cube
-
+        target_lsm = build_rotated_cube(80.0, 10.0, xlim=(-10.0, 5), ylim=(-12, 12))
         with self.assertWarnsRegex(UserWarning, self.warning_msg):
             _check_within_domain(target_lsm, self.rotated_points)
 
@@ -227,10 +217,7 @@ class Test__check_within_domain(ants.tests.TestCase):
         lies at least partially outside of the valid target domain
         in latitude."""
 
-        target_lsm = CubeBuilder(
-            self.crs, (2, 2), xlim=(-25.0, 5.0), ylim=(-8, 12)
-        )._cube
-
+        target_lsm = build_rotated_cube(80.0, 10.0, xlim=(-25.0, 5), ylim=(-8, 12))
         with self.assertWarnsRegex(UserWarning, self.warning_msg):
             _check_within_domain(target_lsm, self.rotated_points)
 
@@ -242,8 +229,7 @@ class Test__check_within_domain(ants.tests.TestCase):
         all points and the comparisons are cartesian in nature.
         """
 
-        target_lsm = CubeBuilder(self.crs, (2, 2), xlim=(0, 360.0))._cube
-
+        target_lsm = build_rotated_cube(80.0, 10.0, xlim=(0.0, 360.0))
         with self.assertWarnsRegex(UserWarning, self.warning_msg):
             _check_within_domain(target_lsm, self.rotated_points)
 
@@ -370,19 +356,14 @@ class Test__transform_coordinates(ants.tests.TestCase):
         self.points = np.array([[10, 10], [10, -10], [-10, -10], [-10, 10]])
 
     def test_identity_rotation_sphere(self):
-        """Test that rotation to a pole at latitude=90.0, longitude=0.0
+        """Test that rotation to a pole at latitude=90.0, longitude=180.0
         returns the same points.
 
         By convention, rotated pole coordinate systems will set the prime
-        meridian rotated 180.0 from the specified longitude. To place the
-        prime meridian at 0.0, we apply a further rotation of 180.0, following
-        rotation to the new pole.
+        meridian to pass through the geographic north pole.
         """
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 0.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 180.0)
         expected_points = np.copy(self.points)
         rotated_coords = _transform_coordinates(
             target_lsm, self.sphere_source, self.points
@@ -393,14 +374,10 @@ class Test__transform_coordinates(ants.tests.TestCase):
     def test_longitudinal_rotation(self):
         """Test rotation to a new pole at latitude=90.0, longitude=90.0."""
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 90.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 270.0)
         expected_points = np.array(
             [[-80.0, 10.0], [-80.0, -10.0], [-100.0, -10.0], [-100.0, 10]]
         )
-
         rotated_coords = _transform_coordinates(
             target_lsm, self.sphere_source, self.points
         )
@@ -411,10 +388,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
         """Test that the rotated points are not corrected by
         _transform_coordinates."""
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 0.0)
         expected_points = np.array(
             [[-170, 10.0], [-170, -10.0], [170, -10.0], [170, 10]]
         )
@@ -509,13 +483,10 @@ class Test__transform_if_required(ants.tests.TestCase):
         """Test that the input points are returned if a non-rotated pole is
         provided as the target_lsm."""
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 0.0, 180, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 180.0)
         warning_msg = re.escape(
             "target_lsm has a geodetic coordinate system with pole located"
-            " at grid_longitude=0.0, grid_latitude=90.0."
+            " at grid_longitude=180.0, grid_latitude=90.0."
             " No transformation will be carried out."
         )
         with self.assertWarnsRegex(UserWarning, warning_msg):
@@ -530,9 +501,7 @@ class Test__transform_if_required(ants.tests.TestCase):
         """Test that transform coordinates is called with the correct arguments
         when a valid target_lsm is given."""
 
-        crs = iris.coord_systems.RotatedGeogCS(90.0, 80.0, ellipsoid=self.sphere_crs)
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
-
+        target_lsm = build_rotated_cube(90.0, 80.0)
         with mock.patch(
             "ants.cli.ancil_create_shapefile._transform_coordinates"
         ) as mock_transform:
@@ -552,10 +521,8 @@ class Test__transform_if_required(ants.tests.TestCase):
         """Test that _translate_lons_to_minimum is called when minimum_lon is
         not None."""
 
-        crs = iris.coord_systems.RotatedGeogCS(90.0, 150.0, ellipsoid=self.sphere_crs)
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 150.0)
         lons = np.array([40, 40, 20, 20])
-
         minimum_lon = 0.0
         with mock.patch(
             "ants.cli.ancil_create_shapefile._translate_lons_to_minimum"
@@ -576,10 +543,7 @@ class Test__transform_if_required(ants.tests.TestCase):
         and so the negative longitudes are instead translated by +360.0
         degrees."""
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+        target_lsm = build_rotated_cube(90.0, 0.0)
         expected_points = np.array(
             [[190.0, 10.0], [190.0, -10.0], [170.0, -10.0], [170.0, 10]]
         )
@@ -601,16 +565,12 @@ class Test__transform_if_required(ants.tests.TestCase):
         longitudes by +360.0 degrees.
 
         The intermediate array after rotation is
-            [[-80, 10], [-80, -10], [-100, -10], [-100, 10]]
+            [[-10, 10], [-10, -10], [-30, -10], [-30, 10]]
         """
 
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 90.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        # define the target lsm with a positive domain.
-        target_lsm = CubeBuilder(crs, (2, 2), xlim=(0, 360.0))._cube
+        target_lsm = build_rotated_cube(90.0, 200.0, xlim=(0.0, 360.0))
         expected_points = np.array(
-            [[280.0, 10.0], [280.0, -10.0], [260.0, -10.0], [260.0, 10.0]]
+            [[350, 10.0], [350.0, -10.0], [330.0, -10.0], [330.0, 10.0]]
         )
         minimum_lon = 0
 
@@ -659,10 +619,8 @@ class Test__transform_if_required(ants.tests.TestCase):
                 [190, 0],
             ]
         )
-        crs = iris.coord_systems.RotatedGeogCS(
-            90.0, 180.0, 180.0, ellipsoid=self.sphere_crs
-        )
-        target_lsm = CubeBuilder(crs, (2, 2))._cube
+
+        target_lsm = build_rotated_cube(90.0, 0.0)
         warning_msg = re.escape(
             "The transformed points are assumed to cross the antimeridian. "
             "The points will instead be defined so that a contiguous polygon "
@@ -684,8 +642,7 @@ class Test_ite_transform(ants.tests.TestCase):
 
         The input points are specified in an unrotated geodetic coordinate system
         as (lon, lat) pairs. They are then rotated to a pole at lon=177.5,
-        lat=37.5. Cartopy converts the geographic longitude of the rotated pole
-        into PROJs longitude-of-origin parameter by adding 180°.
+        lat=37.5.
 
         The points have been obtained by unrotating the coordinates under
         $UMDIR/ancil/data/shapefiles/ite_ukv_polygon/runme.py, which can
@@ -740,9 +697,14 @@ class Test_ite_transform(ants.tests.TestCase):
         source = CubeBuilder(sphere_crs, (2, 2))._cube
 
         # Create a target lsm which is similar to the rose-stem source for
-        # fill_n_merge.
-        crs = iris.coord_systems.RotatedGeogCS(37.5, 177.5, ellipsoid=sphere_crs)
-        target_lsm = CubeBuilder(crs, (93, 75), xlim=(352.8725, 365.261))._cube
+        # fill_n_merge with land_cover.
+        target_lsm = build_rotated_cube(
+            37.5,
+            177.5,
+            xlim=(352.8725, 365.261),
+            ylim=(-5.7732, 8.9013),
+            with_bounds=False,
+        )
 
         rotated_points = _transform_if_required(target_lsm, source, points, minimum_lon)
         self.assertArrayAlmostEqual(rotated_points, expected_points)
