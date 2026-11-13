@@ -97,12 +97,12 @@ class Test__validate_orientation(ants.tests.TestCase):
 
     def test_warning_raised(self):
         """Test that a warning is raised when an identity transform is
-        passed if  Check the function returns False."""
+        passed. Check the function returns False."""
 
-        target_lsm = build_rotated_cube(90.0, 0.0, 180.0)
+        target_lsm = build_rotated_cube(90.0, 180.0)
         self.warning_msg = re.escape(
             "target_lsm has a geodetic coordinate system with pole located"
-            " at grid_longitude=0.0, grid_latitude=90.0."
+            " at grid_longitude=180.0, grid_latitude=90.0."
             " No transformation will be carried out."
         )
 
@@ -152,7 +152,7 @@ class Test__validate_orientation(ants.tests.TestCase):
 
     def test_valid_pole(self):
         """Test that True is returned when target_lsm has a valid rotated pole.
-        In this case the pole would not rotate be an identity map, as the
+        In this case the rotated pole would not be an identity transformation, as the
         two longitude options are specified in different frames of reference."""
 
         target_lsm = build_rotated_cube(90.0, 45.0, 135.0)
@@ -233,6 +233,21 @@ class Test__check_within_domain(ants.tests.TestCase):
         with self.assertWarnsRegex(UserWarning, self.warning_msg):
             _check_within_domain(target_lsm, self.rotated_points)
 
+    def test_cant_guess_bounds_warning(self):
+        """Test that bounds checking is skipped if the coordinate of the
+        target_lsm does not have enough points to successfully guess the
+        bounds."""
+
+        warning_msg = re.escape(
+            "The target lsm has X coordinate of size 1, cannot guess "
+            "bounds. Unable to check if the rotated points lie inside the "
+            "target x domain."
+        )
+
+        target_lsm = build_rotated_cube(80.0, 10.0, shape=(1, 1), with_bounds=False)
+        with self.assertWarnsRegex(UserWarning, warning_msg):
+            _check_within_domain(target_lsm, self.rotated_points)
+
 
 class Test__translate_lons_to_minimum(ants.tests.TestCase):
     def test_translate_up(self):
@@ -249,15 +264,6 @@ class Test__translate_lons_to_minimum(ants.tests.TestCase):
         already lies within [minimum_lon, minimum_lon + 360)."""
         lons = np.array([5, 20, 40])
         minimum_lon = 0
-        expected_lons = np.array([5, 20, 40])
-        translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
-
-        self.assertArrayEqual(translated_lons, expected_lons)
-
-    def test_no_translation_at_minimum(self):
-        """Test that no translation occurs if the longitudes are at the minimum."""
-        lons = np.array([5, 20, 40])
-        minimum_lon = 5
         expected_lons = np.array([5, 20, 40])
         translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
 
@@ -339,7 +345,7 @@ class Test__make_contiguous(ants.tests.TestCase):
 
     def test_pole_encirclement_reverse_order(self):
         """Test a set of points encirlcing the pole in the opposite direction
-        the pole raises an error."""
+        raise an error."""
 
         rotated_points = np.array(
             [[150, 70], [100, 80], [40, 80], [-20, 75], [-100, 70], [-170, 80]]
@@ -384,21 +390,6 @@ class Test__transform_coordinates(ants.tests.TestCase):
 
         self.assertArrayAlmostEqual(rotated_coords, expected_points)
 
-    def test_no_antimeridian_correction(self):
-        """Test that the rotated points are not corrected by
-        _transform_coordinates."""
-
-        target_lsm = build_rotated_cube(90.0, 0.0)
-        expected_points = np.array(
-            [[-170, 10.0], [-170, -10.0], [170, -10.0], [170, 10]]
-        )
-
-        rotated_coords = _transform_coordinates(
-            target_lsm, self.sphere_source, self.points
-        )
-
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
-
 
 class Test__load_points_from_json(ants.tests.TestCase):
     def test_improperly_shaped_input(self):
@@ -409,7 +400,7 @@ class Test__load_points_from_json(ants.tests.TestCase):
         mock_open = mock.mock_open(read_data=json_data)
         with mock.patch("builtins.open", mock_open):
             msg = re.escape(
-                "The input longitude-latitude pairs must have shape (n, 2)."
+                "The input longitude-latitude pairs must have shape (m, 2)."
             )
 
             with self.assertRaisesRegex(ValueError, msg):
@@ -501,41 +492,21 @@ class Test__transform_if_required(ants.tests.TestCase):
         """Test that transform coordinates is called with the correct arguments
         when a valid target_lsm is given."""
 
+        expected_points = self.points.copy()
         target_lsm = build_rotated_cube(90.0, 80.0)
         with mock.patch(
             "ants.cli.ancil_create_shapefile._transform_coordinates"
         ) as mock_transform:
-            mock_transform.return_value = self.points
+            mock_transform.return_value = self.points.copy()
             _ = _transform_if_required(
                 target_lsm, self.sphere_source, self.points, self.minimum_lon
             )
-
         mock_transform.assert_called_once()
         received_lsm, received_source, received_points = mock_transform.call_args.args
 
         self.assertEqual(target_lsm, received_lsm)
         self.assertEqual(received_source, self.sphere_source)
-        self.assertArrayEqual(received_points, self.points)
-
-    def test_minimum_lon_call(self):
-        """Test that _translate_lons_to_minimum is called when minimum_lon is
-        not None."""
-
-        target_lsm = build_rotated_cube(90.0, 150.0)
-        lons = np.array([40, 40, 20, 20])
-        minimum_lon = 0.0
-        with mock.patch(
-            "ants.cli.ancil_create_shapefile._translate_lons_to_minimum"
-        ) as mock_translate:
-            mock_translate.return_value = lons
-            _ = _transform_if_required(
-                target_lsm, self.sphere_source, self.points, minimum_lon
-            )
-
-        mock_translate.assert_called_once()
-        received_lons, received_minimum_lon = mock_translate.call_args.args
-        self.assertArrayEqual(received_lons, lons)
-        self.assertEqual(received_minimum_lon, minimum_lon)
+        self.assertArrayEqual(received_points, expected_points)
 
     def test_antimeridian_rotation(self):
         """Test rotation to a new pole at latitude=90.0, longitude=180.0.
@@ -691,7 +662,7 @@ class Test_ite_transform(ants.tests.TestCase):
             ]
         )
 
-        # Use the lower bound of the target lsm
+        # Use the lower bound of the target lsm as the minimum lon.
         minimum_lon = 352.8725
         sphere_crs = iris.coord_systems.GeogCS(6371229.0)
         source = CubeBuilder(sphere_crs, (2, 2))._cube

@@ -88,8 +88,13 @@ def _check_polygon_validity(polygon):
 
 def _validate_orientation(source, target_lsm):
     """
-    Validate if a transformation would take place between the target and
-    a geodetic spherical source.
+    Validate if a transformation would take place, depending on the source.
+
+    If the source is a spherical geodetic crs with radius = 6371229.0, then
+    target lsms which cause no transformation of the points are skipped.
+    Otherwise if the source is not an instance of
+    ``iris.coord_systems.GeogCS(6371229.0)``, the transformation is performed
+    regardless.
 
     Parameters
     ----------
@@ -162,11 +167,36 @@ def _check_within_domain(target_lsm, rotated_points):
     Warns
     -----
     UserWarning
+        If bounds cannot be guessed for the supplied target lsm due to
+        insufficient coordinate length.
+    UserWarning
         If any point lies outside the target lsm domain.
     """
-    # Find the bounds of the target lsm if there are none
+
     target_x_coord = target_lsm.coord(axis="X").copy()
     target_y_coord = target_lsm.coord(axis="Y").copy()
+
+    # Check that there are enough points to guess bounds
+    if not target_x_coord.has_bounds():
+        x_size = target_x_coord.points.size
+        if x_size <= 1:
+            warnings.warn(
+                f"The target lsm has X coordinate of size {x_size}, cannot guess "
+                "bounds. Unable to check if the rotated points lie inside the "
+                "target x domain."
+            )
+            return
+    if not target_y_coord.has_bounds():
+        y_size = target_y_coord.points.size
+        if y_size <= 1:
+            warnings.warn(
+                f"The target lsm has Y coordinate of size {y_size}, cannot guess "
+                "bounds. Unable to check if the rotated points lie inside the "
+                "target x domain."
+            )
+            return
+
+    # Find the bounds of the target lsm if there are none
     if not target_x_coord.has_bounds():
         target_x_coord.guess_bounds()
     if not target_y_coord.has_bounds():
@@ -225,7 +255,8 @@ def _make_contiguous(rotated_points):
     Longitudes are treated as a closed ring which must return to its starting
     point. If after unwrapping the points do not return to the starting value,
     the ring winds around the globe and it is rejected as pole-encircling
-    points. Points containing the pole are not supported.
+    points. Points containing the pole are not supported. Does not check if
+    a vertex lies on the pole.
 
     Parameters
     ----------
@@ -244,7 +275,7 @@ def _make_contiguous(rotated_points):
 
     Warns
     -----
-    UserWarning.
+    UserWarning
         If the transformed points are assumed to cross the antimeridian.
     """
 
@@ -359,10 +390,9 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
     Transform the points to a target crs if required.
 
     The points are transformed to the specified rotated pole coordinate system
-    if the provided coordinate system is a rotated pole and is not coincident
-    with the geographic north pole. Following transformation, the longitudes
-    are adjusted so that the polygon does not wrap the antimeridian. If
-    ``minimum_lon`` is passed, the longitudes are translated by the same multiple
+    if the provided coordinate system is a rotated pole. Following transformation,
+    the longitudes are adjusted so that the polygon does not wrap the antimeridian.
+    If ``minimum_lon`` is passed, the longitudes are translated by the same multiple
     of 360.0 degrees.
 
     If the input target lsm  is coincident with the north pole, the points
@@ -447,6 +477,7 @@ def _load_points_from_json(json_file):
     """
     Load a json file containing a list of pairs of longitude-latitude points.
 
+
     Parameters
     ----------
     json_file : str
@@ -462,7 +493,8 @@ def _load_points_from_json(json_file):
     points = np.array(points, dtype=float)
 
     if points.ndim != 2 or points.shape[1] != 2:
-        raise ValueError("The input longitude-latitude pairs must have shape (n, 2).")
+        raise ValueError("The input longitude-latitude pairs must have shape (m, 2).")
+
     return points
 
 
@@ -539,7 +571,7 @@ def _get_parser():
     parser.add_argument(
         "json_file", help="Path to json file defining polygon to generate."
     )
-    parser.add_argument("output", help="File to save shape file to.")
+    parser.add_argument("output", help="File to save the shapefile to.")
     parser.add_argument(
         "--target-lsm",
         type=ants.config.filepath_readable,
