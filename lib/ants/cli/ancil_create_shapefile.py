@@ -86,13 +86,16 @@ def _check_polygon_validity(polygon):
         raise ValueError(f"Polygon is invalid: {explain_validity(polygon)}")
 
 
-def _validate_orientation(target_lsm):
+def _validate_orientation(source, target_lsm):
     """
-    Validate that the rotated pole coordinate system is not coincident with the
-    geographic north pole.
+    Validate if a transformation would take place between the target and
+    a geodetic spherical source.
 
     Parameters
     ----------
+    source : :class: `iris.cube.Cube`
+        An iris cube specifying the coordinate system of the input json
+        file.
     target_lsm : :class:`iris.cube.Cube`
         The target lsm cube specifying the rotated pole coordinate system.
 
@@ -104,7 +107,7 @@ def _validate_orientation(target_lsm):
     Warns
     -----
     UserWarning
-        If the rotated pole is coincident with the geographic north pole.
+        If the rotated pole would leave the input points unchanged.
     """
 
     target_crs = target_lsm.coord_system()
@@ -113,17 +116,24 @@ def _validate_orientation(target_lsm):
     grid_lat = target_crs.grid_north_pole_latitude
     pole_lon_rotation = target_crs.north_pole_grid_longitude
 
-    invalid_crs = ants.utils.ndarray.allclose(
-        [grid_lon, grid_lat, pole_lon_rotation], [0.0, 90.0, 0.0]
+    # net longitude change
+    delta_lon = pole_lon_rotation - grid_lon
+    lon_shift = delta_lon % 360.0
+
+    is_geodetic = source.coord_system() == iris.coord_systems.GeogCS(6371229.0)
+    is_identity = np.isclose(lon_shift, 180.0, rtol=0.0, atol=1e-10) and np.isclose(
+        grid_lat, 90.0, rtol=0.0, atol=1e-10
     )
 
-    if invalid_crs:
+    if is_identity and is_geodetic:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
             f" at grid_longitude={grid_lon}, grid_latitude={grid_lat}."
             " No transformation will be carried out."
         )
-    return not invalid_crs
+        return False
+    else:
+        return True
 
 
 def _validate_args(target_lsm_path, source_path, minimum_lon):
@@ -380,7 +390,7 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
 
     _check_coord_system_type(target_lsm)
 
-    if _validate_orientation(target_lsm):
+    if _validate_orientation(source, target_lsm):
         rotated_points = _transform_coordinates(target_lsm, source, points)
         rotated_points = _make_contiguous(rotated_points)
         if minimum_lon is not None:
