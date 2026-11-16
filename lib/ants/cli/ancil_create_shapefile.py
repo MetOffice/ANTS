@@ -91,10 +91,9 @@ def _validate_orientation(source, target_lsm):
     Validate if a transformation would take place, depending on the source.
 
     If the source is a spherical geodetic crs with radius = 6371229.0, then
-    target lsms which cause no transformation of the points are skipped.
-    Otherwise if the source is not an instance of
-    ``iris.coord_systems.GeogCS(6371229.0)``, the transformation is performed
-    regardless.
+    a target lsm with north_pole_longitude = 180.0, north_pole_latitude = 90.0
+    and north_pole_grid_longitude = 0.0 will be ignored. Transformations with
+    any other source are performed regardless.
 
     Parameters
     ----------
@@ -121,14 +120,17 @@ def _validate_orientation(source, target_lsm):
     grid_lat = target_crs.grid_north_pole_latitude
     pole_lon_rotation = target_crs.north_pole_grid_longitude
 
+    ellipsoid = target_lsm.coord_system().ellipsoid
+
     is_geodetic = source.coord_system() == iris.coord_systems.GeogCS(6371229.0)
     is_identity = np.allclose(
         [grid_lon, grid_lat, pole_lon_rotation],
         [180.0, 90.0, 0.0],
         rtol=0.0,
     )
+    same_ellipsoid = ellipsoid == iris.coord_systems.GeogCS(6371229.0)
 
-    if is_identity and is_geodetic:
+    if is_identity and is_geodetic and same_ellipsoid:
         warnings.warn(
             "target_lsm has a geodetic coordinate system with pole located"
             f" at grid_longitude={grid_lon}, grid_latitude={grid_lat}."

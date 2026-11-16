@@ -140,8 +140,18 @@ class Test__validate_orientation(ants.tests.TestCase):
 
         target_lsm = build_rotated_cube(90.0, 180.0)
         rotated_source = build_rotated_cube(10.0, 30.0)
-
         self.assertTrue(_validate_orientation(rotated_source, target_lsm))
+
+    def test_different_target_ellipsoid(self):
+        """Test that a target with a different ellipsoid still allows
+        for a transformation."""
+
+        airy1830 = iris.coord_systems.GeogCS(
+            semi_major_axis=6377563.396, semi_minor_axis=6356256.909
+        )
+        target_lsm = build_rotated_cube(90.0, 180.0, ellipsoid=airy1830)
+
+        self.assertTrue(_validate_orientation(self.sphere_cube, target_lsm))
 
 
 class Test__check_within_domain(ants.tests.TestCase):
