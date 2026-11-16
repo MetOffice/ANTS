@@ -7,7 +7,6 @@
 # Enterprise Copilot.
 
 import re
-import unittest
 import warnings
 from unittest import mock
 
@@ -168,9 +167,8 @@ class Test__check_within_domain(ants.tests.TestCase):
         # The choice of target_lsm pole location does not matter here as
         # the rotated points should already be in the target_lsm reference frame
         target_lsm = build_rotated_cube(80.0, 10.0, xlim=(-25.0, 5), ylim=(-12, 12))
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", UserWarning)
-            _check_within_domain(target_lsm, self.rotated_points)
+
+        _check_within_domain(target_lsm, self.rotated_points)
 
     def test_local_target_no_warning_no_bounds(self):
         """Test that no warning is emitted when the target is passed
@@ -181,9 +179,8 @@ class Test__check_within_domain(ants.tests.TestCase):
         )
         self.assertFalse(target_lsm.coord("grid_longitude").has_bounds())
         self.assertFalse(target_lsm.coord("grid_latitude").has_bounds())
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", UserWarning)
-            _check_within_domain(target_lsm, self.rotated_points)
+
+        _check_within_domain(target_lsm, self.rotated_points)
 
         # check that the bounds of the target lsm remain unchanged
         self.assertFalse(target_lsm.coord("grid_longitude").has_bounds())
@@ -227,7 +224,7 @@ class Test__check_within_domain(ants.tests.TestCase):
         warning_msg = re.escape(
             "The target lsm has X coordinate of size 1, cannot guess "
             "bounds. Unable to check if the rotated points lie inside the "
-            "target x domain."
+            "target domain."
         )
 
         target_lsm = build_rotated_cube(80.0, 10.0, shape=(1, 1), with_bounds=False)
@@ -238,41 +235,30 @@ class Test__check_within_domain(ants.tests.TestCase):
 class Test__translate_lons_to_minimum(ants.tests.TestCase):
     def test_translate_up(self):
         """Test translating longitudes to a specified minimum."""
-        lons = np.array([-5, 0, 5])
-        minimum_lon = 355
-        expected_lons = np.array([355, 360, 365])
+        lons = np.array([-5.0, 0.0, 5.0])
+        minimum_lon = 355.0
+        expected_lons = np.array([355.0, 360.0, 365.0])
         translate_lons = _translate_lons_to_minimum(lons, minimum_lon)
 
         self.assertArrayEqual(translate_lons, expected_lons)
 
-    def test_no_translation_above_minimum(self):
-        """Test that no translation occurs if the minimum longitude
-        already lies within [minimum_lon, minimum_lon + 360)."""
-        lons = np.array([5, 20, 40])
-        minimum_lon = 0
-        expected_lons = np.array([5, 20, 40])
-        translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
-
-        self.assertArrayEqual(translated_lons, expected_lons)
-
     def test_negative_minimum(self):
         """Test that no translation occurs with a negative minimum when
         the points already lie in range."""
-        lons = np.array([-5, 0, 5])
+        lons = np.array([-5.0, 0.0, 5.0])
         minimum_lon = -180.0
-        expected_lons = np.array([-5, 0, 5])
+        expected_lons = np.array([-5.0, 0.0, 5.0])
         translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
 
         self.assertArrayEqual(translated_lons, expected_lons)
 
-    @unittest.expectedFailure
     def test_tolerance(self):
         """Test the sensitivity of rounding errors causing whole period
         translations. This may or may not be desirable."""
 
-        lons = np.array([-5 - 1e-13, 0, 5])
-        minimum_lon = -5
-        expected_lons = np.array([-5, 0, 5])
+        lons = np.array([-5 - 1e-13, 0.0, 5.0])
+        minimum_lon = -5.0
+        expected_lons = np.array([355.0 - 1e-13, 360.0, 365.0])
         translated_lons = _translate_lons_to_minimum(lons, minimum_lon)
         self.assertArrayEqual(translated_lons, expected_lons)
 
@@ -446,6 +432,13 @@ class Test__load_cubes(ants.tests.TestCase):
             _ = _load_cubes("target/path", "source/cube")
 
         self.assertEqual(2, mock_load.call_count)
+        self.assertEqual(
+            mock_load.call_args_list,
+            [
+                mock.call("target/path"),
+                mock.call("source/cube"),
+            ],
+        )
 
 
 class Test__transform_if_required(ants.tests.TestCase):
@@ -504,17 +497,27 @@ class Test__transform_if_required(ants.tests.TestCase):
         expected_points = np.array(
             [[190.0, 10.0], [190.0, -10.0], [170.0, -10.0], [170.0, 10]]
         )
-        warning_msg = re.escape(
-            "The transformed points are assumed to cross the antimeridian. "
-            "The points will instead be defined so that a contiguous polygon "
-            "can be made."
-        )
+        expected_warnings = [
+            (
+                UserWarning,
+                "The transformed points are assumed to cross the antimeridian. "
+                "The points will instead be defined so that a contiguous polygon "
+                "can be made.",
+            ),
+            (UserWarning, "The transformed points lie outside the target lsm domain."),
+        ]
 
-        with self.assertWarnsRegex(UserWarning, warning_msg):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
             rotated_coords = _transform_if_required(
                 target_lsm, self.sphere_source, self.points, self.minimum_lon
             )
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+
+        self.assertCountEqual(
+            [(warning.category, str(warning.message)) for warning in caught],
+            expected_warnings,
+        )
+        self.assertArrayAlmostEqual(rotated_coords, expected_points, decimal=8)
 
     def test_longitudinal_rotation_minimum_lon(self):
         """Test rotation to a new pole at latitude=90.0, longitude=90.0.

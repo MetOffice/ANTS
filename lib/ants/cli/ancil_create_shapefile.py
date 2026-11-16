@@ -88,7 +88,8 @@ def _check_polygon_validity(polygon):
 
 def _validate_orientation(source, target_lsm):
     """
-    Validate if a transformation would take place, depending on the source.
+    Allow for transformation if the target_lsm is rotated and the source
+    is a geodetic crs.
 
     If the source is a spherical geodetic crs with radius = 6371229.0, then
     a target lsm with north_pole_longitude = 180.0, north_pole_latitude = 90.0
@@ -97,7 +98,7 @@ def _validate_orientation(source, target_lsm):
 
     Parameters
     ----------
-    source : :class: `iris.cube.Cube`
+    source : :class:`iris.cube.Cube`
         An iris cube specifying the coordinate system of the input json
         file.
     target_lsm : :class:`iris.cube.Cube`
@@ -183,7 +184,7 @@ def _check_within_domain(target_lsm, rotated_points):
             warnings.warn(
                 f"The target lsm has X coordinate of size {x_size}, cannot guess "
                 "bounds. Unable to check if the rotated points lie inside the "
-                "target x domain."
+                "target domain."
             )
             return
     if not target_y_coord.has_bounds():
@@ -192,15 +193,13 @@ def _check_within_domain(target_lsm, rotated_points):
             warnings.warn(
                 f"The target lsm has Y coordinate of size {y_size}, cannot guess "
                 "bounds. Unable to check if the rotated points lie inside the "
-                "target x domain."
+                "target domain."
             )
             return
 
     # Find the bounds of the target lsm if there are none
-    if not target_x_coord.has_bounds():
-        target_x_coord.guess_bounds()
-    if not target_y_coord.has_bounds():
-        target_y_coord.guess_bounds()
+    ants.utils.coord.guess_bounds(target_x_coord, strict=False)
+    ants.utils.coord.guess_bounds(target_y_coord, strict=False)
 
     # Find the extent of the target lsm domain.
     bounds_lon = target_x_coord.bounds
@@ -387,16 +386,12 @@ def _load_cubes(target_lsm_path, source_path):
 
 def _transform_if_required(target_lsm, source, points, minimum_lon):
     """
-    Transform the points to a target crs if required.
+    Transform the points to a target lsm if required.
 
-    The points are transformed to the specified rotated pole coordinate system
-    if the provided coordinate system is a rotated pole. Following transformation,
-    the longitudes are adjusted so that the polygon does not wrap the antimeridian.
-    If ``minimum_lon`` is passed, the longitudes are translated by the same multiple
-    of 360.0 degrees.
-
-    If the input target lsm  is coincident with the north pole, the points
-    are returned and ``minimum_lon`` is ignored.
+    If the target_lsm has a valid rotated crs, the points are transformed from the
+    source to the target_lsm crs. Following transformation, the longitudes are
+    adjusted so that the polygon does not wrap the antimeridian. If ``minimum_lon``
+    is passed, the longitudes are translated by the same multiple of 360.0 degrees.
 
     Parameters
     ----------
@@ -475,7 +470,7 @@ def _save_json(output, target_lsm_path, source_path, target_lsm, source):
 
 def _load_points_from_json(json_file):
     """
-    Load a json file containing a list of pairs of longitude-latitude points.
+    Load a json file containing a list of pairs of [longitude, latitude] points.
 
 
     Parameters
@@ -500,7 +495,7 @@ def _load_points_from_json(json_file):
 
 def main(json_file, output, target_lsm_path, source_path, minimum_lon):
     """
-    Create a shape file from pairs of longitude, latitude points.
+    Create a shapefile from pairs of longitude, latitude points.
 
     Loads in a provided json file that defines pairs of longitude, latitude
     points to create a polygon from. That polygon is then used to create a
@@ -569,7 +564,9 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
 def _get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "json_file", help="Path to json file defining polygon to generate."
+        "json_file",
+        type=ants.config.filepath_readable,
+        help="Path to json file defining polygon to generate.",
     )
     parser.add_argument("output", help="File to save the shapefile to.")
     parser.add_argument(
@@ -586,7 +583,7 @@ def _get_parser():
         help="Longitude from which the transformed points are translated. All "
         "points are translated by the same multiple of 360 degrees so that the "
         "polygon's minimum longitude lies in [minimum-lon, minimum-lon + 360). "
-        "If not given, no translation is applied. Requires --target-lsm."
+        "If not given, no translation is applied. Requires --target-lsm. "
         "Only applied if a transformation is performed.",
     )
     parser.add_argument(
