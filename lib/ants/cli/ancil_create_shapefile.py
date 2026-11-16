@@ -121,13 +121,11 @@ def _validate_orientation(source, target_lsm):
     grid_lat = target_crs.grid_north_pole_latitude
     pole_lon_rotation = target_crs.north_pole_grid_longitude
 
-    # net longitude change
-    delta_lon = pole_lon_rotation - grid_lon
-    lon_shift = delta_lon % 360.0
-
     is_geodetic = source.coord_system() == iris.coord_systems.GeogCS(6371229.0)
-    is_identity = np.isclose(lon_shift, 180.0, rtol=0.0, atol=1e-10) and np.isclose(
-        grid_lat, 90.0, rtol=0.0, atol=1e-10
+    is_identity = np.allclose(
+        [grid_lon, grid_lat, pole_lon_rotation],
+        [180.0, 90.0, 0.0],
+        rtol=0.0,
     )
 
     if is_identity and is_geodetic:

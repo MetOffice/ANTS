@@ -15,7 +15,7 @@
     "install_graph" : "install_cold",
     "ancil_2anc_graph" : "install_cold => ancil_2anc<split> => rose_ana_2anc:fail? => plot_comparisons_2anc",
     "fill_n_merge_land_cover_graph" : "install_cold => ancil_create_ite_shapefile => ancil_fill_n_merge_land_cover<fill> & ancil_fill_n_merge_land_cover_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
-    "fill_n_merge_land_cover_transformed_graph" : "install_cold => ancil_create_ite_shapefile_transformed => ancil_fill_n_merge_land_cover_transformed<fill> & ancil_fill_n_merge_land_cover_transformed_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge_transformed",
+    "fill_n_merge_land_cover_transformed_graph" : "install_cold => ancil_create_ite_shapefile_transformed => ancil_fill_n_merge_land_cover_transformed<fill> & ancil_fill_n_merge_land_cover_transformed_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
     "fill_n_merge_invert_mask_graph" : "install_cold => ancil_fill_n_merge_invert_mask<fill> & ancil_fill_n_merge_invert_mask_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
     "general_regrid_grid_to_grid_graph" : "install_cold => ancil_general_regrid_grid_to_grid<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_grid_to_grid_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
@@ -365,11 +365,6 @@ fi
         inherit = PLOT_COMPARISONS
         [[[environment]]]
             TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_fill_n_merge
-
-    [[plot_comparisons_fill_n_merge_transformed]]
-        inherit = PLOT_COMPARISONS
-        [[[environment]]]
-            TARGET_ANA_TASK_WORK_DIR=${CYLC_WORKFLOW_WORK_DIR}/${CYLC_TASK_CYCLE_POINT}/rose_ana_fill_n_merge_transformed
 
     [[plot_comparisons_general_regrid_latitude_weighted_kdtree]]
         inherit = PLOT_COMPARISONS

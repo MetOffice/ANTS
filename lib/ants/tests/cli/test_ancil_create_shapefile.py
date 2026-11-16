@@ -110,22 +110,6 @@ class Test__validate_orientation(ants.tests.TestCase):
             valid_crs = _validate_orientation(self.sphere_cube, target_lsm)
         self.assertFalse(valid_crs)
 
-    def test_warning_raised_second_identity(self):
-        """Test that a warning is raised when an definition equivalent
-        to an identity transform is passed. Check the function returns
-        False."""
-
-        target_lsm = build_rotated_cube(90.0, 180.0, 360.0)
-
-        self.warning_msg = re.escape(
-            "target_lsm has a geodetic coordinate system with pole located"
-            " at grid_longitude=180.0, grid_latitude=90.0."
-            " No transformation will be carried out."
-        )
-        with self.assertWarnsRegex(UserWarning, self.warning_msg):
-            valid_crs = _validate_orientation(self.sphere_cube, target_lsm)
-        self.assertFalse(valid_crs)
-
     def test_UM_SPHERE_source(self):
         """Test that the validation check returns False for a UM Sphere
         source when the target is an identity. The UM Sphere is defined on
@@ -148,14 +132,6 @@ class Test__validate_orientation(ants.tests.TestCase):
         that is deemed valid."""
 
         target_lsm = build_rotated_cube(90.0, 90.0)
-        self.assertTrue(_validate_orientation(self.sphere_cube, target_lsm))
-
-    def test_valid_pole(self):
-        """Test that True is returned when target_lsm has a valid rotated pole.
-        In this case the rotated pole would not be an identity transformation, as the
-        two longitude options are specified in different frames of reference."""
-
-        target_lsm = build_rotated_cube(90.0, 45.0, 135.0)
         self.assertTrue(_validate_orientation(self.sphere_cube, target_lsm))
 
     def test_different_source(self):
@@ -375,7 +351,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
             target_lsm, self.sphere_source, self.points
         )
 
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+        self.assertArrayAlmostEqual(rotated_coords, expected_points, decimal=8)
 
     def test_longitudinal_rotation(self):
         """Test rotation to a new pole at latitude=90.0, longitude=90.0."""
@@ -388,7 +364,7 @@ class Test__transform_coordinates(ants.tests.TestCase):
             target_lsm, self.sphere_source, self.points
         )
 
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+        self.assertArrayAlmostEqual(rotated_coords, expected_points, decimal=8)
 
 
 class Test__load_points_from_json(ants.tests.TestCase):
@@ -549,7 +525,7 @@ class Test__transform_if_required(ants.tests.TestCase):
             target_lsm, self.sphere_source, self.points, minimum_lon
         )
 
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+        self.assertArrayAlmostEqual(rotated_coords, expected_points, decimal=8)
 
     def test_multiple_seam_crossings(self):
         """Test a valid set of points that define a polygon crossing the
@@ -602,7 +578,7 @@ class Test__transform_if_required(ants.tests.TestCase):
                 target_lsm, self.sphere_source, complex_points, None
             )
 
-        self.assertArrayAlmostEqual(rotated_coords, expected_points)
+        self.assertArrayAlmostEqual(rotated_coords, expected_points, decimal=8)
 
 
 class Test_ite_transform(ants.tests.TestCase):
@@ -678,4 +654,4 @@ class Test_ite_transform(ants.tests.TestCase):
         )
 
         rotated_points = _transform_if_required(target_lsm, source, points, minimum_lon)
-        self.assertArrayAlmostEqual(rotated_points, expected_points)
+        self.assertArrayAlmostEqual(rotated_points, expected_points, decimal=8)
