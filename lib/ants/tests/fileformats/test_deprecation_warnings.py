@@ -78,11 +78,11 @@ class TestWarnings(ants.tests.TestCase):
                 )
 
     def test_ants_load_lfric_vertical(self):
-        """Tests that calling the deprecated function ants.load_um_vertical will
-        give a FutureWarning."""
-        message = "load_lfric_vertical has been deprecated. Please use "
+        """Tests that calling the deprecated function
+        ants.fileformats.namelist.load_lfric_vertical will give a FutureWarning."""
+        message = ("load_lfric_vertical has been deprecated. Please use "
         "ants.fileformats.namelist.load_vertical with option "
-        "remove_level_zero=False"
+        "remove_level_zero=False")
         with patch("ants.fileformats.namelist.load_vertical"):
             with self.assertRaisesRegex(FutureWarning, message):
                 ants.fileformats.namelist.load_lfric_vertical(
