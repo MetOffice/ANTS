@@ -66,11 +66,11 @@ class TestWarnings(ants.tests.TestCase):
                 ants.load_raw("test_ants_load_fake_filepath")
 
     def test_ants_load_um_vertical(self):
-        """Tests that calling the deprecated function ants.load_um_vertical will
-        give a FutureWarning."""
-        message = "load_um_vertical has been deprecated. Please use "
+        """Tests that calling the deprecated function
+        ants.fileformats.namelist.load_um_vertical will give a FutureWarning."""
+        message = ("load_um_vertical has been deprecated. Please use "
         "ants.fileformats.namelist.load_vertical with option "
-        "remove_level_zero=True"
+        "remove_level_zero=True")
         with patch("ants.fileformats.namelist.load_vertical"):
             with self.assertRaisesRegex(FutureWarning, message):
                 ants.fileformats.namelist.load_um_vertical(
