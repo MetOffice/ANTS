@@ -101,19 +101,24 @@ class TestValue(ants.tests.TestCase):
             target.coord(axis="x").circular = True
 
         overlap = extract_overlap(source, grid, fix_period=fix_period, pad_width=0)
-        breakpoint()
         self.assertEqual(overlap, target)
 
     def test_wraparound_dateline_discon_fixed_period(self):
         # wraparound resulting in discontiguous bounds when defined over the
         # original range i.e. we need to change range in order for iris to deem
-        # it contiguous so we raise an exception here.
-        # TODO: this comment states an exception is raised but it never is. This
-        # could be related to the source and target swapping when extracting the
-        # bounding box.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        # it contiguous so we raise an warning here.
+
+        with warnings.catch_warnings(record=True) as w_catch:
+            warnings.simplefilter("always")
             self.wraparound_discontiguous_over_orig_range(True)
+
+        warning_msg = (
+            "Unable to perform extraction and maintain contiguous coordinates."
+        )
+
+        self.assertEqual(len(w_catch), 1)
+        self.assertIs(w_catch[-1].category, UserWarning)
+        self.assertEqual(warning_msg, str(w_catch[-1].message))
 
     def test_wraparound_dateline_contig_not_fixed_period(self):
         # wraparound resulting is contiguous bounds when range is allowed to
@@ -163,10 +168,17 @@ class TestValue(ants.tests.TestCase):
         grid = stock.geodetic((4, 4), xlim=(0, 190))
         grid.coord(axis="x").coord_system = iris.coord_systems.GeogCS(6371330.0)
         grid.coord(axis="y").coord_system = iris.coord_systems.GeogCS(6371330.0)
-        msg = "Unable to perform extraction and maintain contiguous " "coordinates."
+        warning_msg = (
+            "Unable to perform extraction and maintain contiguous coordinates."
+        )
 
-        with self.assertWarnsRegex(UserWarning, msg):
+        with warnings.catch_warnings(record=True) as w_catch:
+            warnings.simplefilter("always")
             overlap = extract_overlap(source, grid, fix_period=False, pad_width=0)
+
+        self.assertEqual(len(w_catch), 1)
+        self.assertIs(w_catch[-1].category, UserWarning)
+        self.assertEqual(warning_msg, str(w_catch[-1].message))
 
         target = [4.0625, 185.9375]
         self.assertArrayEqual(overlap.coord(axis="x").points, target)

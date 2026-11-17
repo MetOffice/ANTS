@@ -4,7 +4,6 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 import datetime
 import tempfile
-import unittest.mock as mock
 import warnings
 
 import ants
@@ -95,11 +94,9 @@ class Common(object):
             pass
 
         ancil.validate = dummy_validate
-        fh = tempfile.NamedTemporaryFile()
-        ancil.to_file(fh.name)
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
+        with tempfile.NamedTemporaryFile() as fh:
+            ancil.to_file(fh.name)
             cube = ants.io.load.load_cube(fh.name)
         return cube
 
@@ -108,8 +105,21 @@ class Common(object):
 class Test_set_climatology_year(Common, ants.tests.TestCase):
     def assert_climatology(self, ancil, tar):
         set_climatology_year(ancil, 2012)
-        with mock.patch("warnings.warn"):
+
+        warning_msg_mule = "Field validation failures"
+
+        # Catch a warning raised by mule
+        with warnings.catch_warnings(record=True) as w_catch:
+            warnings.filterwarnings(
+                "always", message=r"^Field validation failures", category=UserWarning
+            )
             cube = self.gen_cube(ancil)
+
+        # breakpoint()
+        # Two warnings are raised, the first from
+        self.assertEqual(len(w_catch), 1)
+        self.assertIs(w_catch[-1].category, UserWarning)
+        self.assertIn(warning_msg_mule, str(w_catch[-1].message))
         self.assertTrue(ants.utils.coord.relaxed_equality(cube.coord("time"), tar))
         self.assertTrue(ancil.fixed_length_header.time_type, 2)
 
