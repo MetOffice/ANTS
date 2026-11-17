@@ -122,8 +122,8 @@ def main(
         If provided, all source data after this year is discarded.  Default is to
         include all source data.
     remove_level_zero : bool
-        On loading the target grid from a namelist either remove or keep the level zero data.
-        Value of None indicates a non-namelist file.
+        On loading the target grid from a namelist either remove or keep the level
+        zero data. Value of None indicates a non-namelist file.
 
 
     Returns
