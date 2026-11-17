@@ -88,13 +88,14 @@ def _check_polygon_validity(polygon):
 
 def _validate_orientation(source, target_lsm):
     """
-    Allow for transformation if the target_lsm is rotated and the source
-    is a geodetic crs.
+    Allow for crs conversion if the target_lsm is a rotated pole, or if the
+    source is not a spherical geodetic crs.
 
     If the source is a spherical geodetic crs with radius = 6371229.0, then
-    a target lsm with north_pole_longitude = 180.0, north_pole_latitude = 90.0
-    and north_pole_grid_longitude = 0.0 will be ignored. Transformations with
-    any other source are performed regardless.
+    a target lsm with grid_north_pole_longitude = 180.0,
+    grid_north_pole_latitude = 90.0 and north_pole_grid_longitude = 0.0 and
+    spherical geodetic crs will be ignored. Transformations with any other
+    source are performed regardless.
 
     Parameters
     ----------
@@ -107,7 +108,7 @@ def _validate_orientation(source, target_lsm):
     Returns
     -------
     bool
-        True if target_lsm is a valid rotated pole, False otherwise.
+        True if no crs conversion will be carried out, False otherwise.
 
     Warns
     -----
@@ -302,7 +303,7 @@ def _make_contiguous(rotated_points):
             "can be made."
         )
 
-        # wrapping depends on the first point and can wrap by -360 degrees
+        # unwrapping depends on the first point and can unwrap by -360 degrees
         # instead of +360 degrees
         if np.any(unwrapped_lons[:-1] < -180.0):
             unwrapped_lons += 360.0
@@ -416,15 +417,15 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
 
     if _validate_orientation(source, target_lsm):
         rotated_points = _transform_coordinates(target_lsm, source, points)
-        rotated_points = _make_contiguous(rotated_points)
-        if minimum_lon is not None:
-            rotated_points[:, 0] = _translate_lons_to_minimum(
-                rotated_points[:, 0], minimum_lon
-            )
-        _check_within_domain(target_lsm, rotated_points)
     else:
         rotated_points = np.copy(points)
 
+    rotated_points = _make_contiguous(rotated_points)
+    if minimum_lon is not None:
+        rotated_points[:, 0] = _translate_lons_to_minimum(
+            rotated_points[:, 0], minimum_lon
+        )
+    _check_within_domain(target_lsm, rotated_points)
     return rotated_points
 
 
@@ -472,7 +473,6 @@ def _load_points_from_json(json_file):
     """
     Load a json file containing a list of pairs of [longitude, latitude] points.
 
-
     Parameters
     ----------
     json_file : str
@@ -511,7 +511,7 @@ def main(json_file, output, target_lsm_path, source_path, minimum_lon):
     json_file : str
         Path to json file
     output : str
-        Location to store generated shape file
+        Location to store generated shapefile
     target_lsm_path : str
         File path to a land sea mask that provides the new rotated pole.
     source_path : str
@@ -583,8 +583,7 @@ def _get_parser():
         help="Longitude from which the transformed points are translated. All "
         "points are translated by the same multiple of 360 degrees so that the "
         "polygon's minimum longitude lies in [minimum-lon, minimum-lon + 360). "
-        "If not given, no translation is applied. Requires --target-lsm. "
-        "Only applied if a transformation is performed.",
+        "If not given, no translation is applied. Requires --target-lsm. ",
     )
     parser.add_argument(
         "--source",
