@@ -218,13 +218,11 @@ fi
         inherit = ANTS_CORE, SMALL
         [[[environment]]]
             ROSE_TASK_APP = ancil_create_shapefile
-            ROSE_APP_OPT_CONF_KEYS = shapefile
 
     [[ancil_create_ite_shapefile_transformed]]
         inherit = ANTS_CORE, SMALL
         [[[environment]]]
-            ROSE_TASK_APP = ancil_create_shapefile
-            ROSE_APP_OPT_CONF_KEYS = shapefile_transformed
+            ROSE_TASK_APP = ancil_create_shapefile_transformed
 
     [[rose_ana_fill_n_merge]]
         inherit = ROSE_ANA
