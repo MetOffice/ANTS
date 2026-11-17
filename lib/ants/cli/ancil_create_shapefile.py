@@ -295,7 +295,6 @@ def _make_contiguous(rotated_points):
     ):
         raise ValueError("Points encircling a pole are not supported.")
 
-    # If the unwrapped points have changed,
     if not np.allclose(unwrapped_lons[:-1], lons):
         warnings.warn(
             "The transformed points are assumed to cross the antimeridian. "
@@ -414,7 +413,6 @@ def _transform_if_required(target_lsm, source, points, minimum_lon):
     """
 
     _check_coord_system_type(target_lsm)
-
     if _validate_orientation(source, target_lsm):
         rotated_points = _transform_coordinates(target_lsm, source, points)
     else:
