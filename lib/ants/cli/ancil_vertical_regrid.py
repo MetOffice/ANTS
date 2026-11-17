@@ -27,17 +27,17 @@ def load_data(
     target_grid,
     begin=None,
     end=None,
-    remove_level_zero=False,
+    remove_level_zero=None,
 ):
     source_cubes = ants.io.load.load(source)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
 
-    try:
+    if remove_level_zero is not None:
         target_cube = next(
             load_vertical(target_grid, remove_level_zero=remove_level_zero)
         )
-    except ValueError:
+    else:
         target_cube = ants.io.load.load_grid(target_grid)
 
     check_target(target_cube, source_cubes)
@@ -121,6 +121,9 @@ def main(
     end : :obj:`datetime`, optional
         If provided, all source data after this year is discarded.  Default is to
         include all source data.
+    remove_level_zero : bool
+        On loading the target grid from a namelist either remove or keep the level zero data.
+        Value of None indicates a non-namelist file.
 
 
     Returns
@@ -151,20 +154,21 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(target_grid=True, time_constraints=True)
-    level_zero = parser.add_mutually_exclusive_group(required=True)
+    level_zero = parser.add_mutually_exclusive_group()
+
     level_zero.add_argument(
-        "--remove-L0",
+        "--namelist-remove-L0",
         action="store_true",
         dest="remove_level_zero",
-        default=False,
-        help="Remove the zeroth level from vertical target",
+        default=None,
+        help="Read target grid from a namelist and remove the zeroth level",
     )
     level_zero.add_argument(
-        "--keep-L0",
+        "--namelist-keep-L0",
         action="store_false",
         dest="remove_level_zero",
-        default=False,
-        help="Do not remove the zeroth level from vertical target",
+        default=None,
+        help="Read target grid from a namelist and do not remove the zeroth level",
     )
     parser.add_argument(
         "--save-ukca",
