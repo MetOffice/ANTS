@@ -265,3 +265,62 @@ class TestAntsArgParser(ants.tests.TestCase):
             parser = AntsArgParser(target_lsm=True, time_constraints=True)
             with self.assertRaises(exceptions.TimeConstraintMissingException):
                 parser.parse_args()
+
+    def test_default_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(search_method=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            search_method="kdtree",
+        )
+        self.assertEqual(args, target_args)
+
+    def test_spiral_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+            "--search-method",
+            "SpIRAl",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(search_method=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            search_method="spiral",
+        )
+        self.assertEqual(args, target_args)
+
+    def test_incorrect_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+            "--search-method",
+            "ANN",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            with self.assertRaises(SystemExit):
+                parser = AntsArgParser(search_method=True)
+                parser.parse_args()

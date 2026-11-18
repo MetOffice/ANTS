@@ -23,7 +23,13 @@ class AntsArgParser(argparse.ArgumentParser):
     Standardised ancillary commandline interface.
     """
 
-    def __init__(self, target_lsm=False, target_grid=False, time_constraints=False):
+    def __init__(
+        self,
+        target_lsm=False,
+        target_grid=False,
+        time_constraints=False,
+        search_method=False,
+    ):
         """
         Parse command-line arguments and options.
 
@@ -56,6 +62,10 @@ class AntsArgParser(argparse.ArgumentParser):
             a "--begin" keyword argument which must be earlier or equal to the
             "--end" keyword argument. Both should be provided as years in the
             format YYYY.
+        search_method : :obj:`bool`, optional
+            Standardised optional argument. When True, the user is required
+            to provide a nearest neighbours search method via a ``--search-method``
+            keyword argument. The default search method is ``kdtree``.
 
         Note
         ----
@@ -195,6 +205,15 @@ class AntsArgParser(argparse.ArgumentParser):
             # Argparse may have changed its internal structure - we'll be
             # seeing the default title for groups of arguments.
             pass
+        if search_method:
+            self.add_argument(
+                "--search-method",
+                type=str.lower,
+                help="Select the search method used when filling missing points.",
+                required=False,
+                choices=["kdtree", "spiral"],
+                default="kdtree",
+            )
 
     def parse_args(self, args=None, namespace=None):
         """
