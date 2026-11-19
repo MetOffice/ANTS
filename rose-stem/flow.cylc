@@ -15,6 +15,7 @@
     "install_graph" : "install_cold",
     "ancil_2anc_graph" : "install_cold => ancil_2anc<split> => rose_ana_2anc:fail? => plot_comparisons_2anc",
     "fill_n_merge_land_cover_graph" : "install_cold => ancil_create_ite_shapefile => ancil_fill_n_merge_land_cover<fill> & ancil_fill_n_merge_land_cover_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
+    "load_metadata_regrid_graph" : "install_cold => ancil_general_regrid_metadata => rose_ana_general_regrid",
     "fill_n_merge_invert_mask_graph" : "install_cold => ancil_fill_n_merge_invert_mask<fill> & ancil_fill_n_merge_invert_mask_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
     "general_regrid_grid_to_grid_graph" : "install_cold => ancil_general_regrid_grid_to_grid<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_grid_to_grid_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
@@ -257,6 +258,18 @@ fi
     [[ancil_general_regrid_with_time_constraint_latitude_weighted_kdtree<split>]]
         inherit=ANCIL_GENERAL_REGRID_WITH_TIME_CONSTRAINT
         script = rose task-run --app-key=ancil_general_regrid_with_time_constraint -O latitude-weighted-kdtree
+
+    [[ancil_general_regrid_metadata]]
+    inherit = ANTS_CORE, ANCIL_GENERAL_REGRID, LARGE
+    script = rose task-run --app-key=ancil_general_regrid -O metadata
+
+    [[rose_ana_general_regrid_metadata]]
+        inherit = ROSE_ANA
+        [[[environment]]]
+            ROSE_TASK_APP = rose_ana
+            ROSE_APP_OPT_CONF_KEYS = general_regrid_metadata
+            ANTS_KGO_DIRECTORY_OVERRIDE = /data/users/theo.geddes/ants-source/KGO/
+
 
     [[rose_ana_general_regrid]]
         inherit = ROSE_ANA

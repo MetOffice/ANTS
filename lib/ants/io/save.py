@@ -2,6 +2,8 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the content of this file has been produced with the assistance of Met Office
+# Github Copilot Enterprise
 """
 This module contains code used to save cubes.
 
@@ -21,12 +23,14 @@ specifying ``saver='ukca'`` (see :func:`ants.io.save.ukca_netcdf`).
 
 """
 
+import logging
 import os
 import sys
 import warnings
 
 import ants.utils.cube
 import iris
+import numpy as np
 from ants.fileformats.ancil import _cubes_to_ancilfile, _mule_set_lbuser2
 from ants.fileformats.netcdf.cf import (
     _coerce_netcdf_classic_dtypes,
@@ -35,7 +39,7 @@ from ants.fileformats.netcdf.cf import (
 from ants.fileformats.netcdf.ukca import LOCAL_ATTS, _ukca_conventions
 
 
-def ancil(cubes, filename):
+def ancil(cubes, filename, ignore_metadata_write=False):
     """
     Save one or more cubes to a F03 UM ancillary file.
 
@@ -73,6 +77,9 @@ def ancil(cubes, filename):
         One or more cubes to be saved.
     filename : str
         The name of the F03 UM ancillary file, including any extension.
+    ignore_metadata_write : bool
+        Determines whether attributes should be saved to a seperate metadata file.
+        Default setting is False, so will write out the metadata.
 
     Notes
     -----
@@ -92,6 +99,8 @@ def ancil(cubes, filename):
         raise ValueError("F03 UM ancillary files cannot be saved with a .nc extension.")
 
     cubes = ants.utils.cube.as_cubelist(cubes)
+    if not ignore_metadata_write:
+        _check_and_sort_metadata_attributes(cubes, filename)
     ancilfile = _cubes_to_ancilfile(cubes)
     _mule_set_lbuser2(ancilfile)
     ancilfile.to_file(filename)
@@ -320,3 +329,91 @@ def _update_history_cmd(cube):
     items[0] = os.path.basename(items[0])
     items.append(f"({metadata})") if metadata else None
     ants.utils.cube.update_history(cubes, " ".join(items))
+
+
+def _check_and_sort_metadata_attributes(cubes, data_filepath):
+    """Checks for a license, attribution or restrictions in the metadata of the cubes,
+    and calls `_write_metadata_file` for each attribute.
+    Parameters
+    ----------
+    cubes : :class:`iris.cube.CubeList`
+        One or more cubes to be saved.
+    data_filepath : str
+        The name of the file where the data will be saved to.
+    """
+    # a dictionary to contain all of the metadata to be saved
+    metadata_dictionary = {}
+    # a dictionary to keep track of which cubes have metadata
+    cube_names_dictionary = {}
+    # a list of approved attributes that can be saved
+    attributes_to_save = [
+        "license",
+        "attribution",
+        "restrictions",
+        "institution",
+        "acknowledgement",
+        "references",
+    ]
+
+    for cube in cubes:
+        # Ensure that all attributes will be checked
+        for attribute_level in ["globals", "locals"]:
+            for key, value in getattr(cube.attributes, attribute_level).items():
+                # check the attribute is one we want to save
+                if key == "licence":
+                    warnings.warn(
+                        "The attribute name licence has been changed to "
+                        "'license', in line with ANTS working practices.",
+                        category=ants.exceptions.MetadataWarning,
+                    )
+                    key = "license"
+                if key in attributes_to_save:
+                    if key in metadata_dictionary:
+                        metadata_dictionary[key].append(value)
+                        cube_names_dictionary[key].append(cube.name())
+                    else:
+                        metadata_dictionary[key] = [value]
+                        cube_names_dictionary[key] = [cube.name()]
+    for key, value in metadata_dictionary.items():
+        # Update the metadata ready to save
+        metadata_dictionary[key] = _check_multiple_attributes(
+            metadata_dictionary[key], cube_names_dictionary[key]
+        )
+        # write the metadata
+        _write_metadata_file(metadata_dictionary[key], data_filepath, key)
+
+
+def _check_multiple_attributes(attribute_list, cube_names):
+    """Checks whether the attribute can be written out exactly as is, or if it has to be
+    pre-pended with the cube name."""
+    # check if multiple things in list
+    if len(attribute_list) == 1:
+        return attribute_list
+    # check if attributes are the same
+    if len(set(attribute_list)) == 1:
+        return attribute_list[:1]
+    # check if there is only one cube
+    if len(cube_names) == 1:
+        return attribute_list
+    # if they are not the same, add the cube name
+    concatenated_attribute = []
+    for attribute, name in zip(attribute_list, cube_names, strict=True):
+        concatenated_attribute.append(name + " = " + attribute + "\n")
+    return concatenated_attribute
+
+
+def _write_metadata_file(metadata, filename, attribute_name):
+    """Takes a list of metadata and writes it to a file called
+    filename.<attribute_name>.
+    If for any reason, the file to be written already exists, the new metadata will be
+    appended to it.
+    """
+    filepath = str(filename) + "." + attribute_name
+    # Order metadata to be in one list, if metadata contains list of lists - possible in
+    # cases where metadata is being read in
+    if any(isinstance(element, list) for element in metadata):
+        metadata = np.concatenate(metadata).tolist()
+    with open(filepath, "w") as metadata_file:
+        metadata_file.writelines(metadata)
+    _LOGGER = logging.getLogger(__name__)
+    _LOGGER.info(f"{attribute_name} has been written to sidecar file {filepath}")
