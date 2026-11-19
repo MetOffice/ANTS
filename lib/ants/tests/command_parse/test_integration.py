@@ -299,8 +299,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             sources=["/path/to/source"],
             netcdf_only=False,
-            ignore_metadata_read=False,
-            ignore_metadata_write=True,
+            ignore_metadata_read=True,
+            ignore_metadata_write=False,
         )
         self.assertFalse(self.mock_config.called)
         self.assertEqual(args, target_args)
@@ -351,6 +351,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             sources=["/path/to/source"],
             netcdf_only=False,
             search_method="kdtree",
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
         self.assertEqual(args, target_args)
 
@@ -374,6 +376,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             sources=["/path/to/source"],
             netcdf_only=False,
             search_method="spiral",
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
         self.assertEqual(args, target_args)
 
