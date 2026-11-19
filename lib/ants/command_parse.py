@@ -89,8 +89,6 @@ class AntsArgParser(argparse.ArgumentParser):
             help="Source data path(s).",
         )
 
-        target_obj = self
-
         # Arguments change below depending on whether target_lsm, target_grid,
         # or both are requested.  land-threshold is needed with target_lsm
         # whether or not target_grid is asked for:
@@ -141,14 +139,14 @@ class AntsArgParser(argparse.ArgumentParser):
             self.add_argument(
                 "--target-lsm",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 help="Path to the land sea mask.",
             )
         elif target_grid:
-            target_obj.add_argument(
+            self.add_argument(
                 "--target-grid",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 nargs="+",
                 help="Path to the target grid file.",
             )
