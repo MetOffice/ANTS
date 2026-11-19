@@ -363,19 +363,17 @@ def _customised_load(func):
         # function.
         # Check if metadata functionality has been turned off.
         ignore_metadata_read = kwargs.pop("ignore_metadata_read", False)
+        # Get the inputs of the function.
+        bound_args = inspect.signature(func).bind(*args, **kwargs)
+        bound_args.apply_defaults()
         if not ignore_metadata_read:
-            # Get the inputs of the function.
             # Chain any user callback after the metadata callback.
-            bound = inspect.signature(func).bind(*args, **kwargs)
-            bound.apply_defaults()
-            bound.arguments["callback"] = _CallbackMetadata(bound.arguments["callback"])
-            # Use context manager to avoid permanently modifying iris behaviour.
-            with ants_format_agent():
-                cubes = func(*bound.args, **bound.kwargs)
-        else:
-            # Use context manager to avoid permanently modifying iris behaviour.
-            with ants_format_agent():
-                cubes = func(*args, **kwargs)
+            bound_args.arguments["callback"] = _CallbackMetadata(
+                bound_args.arguments["callback"]
+            )
+        # Use context manager to avoid permanently modifying iris behaviour.
+        with ants_format_agent():
+            cubes = func(*bound_args.args, **bound_args.kwargs)
         if cubes is not None:
             try:
                 ants.utils.cube.derive_circular_status(cubes)
