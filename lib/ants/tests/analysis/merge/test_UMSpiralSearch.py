@@ -95,7 +95,7 @@ class TestAll(Common, ants.tests.TestCase):
         with mock.patch("ants.analysis._merge._spiral_wrapper") as spatch:
             spatch.return_value = [0, 0]
             UMSpiralSearch(source)
-        self.assertTrue(spatch.called)
+        spatch.assert_called_once()
         self.assertFalse(spatch.call_args[0][4].any())
 
     def test_conflicting_src_tgt_mask(self):
@@ -150,7 +150,7 @@ class TestAll(Common, ants.tests.TestCase):
         spiral_func = "um_spiral_search.um_spiral_search.spiral_search"
         with mock.patch(spiral_func) as spiral_patch:
             self.no_source_mask()
-        self.assertFalse(spiral_patch.spiral_circle_search.called)
+        spiral_patch.spiral_circle_search.assert_not_called()
 
     def test_nan_as_missing(self):
         # Ensure NaN values are treated as masked - a double check here is
@@ -224,7 +224,7 @@ class TestAll(Common, ants.tests.TestCase):
 
     def test_no_warning(self):
         UMSpiralSearch(self.source, target_mask=self.target_mask)
-        self.assertFalse(self.mock_warning.called)
+        self.mock_warning.assert_not_called()
 
 
 @ants.tests.skip_spiral

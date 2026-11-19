@@ -125,15 +125,13 @@ def main(
         This specifies which search routine is used in making the
         provided source(s) consistent with the provided land sea mask.
         This should only be provided if a target land sea mask is also
-        provided via target_lsm_path.
-    ignore_metadata_read : :obj:`bool`, optional
-        When set to True, files containing metadata will not be loaded alongside data
-        and added as attributes to the cube.
-    ignore_metadata_write : :obj:`bool`, optional
+        provided via target_lsm_path. The methods currently supported
+        are "spiral" and "kdtree".
     ignore_metadata_read : :obj:`bool`
         When set to True, files containing metadata will not be loaded alongside data
         and added as attributes to the cube.
     ignore_metadata_write : :obj:`bool`
+        If True, do not write metadata sidecar files alongside the ancillary.
 
     Returns
     -------
@@ -178,7 +176,10 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(
-        target_lsm=True, target_grid=True, time_constraints=True
+        target_lsm=True,
+        target_grid=True,
+        time_constraints=True,
+        search_method=True,
     )
     invmask_help = (
         "Invert the provided target_mask or not.\n"
@@ -199,17 +200,6 @@ def _get_parser():
         action="store_true",
         help="Save to a UKCA-specific netCDF file",
         required=False,
-    )
-    parser.add_argument(
-        "--search-method",
-        type=str,
-        help="Select the search method used when filling. "
-        "This specifies which search routine is used in making the "
-        "provided source(s) consistent with the provided land sea mask. "
-        "This should only be provided if a target land sea mask is provided via "
-        "the ``--target-lsm`` option.",
-        required=False,
-        default="spiral",
     )
     return parser
 

@@ -143,7 +143,7 @@ class TestValue(ants.tests.TestCase):
         )
         with pcircular as patch_circular:
             extract_overlap(source, grid, fix_period=True, pad_width=0)
-        self.assertTrue(patch_circular.called)
+        patch_circular.assert_called_once()
 
     def test_discontiguous_extract(self):
         # Two separate overlapping pieces cannot be resolved as contiguous
@@ -190,7 +190,7 @@ class TestValue(ants.tests.TestCase):
         source = stock.geodetic(data=data)
         grid = stock.geodetic((2, 2))
         overlap = extract_overlap(source, grid, fix_period=False, pad_width=0)
-        # The two cubes should be equal but we cannot perform this check due
+        # TODO: The two cubes should be equal but we cannot perform this check due
         # to an iris bug - instead we perform equality on array.
         # https://github.com/SciTools/iris/issues/2123
         # self.assertEqual(overlap, source)

@@ -44,7 +44,7 @@ class Testall(ants.tests.TestCase):
             merge(primary_cube, alternate_cube, None, None)
 
         mock_method.assert_called_once_with(primary_cube, alternate_cube, None, None)
-        self.assertFalse(self.mock_fill.called)
+        self.mock_fill.assert_not_called()
 
     def test_blending_distance_no_polygon(self):
         primary_cube = self.generate_dummy_cube(shape=(4, 8))

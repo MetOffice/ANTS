@@ -54,7 +54,7 @@ class TestLoadCube(ants.tests.TestCase):
         )
         with patch as npatch:
             ants.io.load.load_cube(fh.name)
-        self.assertTrue(npatch.called)
+        npatch.assert_called_once()
 
     def test_forecast_period_removal(self):
         cube = ants.tests.stock.geodetic((2, 2))
