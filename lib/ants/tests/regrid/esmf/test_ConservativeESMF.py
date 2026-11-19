@@ -152,9 +152,10 @@ class Test_regridder_1D(Common1D, ants.tests.TestCase):
         with mock.patch("ants.utils.cube.set_crs") as patch_set_crs:
             regridder = self.scheme.regridder(self.src, self.tgt)
             regridder(new_src)
-        mock.call(self.src) in patch_set_crs.call_args_list
-        mock.call(self.tgt) in patch_set_crs.call_args_list
-        mock.call(new_src) in patch_set_crs.call_args_list
+        patch_set_crs.assert_has_calls(
+            [mock.call(self.src), mock.call(self.tgt), mock.call(new_src)],
+            any_order=True,
+        )
 
     def test_values_beyond_extent(self):
         # Check what happens for points where there are target cells where no

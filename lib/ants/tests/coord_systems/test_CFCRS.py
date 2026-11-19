@@ -18,8 +18,8 @@ class Common(object):
 
 class Test___init__(Common, ants.tests.TestCase):
     def test_correct_args(self):
-        # Ensure that we don't fall over during correct initialisation of the
-        # function.
+        # Ensure that no error is raised during correct initialisation
+        # of the function.
         CFCRS(self.crs)
 
 

@@ -43,7 +43,9 @@ class Test___init__(ants.tests.TestCase):
             DummyGrid(sample)
 
     def test_unused_group(self):
-        # Ensure that the class is not sensitive to unexpected groups
+        # Ensure that the class is not sensitive to unexpected groups.
+        # This test only checks that no error is raised when a group that is not
+        # present in the defaults is passed.
         sample = {"a": {}, mock.sentinel.group: {}}
         DummyGrid(sample)
 
