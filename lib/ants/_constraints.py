@@ -42,6 +42,14 @@ def _extract_overlap(source, target, fix_period=False, pad_width=0):
     ants.exceptions.NoCoverageError
         When no source cells can be found which overlap the target.
     RuntimeError
+        When two transformed bounding-box geometries cannot be
+        combined.
+    RuntimeError
+        When extraction requires more than two slices.
+
+    Warns
+    -----
+    UserWarning
         Where an extraction would otherwise return an overlap with
         discontiguous coordinates, where the source was originally contiguous.
 
@@ -151,7 +159,7 @@ def _extract_overlap(source, target, fix_period=False, pad_width=0):
         # to make it obvious to the user where their coordinate became
         # discontiguous.
         warnings.warn(
-            "Unable to perform extraction and maintain contiguous " "coordinates."
+            "Unable to perform extraction and maintain contiguous coordinates."
         )
 
     return cube

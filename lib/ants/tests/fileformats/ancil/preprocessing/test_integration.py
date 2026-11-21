@@ -4,8 +4,6 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 import datetime
 import tempfile
-import unittest.mock as mock
-import warnings
 
 import ants
 import ants.tests
@@ -60,6 +58,7 @@ def gen_single_field_ffv():
     field.lbuser1 = 1  # Datatype
     field.lbnpt = n_cols
     field.lbrow = n_rows
+    field.lbhem = 0  # Global field
     field.bdx = ancil.real_constants.col_spacing
     field.bdy = ancil.real_constants.row_spacing
     field.bzx = ancil.real_constants.start_lon - 0.5 * field.bdx
@@ -91,15 +90,8 @@ def gen_climatological_ffv():
 
 class Common(object):
     def gen_cube(self, ancil):
-        def dummy_validate(*args, **kwargs):
-            pass
-
-        ancil.validate = dummy_validate
-        fh = tempfile.NamedTemporaryFile()
-        ancil.to_file(fh.name)
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
+        with tempfile.NamedTemporaryFile() as fh:
+            ancil.to_file(fh.name)
             cube = ants.io.load.load_cube(fh.name)
         return cube
 
@@ -108,10 +100,10 @@ class Common(object):
 class Test_set_climatology_year(Common, ants.tests.TestCase):
     def assert_climatology(self, ancil, tar):
         set_climatology_year(ancil, 2012)
-        with mock.patch("warnings.warn"):
-            cube = self.gen_cube(ancil)
+        cube = self.gen_cube(ancil)
+
         self.assertTrue(ants.utils.coord.relaxed_equality(cube.coord("time"), tar))
-        self.assertTrue(ancil.fixed_length_header.time_type, 2)
+        self.assertEqual(ancil.fixed_length_header.time_type, 2)
 
     def test_360_day(self):
         units = cf_units.Unit("hours since 1970-01-01 00:00:00", calendar="360_day")

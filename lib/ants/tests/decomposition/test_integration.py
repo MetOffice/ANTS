@@ -11,7 +11,6 @@ suitable for multiprocessing or any parallelism framework).
 """
 
 import os
-import unittest.mock as mock
 
 import ants.decomposition as decomp
 import ants.tests
@@ -106,10 +105,6 @@ class Common(object):
         # it on test completion:
         self._original_environment = os.environ.copy()
         os.environ.pop("SLURM_NTASKS", None)
-
-        patch = mock.patch("warnings.warn")
-        self.mock_warnings = patch.start()
-        self.addCleanup(patch.stop)
 
     def tearDown(self):
         os.environ = self._original_environment
