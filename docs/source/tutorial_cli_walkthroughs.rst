@@ -134,6 +134,11 @@ the same horizontal (latitude/longitude) coordinates:
         --target-grid vertlevs_L70_50t_20s_80km \
         --ants-config rose-app-run.conf
 
+If the target grid definition is provided via a vertical namelist then there are
+optional arguments to specify whether to remove the level zero data (common for
+UM data) or parse the whole file as provided. These are ``--namelist-remove-L0``
+and ``--namelist-keep-L0``.
+
 This application has no default vertical scheme - the ``--ants-config`` file
 passed above (``rose-app-run.conf``) must include a
 ``[ants_regridding_vertical]`` section specifying one, for example:

@@ -18,6 +18,7 @@ details.
 import ants
 import ants.io.save as save
 import ants.utils
+from ants.fileformats.namelist import load_vertical
 from ants.utils.cube import create_time_constrained_cubes
 
 
@@ -26,13 +27,19 @@ def load_data(
     target_grid,
     begin=None,
     end=None,
+    remove_level_zero=None,
     ignore_metadata_read=False,
 ):
     source_cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
 
-    target_cube = ants.io.load.load_grid(target_grid)
+    if remove_level_zero is not None:
+        target_cube = next(
+            load_vertical(target_grid, remove_level_zero=remove_level_zero)
+        )
+    else:
+        target_cube = ants.io.load.load_grid(target_grid)
 
     check_target(target_cube, source_cubes)
 
@@ -87,6 +94,7 @@ def main(
     target_path,
     begin,
     end,
+    remove_level_zero,
     save_ukca,
     netcdf_only,
     ignore_metadata_read,
@@ -116,6 +124,9 @@ def main(
     end : :obj:`datetime`, optional
         If provided, all source data after this year is discarded.  Default is to
         include all source data.
+    remove_level_zero : bool
+        On loading the target grid from a namelist either remove or keep the level
+        zero data. Value of None indicates a non-namelist file.
     ignore_metadata_read : :obj:`bool`
         When set to True, files containing metadata will not be loaded alongside data
         and added as attributes to the cube.
@@ -130,7 +141,12 @@ def main(
 
     """
     source_cubes, target_cube = load_data(
-        source_path, target_path, begin, end, ignore_metadata_read
+        source_path,
+        target_path,
+        begin,
+        end,
+        remove_level_zero,
+        ignore_metadata_read,
     )
 
     regridded_cubes = regrid(source_cubes, target_cube)
@@ -151,6 +167,22 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(target_grid=True, time_constraints=True)
+    level_zero = parser.add_mutually_exclusive_group()
+
+    level_zero.add_argument(
+        "--namelist-remove-L0",
+        action="store_true",
+        dest="remove_level_zero",
+        default=None,
+        help="Read target grid from a namelist and remove the zeroth level",
+    )
+    level_zero.add_argument(
+        "--namelist-keep-L0",
+        action="store_false",
+        dest="remove_level_zero",
+        default=None,
+        help="Read target grid from a namelist and do not remove the zeroth level",
+    )
     parser.add_argument(
         "--save-ukca",
         action="store_true",
@@ -171,6 +203,7 @@ def cli_interface():
         args.target_grid,
         args.begin,
         args.end,
+        args.remove_level_zero,
         args.save_ukca,
         args.netcdf_only,
         args.ignore_metadata_read,
