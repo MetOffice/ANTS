@@ -30,8 +30,8 @@ Deprecations
 Incompatible Changes
 ====================
 - :pr:`214`: The environment and dependencies that ANTS uses has been upgraded, including numpy being
-  upgraded to 2.3.5. This has had a major impact on ANTS, which is not backwards
-  compatible.
+  upgraded to 2.3.5. These changes are not backwards compatible and will likely have an
+  effect on downstream applications.
 
 Infrastructure
 ==============
