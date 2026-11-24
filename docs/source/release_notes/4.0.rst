@@ -1,0 +1,42 @@
+.. include:: /common.txt
+
+************************
+ANTS 4.0 (November 2026)
+************************
+
+For a full list of changes see the :milestone:`4.0 release milestone <2>`.
+
+
+Features
+========
+- :pr:`175`: Added a new CLI interface for vertical-only regridding.
+- :pr:`221`: kdtree is now the default search method.
+- :pr:`173`: External metadata can now be reserved alongside ancillary filetypes that do
+  not support metadata.
+- :pr:`189`: Added the ability to specify whether the zero level should be removed when
+  loading vertical namelist files.
+
+Bugs Fixed
+==========
+- :pr:`172`: Cubelists with only one history attribute can now be saved without erroring.
+- :pr:`211`: Extrapolation mode now correctly parses NaNs in the config file.
+
+Deprecations
+============
+- :func:`ants.fileformats.namelist.load_um_vertical` and
+  `ants.fileformats.namelist.load_lfric_vertical` have been deprecated in favour of
+  :func:`ants.fileformats.namelist.load_vertical` as part of the work in :pr:`189`.
+
+Incompatible Changes
+====================
+- :pr:`214`: The environment and dependencies that ANTS uses has been upgraded, including numpy being
+  upgraded to 2.3.5. These changes are not backwards compatible and will likely have an
+  effect on downstream applications.
+
+Infrastructure
+==============
+- :pr:`218`: Pytest xfail is now set to strict.
+
+Documentation
+=============
+- :pr:`179`: Additional ANTS tutorials have been added to the documentation.
