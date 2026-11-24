@@ -31,6 +31,7 @@ class TestAntsArgParser(ants.tests.TestCase):
         self.addCleanup(patch.stop)
 
     def test_default_args(self):
+        """Tests that the default arguments are as expected."""
         new = [
             "program",
             "/path/to/source",
@@ -54,8 +55,10 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             sources=["/path/to/source"],
             netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_add_args(self):
@@ -70,6 +73,8 @@ class TestAntsArgParser(ants.tests.TestCase):
             output="/path/to/output",
             ants_config=None,
             netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
             new_arg="new_arg_value",
         )
         self.assertEqual(args, target_args)
@@ -150,6 +155,7 @@ class TestAntsArgParser(ants.tests.TestCase):
         self.mock_dirpath_writeable.assert_called_once()
 
     def test_time_constraint_args(self):
+        """Tests that using time constraint arguments will be correctly parsed."""
         new = [
             "program",
             "/path/to/source",
@@ -176,11 +182,14 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=2016,
             end=2021,
             netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_flags(self):
+        """Tests that using time constraint flags will be correctly parsed."""
         new = [
             "program",
             "/path/to/source",
@@ -207,8 +216,10 @@ class TestAntsArgParser(ants.tests.TestCase):
             begin=1990,
             end=1996,
             netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
         )
-        self.assertFalse(self.mock_config.called)
+        self.mock_config.assert_not_called()
         self.assertEqual(args, target_args)
 
     def test_time_constraint_input(self):
@@ -264,4 +275,123 @@ class TestAntsArgParser(ants.tests.TestCase):
         with mock.patch("sys.argv", new=new):
             parser = AntsArgParser(target_lsm=True, time_constraints=True)
             with self.assertRaises(exceptions.TimeConstraintMissingException):
+                parser.parse_args()
+
+    def test_set_ignore_metadata_read_flag(self):
+        "Tests that ignore_metadata_read will be set to True when passed in."
+        new = [
+            "program",
+            "/path/to/source",
+            "--target-lsm",
+            "/path/to/lsm",
+            "-o",
+            "/path/to/output",
+            "--ignore-metadata-read",
+        ]
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(target_lsm=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            land_threshold=None,
+            target_lsm="/path/to/lsm",
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            ignore_metadata_read=True,
+            ignore_metadata_write=False,
+        )
+        self.assertFalse(self.mock_config.called)
+        self.assertEqual(args, target_args)
+
+    def test_set_ignore_metadata_write_flag(self):
+        "Tests that ignore_metadata_write will be set to True when passed in."
+        new = [
+            "program",
+            "/path/to/source",
+            "--target-lsm",
+            "/path/to/lsm",
+            "-o",
+            "/path/to/output",
+            "--ignore-metadata-write",
+        ]
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(target_lsm=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            land_threshold=None,
+            target_lsm="/path/to/lsm",
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            ignore_metadata_read=False,
+            ignore_metadata_write=True,
+        )
+        self.assertFalse(self.mock_config.called)
+        self.assertEqual(args, target_args)
+
+    def test_default_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(search_method=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            search_method="kdtree",
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
+        )
+        self.assertEqual(args, target_args)
+
+    def test_spiral_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+            "--search-method",
+            "SpIRAl",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            parser = AntsArgParser(search_method=True)
+            args = parser.parse_args()
+
+        target_args = argparse.Namespace(
+            ants_config=None,
+            output="/path/to/output",
+            sources=["/path/to/source"],
+            netcdf_only=False,
+            search_method="spiral",
+            ignore_metadata_read=False,
+            ignore_metadata_write=False,
+        )
+        self.assertEqual(args, target_args)
+
+    def test_incorrect_search_method(self):
+        new = [
+            "program",
+            "/path/to/source",
+            "-o",
+            "/path/to/output",
+            "--search-method",
+            "ANN",
+        ]
+
+        with mock.patch("sys.argv", new=new):
+            with self.assertRaises(SystemExit):
+                parser = AntsArgParser(search_method=True)
                 parser.parse_args()

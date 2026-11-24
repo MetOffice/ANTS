@@ -28,8 +28,9 @@ def load_data(
     begin=None,
     end=None,
     remove_level_zero=None,
+    ignore_metadata_read=False,
 ):
-    source_cubes = ants.io.load.load(source)
+    source_cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
 
@@ -96,6 +97,8 @@ def main(
     remove_level_zero,
     save_ukca,
     netcdf_only,
+    ignore_metadata_read,
+    ignore_metadata_write,
 ):
     """
     Vertical regrid application top level call function.
@@ -124,6 +127,11 @@ def main(
     remove_level_zero : bool
         On loading the target grid from a namelist either remove or keep the level
         zero data. Value of None indicates a non-namelist file.
+    ignore_metadata_read : :obj:`bool`
+        When set to True, files containing metadata will not be loaded alongside data
+        and added as attributes to the cube.
+    ignore_metadata_write : bool
+        If True, do not write metadata sidecar files alongside the ancillary.
 
 
     Returns
@@ -138,6 +146,7 @@ def main(
         begin,
         end,
         remove_level_zero,
+        ignore_metadata_read,
     )
 
     regridded_cubes = regrid(source_cubes, target_cube)
@@ -146,7 +155,11 @@ def main(
         save.ukca_netcdf(regridded_cubes, output_path)
     else:
         if not netcdf_only:
-            save.ancil(regridded_cubes, output_path)
+            save.ancil(
+                regridded_cubes,
+                output_path,
+                ignore_metadata_write=ignore_metadata_write,
+            )
         save.netcdf(regridded_cubes, output_path)
 
     return regridded_cubes
@@ -193,6 +206,8 @@ def cli_interface():
         args.remove_level_zero,
         args.save_ukca,
         args.netcdf_only,
+        args.ignore_metadata_read,
+        args.ignore_metadata_write,
     )
 
 

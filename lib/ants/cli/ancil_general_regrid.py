@@ -43,15 +43,20 @@ def load_data(
     land_fraction_threshold=None,
     begin=None,
     end=None,
+    ignore_metadata_read=False,
 ):
-    source_cubes = ants.io.load.load(source)
+    source_cubes = ants.io.load.load(source, ignore_metadata_read=ignore_metadata_read)
     if begin is not None:
         source_cubes = create_time_constrained_cubes(source_cubes, begin, end)
     if target_grid:
-        target_cube = ants.io.load.load_grid(target_grid)
+        target_cube = ants.io.load.load_grid(
+            target_grid, ignore_metadata_read=ignore_metadata_read
+        )
     else:
         target_cube = ants.io.load.load_landsea_mask(
-            target_landseamask, land_fraction_threshold
+            target_landseamask,
+            land_fraction_threshold,
+            ignore_metadata_read=ignore_metadata_read,
         )
     return source_cubes, target_cube
 
@@ -77,6 +82,8 @@ def main(
     save_ukca,
     netcdf_only,
     search_method,
+    ignore_metadata_read,
+    ignore_metadata_write,
 ):
     """
     General regrid application top level call function.
@@ -118,7 +125,13 @@ def main(
         This specifies which search routine is used in making the
         provided source(s) consistent with the provided land sea mask.
         This should only be provided if a target land sea mask is also
-        provided via target_lsm_path.
+        provided via target_lsm_path. The methods currently supported
+        are "spiral" and "kdtree".
+    ignore_metadata_read : :obj:`bool`
+        When set to True, files containing metadata will not be loaded alongside data
+        and added as attributes to the cube.
+    ignore_metadata_write : :obj:`bool`
+        If True, do not write metadata sidecar files alongside the ancillary.
 
     Returns
     -------
@@ -133,6 +146,7 @@ def main(
         land_fraction_threshold,
         begin,
         end,
+        ignore_metadata_read,
     )
     if ants.utils.cube._is_ugrid(target_cube):
         raise ValueError(
@@ -150,7 +164,11 @@ def main(
         save.ukca_netcdf(regridded_cubes, output_path)
     else:
         if not netcdf_only:
-            save.ancil(regridded_cubes, output_path)
+            save.ancil(
+                regridded_cubes,
+                output_path,
+                ignore_metadata_write=ignore_metadata_write,
+            )
         save.netcdf(regridded_cubes, output_path)
 
     return regridded_cubes
@@ -158,7 +176,10 @@ def main(
 
 def _get_parser():
     parser = ants.AntsArgParser(
-        target_lsm=True, target_grid=True, time_constraints=True
+        target_lsm=True,
+        target_grid=True,
+        time_constraints=True,
+        search_method=True,
     )
     invmask_help = (
         "Invert the provided target_mask or not.\n"
@@ -180,17 +201,6 @@ def _get_parser():
         help="Save to a UKCA-specific netCDF file",
         required=False,
     )
-    parser.add_argument(
-        "--search-method",
-        type=str,
-        help="Select the search method used when filling. "
-        "This specifies which search routine is used in making the "
-        "provided source(s) consistent with the provided land sea mask. "
-        "This should only be provided if a target land sea mask is provided via "
-        "the ``--target-lsm`` option.",
-        required=False,
-        default="spiral",
-    )
     return parser
 
 
@@ -211,6 +221,8 @@ def cli_interface():
         args.save_ukca,
         args.netcdf_only,
         args.search_method,
+        args.ignore_metadata_read,
+        args.ignore_metadata_write,
     )
 
 

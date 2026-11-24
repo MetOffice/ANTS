@@ -2,6 +2,7 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+import re
 import unittest.mock as mock
 
 import ants.tests
@@ -15,11 +16,12 @@ class TestErrorMessages(ants.tests.TestCase):
         source = ants.tests.stock.geodetic((2, 2))
         target = ants.tests.stock.geodetic((2, 2))
         scheme = GeneralRegridScheme()
-        with self.assertRaises(AttributeError) as context:
+        msg = re.escape(
+            "At least one of horizontal "
+            "or vertical re-grid schemes must be provided."
+        )
+        with self.assertRaisesRegex(AttributeError, msg):
             source.regrid(target, scheme)
-
-            self.assertTrue("At least one of horizontal \
-            or vertical re-grid schemes must be provided." in context.exception)
 
 
 class TestInterpolation(ants.tests.TestCase):
@@ -32,21 +34,21 @@ class TestInterpolation(ants.tests.TestCase):
         with mock.patch(scheme) as patched_scheme:
             scheme = GeneralRegridScheme(vertical_scheme="Conservative")
             self.source.regrid(self.target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
     def test_linear(self):
         scheme = "ants.regrid.interpolation.Linear"
         with mock.patch(scheme) as patched_scheme:
             scheme = GeneralRegridScheme(vertical_scheme="Linear")
             self.source.regrid(self.target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
     def test_nearest(self):
         scheme = "ants.regrid.interpolation.Nearest"
         with mock.patch(scheme) as patched_scheme:
             scheme = GeneralRegridScheme(vertical_scheme="Nearest")
             self.source.regrid(self.target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
 
 class TestESMF(ants.tests.TestCase):
@@ -64,7 +66,7 @@ class TestESMF(ants.tests.TestCase):
             source = ants.tests.stock.geodetic((2, 2))
             target = source.copy()
             source.regrid(target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
 
 class TestRectilinear(ants.tests.TestCase):
@@ -74,7 +76,7 @@ class TestRectilinear(ants.tests.TestCase):
             source = ants.tests.stock.geodetic((2, 2))
             target = source.copy()
             source.regrid(target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
     def test_expected_scheme(self):
         # Ensure our Linear is used over the iris one.
@@ -83,7 +85,7 @@ class TestRectilinear(ants.tests.TestCase):
             source = ants.tests.stock.geodetic((2, 2))
             target = source.copy()
             source.regrid(target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
 
 class TestIris(ants.tests.TestCase):
@@ -100,7 +102,7 @@ class TestIris(ants.tests.TestCase):
             source = ants.tests.stock.geodetic((2, 2))
             target = source.copy()
             source.regrid(target, scheme)
-        self.assertTrue(patched_scheme.called)
+        patched_scheme.assert_called_once()
 
 
 class TestHorizontalExtrapolationConfig(ants.tests.TestCase):

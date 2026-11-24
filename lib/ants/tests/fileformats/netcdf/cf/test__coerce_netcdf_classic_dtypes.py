@@ -16,7 +16,7 @@ class TestAll(ants.tests.TestCase):
         cube = ants.tests.stock.geodetic((2, 2))
         with mock.patch("numpy.can_cast") as can_cast:
             _coerce_netcdf_classic_dtypes(cube)
-        self.assertFalse(can_cast.called)
+        can_cast.assert_not_called()
         # We don't coerce so cube data should remain its original non-lazy self.
         self.assertFalse(cube.has_lazy_data())
 

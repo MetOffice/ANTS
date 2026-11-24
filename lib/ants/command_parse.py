@@ -23,7 +23,13 @@ class AntsArgParser(argparse.ArgumentParser):
     Standardised ancillary commandline interface.
     """
 
-    def __init__(self, target_lsm=False, target_grid=False, time_constraints=False):
+    def __init__(
+        self,
+        target_lsm=False,
+        target_grid=False,
+        time_constraints=False,
+        search_method=False,
+    ):
         """
         Parse command-line arguments and options.
 
@@ -33,6 +39,14 @@ class AntsArgParser(argparse.ArgumentParser):
             sources <SOURCE1> <SOURCE2> ... <SOURCEN>     Source data path(s).
             --output <OUTPUT>, -o <OUTPUT>                Output filepath
             --ants-config <ANTS_CONFIG>                   Configuration path.
+            --ignore-metadata-read                        Stops the application from
+                                                          searching for metadata files
+                                                          with the same name as the
+                                                          source and loading them
+                                                          alongside the source.
+            --ignore-metadata-write                       Stops the application from
+                                                          writing metadata files
+                                                          alongside the outputs.
 
         Additionally, there are standardised optional arguments and these are
         activated by passing the relevant keyword argument.  See 'Parameters'
@@ -56,6 +70,10 @@ class AntsArgParser(argparse.ArgumentParser):
             a "--begin" keyword argument which must be earlier or equal to the
             "--end" keyword argument. Both should be provided as years in the
             format YYYY.
+        search_method : :obj:`bool`, optional
+            Standardised optional argument. When True, the user is required
+            to provide a nearest neighbours search method via a ``--search-method``
+            keyword argument. The default search method is ``kdtree``.
 
         Note
         ----
@@ -88,8 +106,6 @@ class AntsArgParser(argparse.ArgumentParser):
             nargs="+",
             help="Source data path(s).",
         )
-
-        target_obj = self
 
         # Arguments change below depending on whether target_lsm, target_grid,
         # or both are requested.  land-threshold is needed with target_lsm
@@ -141,14 +157,14 @@ class AntsArgParser(argparse.ArgumentParser):
             self.add_argument(
                 "--target-lsm",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 help="Path to the land sea mask.",
             )
         elif target_grid:
-            target_obj.add_argument(
+            self.add_argument(
                 "--target-grid",
                 type=ants.config.filepath_readable,
-                required=target_obj is self,
+                required=True,
                 nargs="+",
                 help="Path to the target grid file.",
             )
@@ -169,6 +185,19 @@ class AntsArgParser(argparse.ArgumentParser):
             "--netcdf-only",
             action="store_true",
             help="Only write out a netCDF file.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-read",
+            action="store_true",
+            help="Stops the application from searching for metadata files with "
+            "the same name as the source and loading them alongside the source.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-write",
+            action="store_true",
+            help="Stops the application from writing metadata files alongside outputs.",
             required=False,
         )
         if time_constraints:
@@ -195,6 +224,15 @@ class AntsArgParser(argparse.ArgumentParser):
             # Argparse may have changed its internal structure - we'll be
             # seeing the default title for groups of arguments.
             pass
+        if search_method:
+            self.add_argument(
+                "--search-method",
+                type=str.lower,
+                help="Select the search method used when filling missing points.",
+                required=False,
+                choices=["kdtree", "spiral"],
+                default="kdtree",
+            )
 
     def parse_args(self, args=None, namespace=None):
         """

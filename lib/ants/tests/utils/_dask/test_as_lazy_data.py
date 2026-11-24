@@ -22,4 +22,4 @@ class TestAll(ants.tests.TestCase):
                 chunks=mock.sentinel.chunks,
                 asarray=mock.sentinel.asarray,
             )
-        self.assertTrue(patched.called)
+        patched.assert_called_once()

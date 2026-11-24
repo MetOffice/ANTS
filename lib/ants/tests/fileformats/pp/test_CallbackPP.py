@@ -33,12 +33,12 @@ class Test___call__(ants.tests.TestCase):
         freeze_level = "ants.fileformats.pp._CallbackPP._freeze_pseudo_level"
         with mock.patch(freeze_level) as freeze_pseudo_level_mocked:
             self.call()
-        self.assertFalse(freeze_pseudo_level_mocked.called)
+        freeze_pseudo_level_mocked.assert_not_called()
 
     def test_file_not_used(self):
         mockfile = mock.Mock()
         CallbackPP().__call__(self.cube, None, mockfile)
-        self.assertFalse(mockfile.called)
+        mockfile.assert_not_called()
 
     def test_user_callback_called(self):
         self.call()

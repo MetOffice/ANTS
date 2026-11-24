@@ -2,9 +2,14 @@
 #
 # This file is part of ANTS and is released under the BSD 3-Clause license.
 # See LICENSE.txt in the root of the repository for full licensing details.
+# Some of the content of this file has been produced with the assistance of
+# Met Office GitHub Copilot Enterprise.
 import collections
+import contextlib
 import functools
 import os
+import shutil
+import tempfile
 import unittest
 import warnings
 
@@ -144,6 +149,37 @@ def get_data_path(relative_path):
     if not isinstance(relative_path, str):
         relative_path = os.path.join(*relative_path)
     return os.path.abspath(os.path.join(_RESOURCE_PATH, relative_path))
+
+
+@contextlib.contextmanager
+def isolated_resource(relative_path, sidecars=None):
+    """
+    Copy a resource file into a standalone temporary directory.
+    The path is relative to the directory returned by `get_data_path`.  The
+    path of the copied file is yielded, and the temporary directory is removed
+    on exit.  Useful for testing sidecar metadata file loading, where
+    neighbouring files matter.
+    Parameters
+    ----------
+    relative_path : str
+        Resource file to copy.
+    sidecars : dict, optional
+        Maps sidecar extensions to text content, for files to create alongside
+        the copied file, named ``<file name>.<extension>``.
+    Example usage:
+        def test_sidecar(self):
+            with isolated_resource(
+                "global_geodetic.tif", sidecars={"license": "A license\\n"}
+            ) as path:
+                cube = ants.load_cube(path)
+    """
+    with tempfile.TemporaryDirectory(prefix="ants_test_resources_") as tmp:
+        path = os.path.join(tmp, os.path.basename(relative_path))
+        shutil.copy2(get_data_path(relative_path), path)
+        for extension, content in (sidecars or {}).items():
+            with open(f"{path}.{extension}", "x") as sidecar:
+                sidecar.write(content)
+        yield path
 
 
 class TestCase(unittest.TestCase):

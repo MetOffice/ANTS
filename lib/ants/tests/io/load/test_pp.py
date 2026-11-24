@@ -39,7 +39,9 @@ def test_pseudo_level_order_preserved():
 
 
 @ants.tests.skip_mule
-@pytest.mark.xfail
+@pytest.mark.xfail(
+    raises=AssertionError, reason="Iris sorts pseudo level in ascending order."
+)
 def test_pseudo_level_orders_with_iris():
     """Loads a pp file, modifies the pseudo levels and saves this to a temporary file.
     The file is loaded with iris and the order of the pseudo levels are checked."""
