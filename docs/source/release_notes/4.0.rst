@@ -14,7 +14,7 @@ Features
 - :pr:`173`: External metadata can now be reserved alongside ancillary filetypes that do
   not support metadata.
 - :pr:`189`: Added the ability to specify whether the zero level should be removed when
-  loading.
+  loading vertical namelist files.
 
 Bugs Fixed
 ==========
