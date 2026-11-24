@@ -19,7 +19,7 @@ Features
 Bugs Fixed
 ==========
 - :pr:`172`: Cubelists with only one history attribute can now be saved without erroring.
-- :pr:`211`: Extrapolation mode is now correctly parses NaNs in the config file.
+- :pr:`211`: Extrapolation mode now correctly parses NaNs in the config file.
 
 Deprecations
 ============
