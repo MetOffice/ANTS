@@ -16,7 +16,7 @@ Features
 
 Bugs Fixed
 ==========
-- :pr:`171`: Cubelists with only one history attribute can now be saved without erroring.
+- :pr:`172`: Cubelists with only one history attribute can now be saved without erroring.
 - :pr:`211`: Extrapolation mode is now correctly parses NaNs in the config file.
 
 Deprecations
@@ -31,7 +31,7 @@ Incompatible Changes
 
 Infrastructure
 ==============
-- :pr:`218`: Pytest xfail is nwo set to strict.
+- :pr:`218`: Pytest xfail is now set to strict.
 
 Documentation
 =============
