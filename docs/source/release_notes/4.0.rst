@@ -1,0 +1,38 @@
+.. include:: /common.txt
+
+************************
+ANTS 4.0 (November 2026)
+************************
+
+For a full list of changes see the :milestone:`4.0 release milestone <2>`.
+
+
+Features
+========
+- :pr:`175`: Added a new CLI interfacte for vertical-only regridding.
+- :pr:`221`: kdtree is now the default search method.
+- :pr:`173`: External metadata can now be reserved alonside ancillary filetypes that do
+  not support metadata.
+
+Bugs Fixed
+==========
+- :pr:`171`: Cubelists with only one history attribute can now be saved without erroring.
+- :pr:`211`: Extrapolation mode is now correctly parses NaNs in the config file.
+
+Deprecations
+============
+None
+
+Incompatible Changes
+====================
+- :pr:`214`: The environment and dependencies that ANTS uses has been upgraded, including numpy being
+  upgraded to 2.3.5. This has had a major impact on ANTS, which is not backwards
+  compatible.
+
+Infrastructure
+==============
+- :pr:`218`: Pytest xfail is nwo set to strict.
+
+Documentation
+=============
+- :pr:`179`: Additional ANTS tutorials have been added to the documentation.
