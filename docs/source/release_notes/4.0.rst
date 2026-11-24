@@ -9,7 +9,7 @@ For a full list of changes see the :milestone:`4.0 release milestone <2>`.
 
 Features
 ========
-- :pr:`175`: Added a new CLI interfacte for vertical-only regridding.
+- :pr:`175`: Added a new CLI interface for vertical-only regridding.
 - :pr:`221`: kdtree is now the default search method.
 - :pr:`173`: External metadata can now be reserved alongside ancillary filetypes that do
   not support metadata.
