@@ -23,8 +23,9 @@ Bugs Fixed
 
 Deprecations
 ============
-- :func:`ants.fileformats.namelist.load_um_vertical` has been deprecated in favour of
-  :func:`ants.fileformats.namelist.load_vertical` as part of the work in :pr:`189`.
+- :func:`ants.fileformats.namelist.load_um_vertical` and
+  `ants.fileformats.namelist.load_lfric_vertical` have been deprecated in favour of
+  :func:`ants.fileformats.namelist.load_vertical` as part of the work in :pr:
 
 Incompatible Changes
 ====================
