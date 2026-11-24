@@ -9,9 +9,9 @@ For a full list of changes see the :milestone:`4.0 release milestone <2>`.
 
 Features
 ========
-- :pr:`175`: Added a new CLI interfacte for vertical-only regridding.
+- :pr:`175`: Added a new CLI interface for vertical-only regridding.
 - :pr:`221`: kdtree is now the default search method.
-- :pr:`173`: External metadata can now be reserved alonside ancillary filetypes that do
+- :pr:`173`: External metadata can now be reserved alongside ancillary filetypes that do
   not support metadata.
 - :pr:`189`: Added the ability to specify whether the zero level should be removed when
   loading.
@@ -19,7 +19,7 @@ Features
 Bugs Fixed
 ==========
 - :pr:`172`: Cubelists with only one history attribute can now be saved without erroring.
-- :pr:`211`: Extrapolation mode is now correctly parses NaNs in the config file.
+- :pr:`211`: Extrapolation mode now correctly parses NaNs in the config file.
 
 Deprecations
 ============
