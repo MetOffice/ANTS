@@ -11,7 +11,7 @@ Features
 ========
 - :pr:`175`: Added a new CLI interfacte for vertical-only regridding.
 - :pr:`221`: kdtree is now the default search method.
-- :pr:`173`: External metadata can now be reserved alonside ancillary filetypes that do
+- :pr:`173`: External metadata can now be reserved alongside ancillary filetypes that do
   not support metadata.
 - :pr:`189`: Added the ability to specify whether the zero level should be removed when
   loading.
