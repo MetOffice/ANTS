@@ -4,4 +4,4 @@
 # See LICENSE.txt in the root of the repository for full licensing details.
 """Define the fallback version to be used when ANTS is not installed into an environment."""  # noqa: E501
 
-FALLBACK_VERSION = "4.0.0"
+FALLBACK_VERSION = "4.1.0dev"
