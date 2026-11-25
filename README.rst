@@ -1,6 +1,11 @@
 ANTS
 ----
 
+
+.. image:: https://zenodo.org/badge/1063305953.svg
+  :target: https://doi.org/10.5281/zenodo.24527749
+
+
 ANTS is a versatile Python library for developing ancillary
 applications.
 
