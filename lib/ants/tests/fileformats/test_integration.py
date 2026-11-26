@@ -25,10 +25,11 @@ class TestLoadCube(ants.tests.TestCase):
 
     def test_no_horizontal_coords(self):
         # Ensure that in the case where we have no horizontal coords, that
-        # we are still able to load a cube.
+        # we are still able to load a cube and no error is raised.
         cube = iris.cube.Cube([1])
         with mock.patch("iris.io.load_files", return_value=[cube]):
-            ants.io.load.load_cube("stub_filename")
+            result = ants.io.load.load_cube("stub_filename")
+        self.assertEqual(cube, result)
 
     @ants.tests.skip_gdal
     def test_raster_load(self):

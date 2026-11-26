@@ -45,10 +45,12 @@ class TestAll(ants.tests.TestCase):
         # Ensure that when strict keyword is False, that no exception is
         # raised.
         coord = self.latitude_coord(with_bounds=True)
+        coord_original = coord.copy()
         guess_bounds(coord, strict=False)
+        self.assertEqual(coord_original, coord)
 
     def test_strict_keyword_true_single_coord_points(self):
-        # Ensure that an exception is raised when strict if False and there is
+        # Ensure that an exception is raised when strict is False and there is
         # only one coordinate point.
         coord = self.latitude_coord(with_bounds=False)[0]
         msg = "Cannot guess bounds for a coordinate of length 1."
@@ -60,6 +62,7 @@ class TestAll(ants.tests.TestCase):
         # when the strict keyword is False.
         coord = self.latitude_coord(with_bounds=False)[0]
         guess_bounds(coord, strict=False)
+        self.assertIsNone(coord.bounds)
 
     def test_coord_metadata(self):
         # Ensure that coordinate remains unchanged including metadata
