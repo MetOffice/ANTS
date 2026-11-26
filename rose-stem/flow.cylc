@@ -1,11 +1,11 @@
 #!jinja2
-{% set ANTS_MODULE = "ants/developer-68-beta" %}
+{% set ANTS_MODULE = "ants/developer" %}
 {% set PYTHONPATH_PREPEND = "$CYLC_WORKFLOW_RUN_DIR/share/fcm_make_ants/build/lib" %}
 
 {% set fill_n_merge_source = ['land_cover', 'invert_mask'] %}
 {% set grid_source = ['grid_to_grid', 'grid_to_variable_resolution_grid', 'grid_to_n48e_namelist', 'grid_to_n48_namelist', '3d_to_3d', '3d_to_3d_with_extrapolation', 'invert_mask'] %}
 {% set target_lsm_grid_sources = ['grid_to_grid', 'invert_mask'] %}
-{% set vertical_regrid_source = ['ozone_zonal_mean', 'aerosol_3d'] %}
+{% set vertical_regrid_source = ['ozone_zonal_mean', 'ozone_zonal_mean_level_zero', 'aerosol_3d', 'aerosol_3d_level_zero', 'aerosol_3d_nc_target'] %}
 
 
 # This links a name specified on the command in rose-stem with a
@@ -15,6 +15,7 @@
     "install_graph" : "install_cold",
     "ancil_2anc_graph" : "install_cold => ancil_2anc<split> => rose_ana_2anc:fail? => plot_comparisons_2anc",
     "fill_n_merge_land_cover_graph" : "install_cold => ancil_create_ite_shapefile => ancil_fill_n_merge_land_cover<fill> & ancil_fill_n_merge_land_cover_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
+    "load_metadata_regrid_graph" : "install_cold => ancil_general_regrid_metadata => rose_ana_general_regrid",
     "fill_n_merge_invert_mask_graph" : "install_cold => ancil_fill_n_merge_invert_mask<fill> & ancil_fill_n_merge_invert_mask_latitude_weighted_kdtree => rose_ana_fill_n_merge:fail? => plot_comparisons_fill_n_merge",
     "general_regrid_grid_to_grid_graph" : "install_cold => ancil_general_regrid_grid_to_grid<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_grid_to_grid_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
@@ -28,7 +29,10 @@
     "general_regrid_time_constrained": "install_cold => ancil_general_regrid_with_time_constraint<fill,split> => rose_ana_general_regrid<fill>:fail? => plot_comparisons_general_regrid<fill>
         install_cold => ancil_general_regrid_with_time_constraint_latitude_weighted_kdtree<split> => rose_ana_general_regrid_latitude_weighted_kdtree:fail? => plot_comparisons_general_regrid_latitude_weighted_kdtree",
     "vertical_regrid_zonal_mean": "install_cold => ancil_vertical_regrid_ozone_zonal_mean => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
+    "vertical_regrid_zm_level_zero": "install_cold => ancil_vertical_regrid_ozone_zonal_mean_level_zero => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
     "vertical_regrid_3d": "install_cold => ancil_vertical_regrid_aerosol_3d => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
+    "vertical_regrid_3d_level_zero": "install_cold => ancil_vertical_regrid_aerosol_3d_level_zero => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
+    "vertical_regrid_3d_nc_target": "install_cold => ancil_vertical_regrid_aerosol_3d_nc_target => rose_ana_vertical_regrid:fail? => plot_comparisons_vertical_regrid",
     "build_documentation_graph": "install_cold => build_docs => linkcheck",
     "unittests_graph": "install_cold => unittests",
     "black_graph": "install_cold => black",
@@ -58,7 +62,7 @@
     "core" : ["ancil_2anc_graph", "fill_n_merge", "general_regrid"],
     "fill_n_merge": ["fill_n_merge_land_cover_graph", "fill_n_merge_invert_mask_graph"],
     "general_regrid": ["general_regrid_grid_to_grid_graph", "general_regrid_grid_to_variable_graph", "general_regrid_grid_to_n48e_namelist_graph", "general_regrid_grid_to_n48_namelist_graph", "general_regrid_3d_to_3d_graph", "general_regrid_3d_to_3d_with_extrapolation", "general_regrid_time_constrained", "general_regrid_invert_mask_graph"],
-    "vertical_regrid": ["vertical_regrid_zonal_mean", "vertical_regrid_3d"],
+    "vertical_regrid": ["vertical_regrid_zonal_mean", "vertical_regrid_zm_level_zero", "vertical_regrid_3d", "vertical_regrid_3d_level_zero", "vertical_regrid_3d_nc_target"],
     "documentation": ["build_documentation_graph"],
     "unittests": ["unittests_graph", "black_graph", "flake8_graph", "isort_graph"],
 }
@@ -257,6 +261,17 @@ fi
     [[ancil_general_regrid_with_time_constraint_latitude_weighted_kdtree<split>]]
         inherit=ANCIL_GENERAL_REGRID_WITH_TIME_CONSTRAINT
         script = rose task-run --app-key=ancil_general_regrid_with_time_constraint -O latitude-weighted-kdtree
+
+    [[ancil_general_regrid_metadata]]
+    inherit = ANTS_CORE, ANCIL_GENERAL_REGRID, LARGE
+    script = rose task-run --app-key=ancil_general_regrid -O metadata
+
+    [[rose_ana_general_regrid_metadata]]
+        inherit = ROSE_ANA
+        [[[environment]]]
+            ROSE_TASK_APP = rose_ana
+            ROSE_APP_OPT_CONF_KEYS = general_regrid_metadata
+
 
     [[rose_ana_general_regrid]]
         inherit = ROSE_ANA

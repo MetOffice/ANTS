@@ -39,6 +39,14 @@ class AntsArgParser(argparse.ArgumentParser):
             sources <SOURCE1> <SOURCE2> ... <SOURCEN>     Source data path(s).
             --output <OUTPUT>, -o <OUTPUT>                Output filepath
             --ants-config <ANTS_CONFIG>                   Configuration path.
+            --ignore-metadata-read                        Stops the application from
+                                                          searching for metadata files
+                                                          with the same name as the
+                                                          source and loading them
+                                                          alongside the source.
+            --ignore-metadata-write                       Stops the application from
+                                                          writing metadata files
+                                                          alongside the outputs.
 
         Additionally, there are standardised optional arguments and these are
         activated by passing the relevant keyword argument.  See 'Parameters'
@@ -177,6 +185,19 @@ class AntsArgParser(argparse.ArgumentParser):
             "--netcdf-only",
             action="store_true",
             help="Only write out a netCDF file.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-read",
+            action="store_true",
+            help="Stops the application from searching for metadata files with "
+            "the same name as the source and loading them alongside the source.",
+            required=False,
+        )
+        self.add_argument(
+            "--ignore-metadata-write",
+            action="store_true",
+            help="Stops the application from writing metadata files alongside outputs.",
             required=False,
         )
         if time_constraints:
